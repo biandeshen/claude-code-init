@@ -35,21 +35,45 @@ SECRET_PATTERNS = [
     r"[a-zA-Z0-9]{40,}",                # 40位+ 字符串
 ]
 
-# 白名单（允许的值）- 使用子串匹配
-WHITELIST = [
-    "${",           # 环境变量引用
-    "your_",       # your_secret_key
-    "your_secret",
-    "xxx",         # xxx_api_key
-    "placeholder",  # 占位符
-    "example",      # example_key
-    "changeme",    # changeme_password
-    "test_",        # test_token
-    "dummy",        # dummy_key
-    "localhost",    # 本地地址
-    "127.0.0.1",   # 本地地址
-    "::1",          # IPv6 本地地址
+# 白名单（允许的值）
+# 这些是明确的占位符示例值，不是真实密钥
+
+# 前缀匹配的白名单项（允许以这些前缀开头的值）
+WHITELIST_PREFIX = ["test_"]
+
+# 精确匹配的白名单项
+WHITELIST_EXACT = [
+    "${",              # 环境变量引用
+    "your_secret",     # 完整占位符
+    "your_api_key",
+    "your_password",
+    "your_token",
+    "your_key",
+    "xxx",             # xxx_api_key
+    "placeholder",     # 占位符
+    "example",         # example_key
+    "changeme",        # changeme_password
+    "dummy",           # dummy_key
+    "localhost",        # 本地地址
+    "127.0.0.1",       # 本地地址
+    "::1",             # IPv6 本地地址
 ]
+
+
+def is_whitelisted(value: str) -> bool:
+    """检查值是否在白名单中"""
+    value_lower = value.lower()
+
+    # 精确匹配
+    if value_lower in [w.lower() for w in WHITELIST_EXACT]:
+        return True
+
+    # 前缀匹配
+    for prefix in WHITELIST_PREFIX:
+        if value_lower.startswith(prefix.lower()):
+            return True
+
+    return False
 
 
 def check_config_file(file_path: str) -> list:
@@ -147,9 +171,8 @@ def check_python_files(file_paths: list) -> list:
                     if len(parts) == 2:
                         value = parts[1].strip().strip('"').strip("'")
 
-                        # 跳过白名单（子串匹配，不区分大小写）
-                        value_lower = value.lower()
-                        if any(wl.lower() in value_lower for wl in WHITELIST):
+                        # 跳过白名单
+                        if is_whitelisted(value):
                             continue
 
                         # 跳过空值和 os.environ 调用

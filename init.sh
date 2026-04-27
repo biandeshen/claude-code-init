@@ -1,12 +1,15 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.0.0 | 2026-04-28
+# 版本: v1.4.1 | 2026-04-28
 
 set -e
 
 # 启用 nullglob，避免空通配符展开问题
 shopt -s nullglob
+
+# 注意：set -e 会在命令失败时退出脚本
+# 对于可选步骤（OpenSpec、cc-discipline），使用 || true 来忽略失败
 
 PROJECT_PATH="${1:-.}"
 
@@ -27,7 +30,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.0.0)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.4.1)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 
@@ -62,12 +65,15 @@ echo_info "请在 Claude Code 中执行以下命令:"
 echo -e "  ${YELLOW}/plugin marketplace add obra/superpowers-marketplace${NC}"
 echo -e "  ${YELLOW}/plugin install superpowers@superpowers-marketplace${NC}"
 
-# 5. 安装 OpenSpec (SDD)
+# 5. 安装 OpenSpec (SDD) - 自动执行
 echo_step "安装 OpenSpec (SDD 工作流)"
-echo_info "请在终端执行:"
-echo -e "  ${YELLOW}npx kld-sdd${NC}"
+if npx kld-sdd; then
+    echo_success "OpenSpec 已初始化"
+else
+    echo_warn "OpenSpec 自动安装失败，请手动执行: npx kld-sdd"
+fi
 
-# 6. 安装 cc-discipline (物理防火墙)
+# 6. 安装 cc-discipline (物理防火墙) - 自动执行
 echo_step "安装 cc-discipline (物理防火墙 Hooks)"
 CC_DISCIPLINE_PATH="$HOME/.cc-discipline"
 CC_DISCIPLINE_BRANCH="main"  # 锁定分支以确保可重复性
@@ -78,9 +84,12 @@ if [ ! -d "$CC_DISCIPLINE_PATH" ]; then
 else
     echo_info "cc-discipline 已存在，如需更新请手动执行: git -C $CC_DISCIPLINE_PATH pull"
 fi
-echo_warn "即将执行第三方脚本: $HOME/.cc-discipline/init.sh"
-echo_info "请在项目目录执行:"
-echo -e "  ${YELLOW}bash $CC_DISCIPLINE_PATH/init.sh${NC}"
+echo_info "正在执行 cc-discipline 初始化..."
+if bash "$CC_DISCIPLINE_PATH/init.sh"; then
+    echo_success "cc-discipline 已安装"
+else
+    echo_warn "cc-discipline 初始化失败，请手动执行: bash $CC_DISCIPLINE_PATH/init.sh"
+fi
 
 # 7. 复制 Python 校验脚本
 echo_step "复制校验脚本到 scripts/"

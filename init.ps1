@@ -1,6 +1,6 @@
 # claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.0.0 | 2026-04-28
+# 版本: v1.4.1 | 2026-04-28
 
 param(
     [Parameter(Mandatory=$true)]
@@ -24,7 +24,7 @@ function Write-Info { param($msg) Write-Host "[信息] $msg" -ForegroundColor Gr
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  Claude Code 开发环境一键初始化 (v1.0.0)" -ForegroundColor Cyan
+Write-Host "  Claude Code 开发环境一键初始化 (v1.4.1)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -75,16 +75,20 @@ if (-not $SkipSuperpowers) {
     Write-Info "跳过 Superpowers 安装"
 }
 
-# 5. 安装 OpenSpec (SDD)
+# 5. 安装 OpenSpec (SDD) - 自动执行
 if (-not $SkipOpenSpec) {
     Write-Step "安装 OpenSpec (SDD 工作流)"
-    Write-Info "请在终端执行:"
-    Write-Host "  npx kld-sdd" -ForegroundColor Yellow
+    try {
+        npx kld-sdd
+        Write-Success "OpenSpec 已初始化"
+    } catch {
+        Write-Warn "OpenSpec 自动安装失败，请手动执行: npx kld-sdd"
+    }
 } else {
     Write-Info "跳过 OpenSpec 安装"
 }
 
-# 6. 安装 cc-discipline (物理防火墙)
+# 6. 安装 cc-discipline (物理防火墙) - 自动执行
 if (-not $SkipCcDiscipline) {
     Write-Step "安装 cc-discipline (物理防火墙 Hooks)"
     $CcDisciplinePath = "$HOME\.cc-discipline"
@@ -97,9 +101,13 @@ if (-not $SkipCcDiscipline) {
     } else {
         Write-Info "cc-discipline 已存在，如需更新请手动执行: git -C $CcDisciplinePath pull"
     }
-    Write-Warn "即将执行第三方脚本: $HOME/.cc-discipline/init.sh"
-    Write-Info "请在项目目录执行:"
-    Write-Host "  bash `$HOME/.cc-discipline/init.sh" -ForegroundColor Yellow
+    Write-Info "正在执行 cc-discipline 初始化..."
+    try {
+        bash "$CcDisciplinePath/init.sh"
+        Write-Success "cc-discipline 已安装"
+    } catch {
+        Write-Warn "cc-discipline 初始化失败，请手动执行: bash $CcDisciplinePath/init.sh"
+    }
 } else {
     Write-Info "跳过 cc-discipline 安装"
 }
@@ -127,22 +135,26 @@ if (Test-Path $PrecommitConfig) {
     Write-Info "Pre-commit 配置不存在，跳过"
 }
 
-# 9. 安装 Pre-commit hooks
+# 9. 安装 Pre-commit hooks - 自动执行
 Write-Step "安装 Pre-commit Hooks"
 
 # 检查 Python 是否可用
 $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
 if ($pythonCmd) {
     # 检查 pre-commit 是否已安装
-    $precommitCheck = python -c "import pre_commit" 2>$null
-    if (-not $precommitCheck) {
-        Write-Info "正在下载并安装 pre-commit（可能需要几分钟，请耐心等待）..."
+    try {
+        $null = python -c "import pre_commit" 2>$null
+    } catch {
+        Write-Info "正在安装 pre-commit..."
         python -m pip install --quiet pre-commit
         Write-Success "pre-commit 安装完成"
     }
-    Write-Info "执行: pre-commit install"
-    pre-commit install
-    Write-Success "Pre-commit Hooks 已安装"
+    try {
+        pre-commit install
+        Write-Success "Pre-commit Hooks 已安装"
+    } catch {
+        Write-Warn "pre-commit install 失败，请手动执行: pre-commit install"
+    }
 } else {
     Write-Warn "未找到 Python，无法自动安装 pre-commit"
     Write-Host "  手动安装: pip install pre-commit" -ForegroundColor Yellow

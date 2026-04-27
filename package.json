@@ -1,6 +1,6 @@
 {
   "name": "claude-code-init",
-  "version": "1.3.0",
+  "version": "1.4.1",
   "description": "Claude Code 项目脚手架：一键初始化开发环境",
   "bin": {
     "claude-code-init": "./index.js"

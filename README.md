@@ -80,22 +80,3 @@ claude
 ## License
 
 MIT
-
-单文件编辑超过5次强制中断。
-
-## 常用命令
-
-| 命令 | 作用 |
-|------|------|
-| `/commit` | 规范提交 |
-| `/review` | 代码审查 |
-| `/architect` | 架构评审 |
-| `/validate` | 运行校验脚本 |
-
-## 完整文档
-
-👉 [查看完整使用指南](GUIDE.md)
-
-## License
-
-MIT

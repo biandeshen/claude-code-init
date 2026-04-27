@@ -42,6 +42,21 @@ function checkDependency(cmd, name) {
     }
 }
 
+// 检测 PowerShell（pwsh 优先，降级到 powershell）
+function detectPowerShell() {
+    try {
+        execSync('pwsh -Command "exit 0"', { stdio: 'pipe' });
+        return 'pwsh';
+    } catch {
+        try {
+            execSync('powershell -Command "exit 0"', { stdio: 'pipe' });
+            return 'powershell';
+        } catch {
+            return null;
+        }
+    }
+}
+
 console.log('='.repeat(50));
 console.log('  Claude Code 项目脚手架初始化');
 console.log('='.repeat(50));
@@ -56,7 +71,7 @@ const deps = [
     ['git', 'Git'],
     ['python', 'Python'],
 ];
-if (isWindows) deps.push(['pwsh', 'PowerShell']);
+if (isWindows) deps.push([detectPowerShell() || 'pwsh', 'PowerShell']);
 else deps.push(['bash', 'Bash']);
 
 const missingDeps = [];
@@ -78,10 +93,15 @@ console.log('');
 
 try {
     if (isWindows) {
-        // Windows: 使用 PowerShell
-        console.log('[执行] init.ps1');
+        // Windows: 使用 PowerShell（优先 pwsh，降级到 powershell）
+        const psCmd = detectPowerShell();
+        if (!psCmd) {
+            console.error('[错误] 未找到 PowerShell，请安装 PowerShell 7 或 Windows PowerShell。');
+            process.exit(1);
+        }
+        console.log(`[执行] init.ps1 (${psCmd})`);
         const initScript = path.join(scriptDir, 'init.ps1');
-        execSync(`pwsh -File "${initScript}" -ProjectPath "${path.resolve(projectPath)}"`, {
+        execSync(`${psCmd} -File "${initScript}" -ProjectPath "${path.resolve(projectPath)}"`, {
             stdio: 'inherit',
             cwd: scriptDir
         });
