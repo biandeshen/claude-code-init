@@ -17,8 +17,16 @@
 
 ## 第三方依赖
 
-本项目引入的第三方工具：
-- [ECC (Everything Claude Code)](https://github.com/affaan-m/everything-claude-code)
-- [cc-discipline](https://github.com/TechHU-GS/cc-discipline)
+本项目引入的第三方工具及其安全策略：
 
-如使用这些工具，请同时参考其安全策略。
+| 工具 | 类型 | 仓库/链接 | 安全策略 |
+|------|------|-----------|----------|
+| **ECC** | Claude Code 插件 | [github.com/affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code) | 参考 ECC 项目安全政策 |
+| **Superpowers** | Claude Code 插件 | [github.com/obra/superpowers-marketplace](https://github.com/obra/superpowers-marketplace) | 参考 Superpowers 项目安全政策 |
+| **OpenSpec** | npm 包 | [npmjs.com/package/kld-sdd](https://www.npmjs.com/package/kld-sdd) | 使用前阅读其安全说明 |
+| **cc-discipline** | Git Hooks | [github.com/TechHU-GS/cc-discipline](https://github.com/TechHU-GS/cc-discipline) | 参考 cc-discipline 项目安全政策 |
+
+> **警告**：本项目会执行 `git clone` 和 `npm install` 等命令来安装上述工具。请确保：
+> - 只从官方仓库/官方 npm 安装
+> - 检查安装脚本的内容
+> - 了解每个工具的权限范围
