@@ -204,6 +204,18 @@ if (Test-Path $CommandsDir) {
     Write-Info "命令目录不存在，跳过"
 }
 
+# 11.1 复制 Skills
+Write-Step "复制 Skills"
+$SkillsDir = Join-Path $ScriptDir ".claude\skills"
+$TargetSkillsDir = "$ProjectPath\.claude\skills"
+if (Test-Path $SkillsDir) {
+    New-Item -ItemType Directory -Force -Path $TargetSkillsDir | Out-Null
+    Copy-Item -Path "$SkillsDir\*" -Destination $TargetSkillsDir -Force -Recurse
+    Write-Success "已复制 Skills 到 .claude/skills/"
+} else {
+    Write-Info "Skills 目录不存在，跳过"
+}
+
 # 12. 创建本地偏好文件 (gitignored)
 Write-Step "创建 CLAUDE.local.md (本地偏好)"
 $localMd = @"

@@ -166,6 +166,18 @@ else
     echo_info "命令目录不存在，跳过"
 fi
 
+# 11.1 复制 Skills
+echo_step "复制 Skills"
+SKILLS_DIR="$SCRIPT_DIR/.claude/skills"
+TARGET_SKILLS_DIR="$PROJECT_PATH/.claude/skills"
+if [ -d "$SKILLS_DIR" ]; then
+    mkdir -p "$TARGET_SKILLS_DIR"
+    cp -r "$SKILLS_DIR/"* "$TARGET_SKILLS_DIR/"
+    echo_success "已复制 Skills 到 .claude/skills/"
+else
+    echo_info "Skills 目录不存在，跳过"
+fi
+
 # 12. 创建本地偏好文件 (gitignored)
 echo_step "创建 CLAUDE.local.md (本地偏好)"
 cat > "$PROJECT_PATH/CLAUDE.local.md" << 'EOF'
