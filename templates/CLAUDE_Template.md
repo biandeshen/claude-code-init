@@ -5,37 +5,39 @@
 
 ---
 
-## 双索引架构
+## 索引架构
 
-> **工具规范与项目规范分离**
+> **工具规范 → ECC 内置 | 项目规范 → docs/ | 元认知 → SOUL.md**
 
-| 索引 | 说明 | 位置 |
-|------|------|------|
-| **Claude Code 工具规范** | 跨项目通用规范 | [./_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) |
-| **项目文档** | 项目专用文档 | [docs/DOCS_INDEX.md](docs/DOCS_INDEX.md) |
+| 规范类型 | 来源 | 说明 |
+|----------|------|------|
+| **工具规范** | ECC 内置 | 156+ Skills / 38 Agents，跨项目通用 |
+| **元认知规则** | [SOUL.md](SOUL.md) | 复杂度评估、决策树、熔断机制 |
+| **项目规范** | `docs/` 目录 | 项目专用文档 |
 
 ---
 
-## Claude Code 工具规范
+## 工具规范（ECC 内置）
 
-> ⚠️ 这些是通用规范，存放在 `_archived/`，由 Git 统一维护。
+ECC 已提供丰富的内置 Skills 和 Agents，无需额外配置：
 
-| 规范 | 说明 | 位置 |
-|------|------|------|
-| 行为规则 | 假设验证、错误熔断、变更记录、主动升级 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Agent_Behavior_Rules.md |
-| Plan 模板 | 任务计划格式、执行日志 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → PLAN_Template.md |
-| 前端规范 | 考古学家+外科医生模式 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Frontend_Modification_Rules.md |
-| 提交规范 | feat/fix/docs 等 type | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Commit_Convention.md |
-| 代码规范 | Python 命名、导入、函数设计 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Coding_Convention.md |
-| 语言约定 | 中文对话/英文代码 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Language_Convention.md |
+| 类别 | 示例 Skill | 说明 |
+|------|-----------|------|
+| 代码审查 | `requesting-code-review` | 自动审查代码变更 |
+| 架构分析 | `requesting-architect` | 架构评审和建议 |
+| 文档生成 | `document-generation` | 自动生成文档 |
+| 测试 | `tdd-explain` | TDD 工作流 |
+| 重构 | `refactoring-explain` | 安全重构指导 |
 
-完整索引：[./_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md)
+**使用方式**：在 Claude Code 中直接描述需求，AI 会调用合适的 Skill。
+
+**规范约束**：通过 [SOUL.md](SOUL.md) 的复杂度评估规则自动分流。
 
 ---
 
 ## 项目特有规范
 
-> ⚠️ 在此添加项目特有的规范（如果有）
+> 在此添加项目特有的规范
 
 ### 项目结构
 
@@ -55,16 +57,16 @@
 
 | 内容 | 位置 |
 |------|------|
-| **Claude Code 工具规范索引** | [./_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) |
-| **项目文档索引** | [docs/DOCS_INDEX.md](docs/DOCS_INDEX.md) |
 | **元认知规则** | [SOUL.md](SOUL.md) |
+| **复杂度评估** | [SOUL.md → 复杂度自动评估规则](SOUL.md) |
+| **项目文档** | `docs/` 目录 |
 
 ---
 
 ## 版本历史
 
-- `v1.0.0` (2026-04-28)：初始化项目规范，基于双索引架构模板
+- `v1.0.0` (2026-04-28)：初始化项目规范，基于 ECC + 双索引架构
 
 ---
 
-*核心原则：工具是工具，项目是项目。Claude Code 工具规范在 `_archived/`，项目规范在 `docs/`*
+*核心原则：工具规范由 ECC 提供，项目规范放在 `docs/`*

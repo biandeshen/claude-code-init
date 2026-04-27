@@ -89,11 +89,17 @@ if (-not $SkipCcDiscipline) {
     Write-Step "安装 cc-discipline (物理防火墙 Hooks)"
     $CcDisciplinePath = "$HOME\.cc-discipline"
     if (-not (Test-Path $CcDisciplinePath)) {
+        Write-Warn "即将从第三方仓库下载代码: https://github.com/TechHU-GS/cc-discipline"
         Write-Info "克隆 cc-discipline 仓库..."
         git clone https://github.com/TechHU-GS/cc-discipline.git $CcDisciplinePath
+        Write-Warn "即将执行第三方脚本: $HOME/.cc-discipline/init.sh"
+        Write-Info "请在项目目录执行:"
+        Write-Host "  bash `$HOME/.cc-discipline/init.sh" -ForegroundColor Yellow
+    } else {
+        Write-Warn "即将执行第三方脚本: $HOME/.cc-discipline/init.sh"
+        Write-Info "请在项目目录执行:"
+        Write-Host "  bash `$HOME/.cc-discipline/init.sh" -ForegroundColor Yellow
     }
-    Write-Info "请在项目目录执行:"
-    Write-Host "  bash `$HOME/.cc-discipline/init.sh" -ForegroundColor Yellow
 } else {
     Write-Info "跳过 cc-discipline 安装"
 }
@@ -130,16 +136,17 @@ if ($pythonCmd) {
     # 检查 pre-commit 是否已安装
     $precommitCheck = python -c "import pre_commit" 2>$null
     if (-not $precommitCheck) {
-        Write-Info "安装 pre-commit..."
-        python -m pip install pre-commit
+        Write-Info "正在下载并安装 pre-commit（可能需要几分钟，请耐心等待）..."
+        python -m pip install --quiet pre-commit
+        Write-Success "pre-commit 安装完成"
     }
     Write-Info "执行: pre-commit install"
     pre-commit install
     Write-Success "Pre-commit Hooks 已安装"
 } else {
-    Write-Warn "未找到 Python，无法安装 pre-commit"
-    Write-Host "  pip install pre-commit" -ForegroundColor Yellow
-    Write-Host "  pre-commit install" -ForegroundColor Yellow
+    Write-Warn "未找到 Python，无法自动安装 pre-commit"
+    Write-Host "  手动安装: pip install pre-commit" -ForegroundColor Yellow
+    Write-Host "  手动安装 hooks: pre-commit install" -ForegroundColor Yellow
 }
 
 # 10. 复制覆盖层模板
