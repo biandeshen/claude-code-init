@@ -101,7 +101,7 @@ def check_config_file(file_path: str) -> list:
                     value = value.strip().strip('"').strip("'")
 
                     # 跳过白名单
-                    if any(wl in value for wl in WHITELIST):
+                    if is_whitelisted(value):
                         continue
 
                     # 跳过空值

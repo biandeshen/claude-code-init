@@ -91,6 +91,8 @@ AI 自动加载全部配置，**任务类型由 AI 自动评估**。
 
 > ⚠️ **例外触发**：只读操作若涉及搜索敏感字段（password、secret、token、key、credential）、
 > 扫描 `.env` 文件、或以 `-S`/`-G` 搜索二进制模式，**立即升级为 3 分**（走 TDD 流程），并输出安全审计报告。
+>
+> **升级后的执行流程**：检测到敏感搜索 → 立即停止 → 输出安全审计报告（含敏感字段清单、文件路径、风险等级、修复建议）→ 等待用户确认 → 才可继续。
 
 ### 风险因子评分
 
@@ -143,7 +145,7 @@ AI 自动加载全部配置，**任务类型由 AI 自动评估**。
 | `/commit` | 规范提交（自动分析 + Conventional Commits + Pre-commit） |
 | `/review` | 代码审查（安全性/正确性/性能/可维护性/测试覆盖） |
 | `/architect 方案` | 架构评审 |
-| `/validate` | 运行项目 scripts/ 下的自定义校验脚本 |
+| `/validate` | 运行项目 `.claude/scripts/` 下的自定义校验脚本 |
 | `/opsx:propose 名称` | 复杂功能 SDD 流程（AI 可能自动触发） |
 
 ---
@@ -173,7 +175,7 @@ claude-code-init/templates/
 
 ## 校验脚本
 
-初始化后会复制 `scripts/` 目录到项目：
+初始化后会复制 `.claude/scripts/` 目录到项目：
 
 | 脚本 | 说明 | Pre-commit |
 |------|------|:----------:|
@@ -186,7 +188,7 @@ claude-code-init/templates/
 ### 手动运行
 
 ```bash
-python scripts/check_secrets.py
+python .claude/scripts/check_secrets.py
 pre-commit run --all-files
 ```
 
@@ -256,7 +258,7 @@ claude-code-init/
 │   ├── review.md
 │   ├── commit.md
 │   └── architect.md
-├── scripts/               # Python 校验脚本
+├── .claude/scripts/         # Python 校验脚本（Claude Code 专用目录）
 │   ├── check_secrets.py
 │   ├── check_function_length.py
 │   ├── check_dependencies.py

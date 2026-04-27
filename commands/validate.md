@@ -8,7 +8,7 @@
 
 ## 执行步骤
 
-1. **检查 scripts/ 目录是否存在**
+1. **检查 .claude/scripts/ 目录是否存在**
 2. **按顺序执行校验脚本**
 3. **汇总结果并输出报告**
 
@@ -16,11 +16,11 @@
 
 | 脚本 | 检查内容 | Pre-commit |
 |------|----------|:----------:|
-| `scripts/check_project_structure.py` | 项目结构完整性（CLAUDE.md 存在、tests/ 目录、.gitignore 条目） | - |
-| `scripts/check_secrets.py` | 密钥安全（config.yaml 硬编码密钥、.env 文件是否被提交） | ✅ |
-| `scripts/check_function_length.py` | 函数长度（≤50 行） | ✅ |
-| `scripts/check_dependencies.py` | 模块依赖方向 | ✅ |
-| `scripts/check_import_order.py` | import 语句顺序 | ✅ |
+| `.claude/scripts/check_project_structure.py` | 项目结构完整性（CLAUDE.md 存在、tests/ 目录、.gitignore 条目） | - |
+| `.claude/scripts/check_secrets.py` | 密钥安全（config.yaml 硬编码密钥、.env 文件是否被提交） | ✅ |
+| `.claude/scripts/check_function_length.py` | 函数长度（≤50 行） | ✅ |
+| `.claude/scripts/check_dependencies.py` | 模块依赖方向 | ✅ |
+| `.claude/scripts/check_import_order.py` | import 语句顺序 | ✅ |
 
 ## 输出格式
 
@@ -52,5 +52,5 @@
 ## 注意事项
 
 - 任何一项失败都应输出具体的修复建议
-- 可以使用 `python scripts/check_*.py --fix` 尝试自动修复（如支持）
+- 可以使用 `python .claude/scripts/check_*.py --fix` 尝试自动修复（如支持）
 - 复杂项目建议安装 pre-commit hooks：`pre-commit install`

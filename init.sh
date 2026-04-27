@@ -92,14 +92,14 @@ else
 fi
 
 # 7. 复制 Python 校验脚本
-echo_step "复制校验脚本到 scripts/"
+echo_step "复制校验脚本到 .claude/scripts/"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
-TARGET_SCRIPTS_DIR="$PROJECT_PATH/scripts"
+TARGET_SCRIPTS_DIR="$PROJECT_PATH/.claude/scripts"
 # 检查源目录是否存在且非空
 if [ -d "$SCRIPTS_DIR" ] && [ "$(ls -A "$SCRIPTS_DIR" 2>/dev/null)" ]; then
     mkdir -p "$TARGET_SCRIPTS_DIR"
     cp -r "$SCRIPTS_DIR/"* "$TARGET_SCRIPTS_DIR/"
-    echo_success "已复制校验脚本到 scripts/"
+    echo_success "已复制校验脚本到 .claude/scripts/"
 else
     echo_info "scripts 目录为空或不存在，跳过"
 fi

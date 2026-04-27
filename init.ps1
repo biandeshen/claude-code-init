@@ -113,13 +113,13 @@ if (-not $SkipCcDiscipline) {
 }
 
 # 7. 复制 Python 校验脚本
-Write-Step "复制校验脚本到 scripts/"
+Write-Step "复制校验脚本到 .claude/scripts/"
 $ScriptsDir = Join-Path $ScriptDir "scripts"
-$TargetScriptsDir = "$ProjectPath\scripts"
+$TargetScriptsDir = "$ProjectPath\.claude\scripts"
 if (Test-Path $ScriptsDir) {
     New-Item -ItemType Directory -Force -Path $TargetScriptsDir | Out-Null
     Copy-Item -Path "$ScriptsDir\*" -Destination $TargetScriptsDir -Force -Recurse
-    Write-Success "已复制校验脚本到 scripts/"
+    Write-Success "已复制校验脚本到 .claude/scripts/"
 } else {
     Write-Info "scripts 目录不存在，跳过"
 }
