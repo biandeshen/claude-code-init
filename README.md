@@ -1,5 +1,7 @@
 # Claude Code 通用开发环境
 
+> ⚠️ **重要提醒**：此脚本仅提供模板文件。**核心插件 (ECC/Superpowers) 必须在 Claude Code 中手动交互安装**，详见下方步骤 3。
+
 一键初始化 Claude Code 开发环境，AI 自动评估任务复杂度并选择执行模式。
 
 ## 快速开始
@@ -11,7 +13,7 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 # 2. 添加到 PATH（PowerShell）
 $env:Path += ";$HOME\tools\claude-code-init"
 
-# 3. 安装插件（在 Claude Code 中）
+# 3. ⚠️ 安装插件（必须，在 Claude Code 中手动操作）
 /plugin marketplace add affaan-m/everything-claude-code
 /plugin install everything-claude-code@everything-claude-code
 /plugin marketplace add obra/superpowers-marketplace

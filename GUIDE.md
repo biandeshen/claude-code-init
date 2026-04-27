@@ -235,23 +235,6 @@ pre-commit run --all-files
 
 ---
 
-## 跳过某些工具
-
-> 当前版本的 `-Skip` 参数仅控制安装提示的显示，不执行真正的自动化安装。ECC/Superpowers 插件需要在 Claude Code 中手动安装。
-
-```powershell
-.\init.ps1 -ProjectPath "你的项目路径" -SkipECC -SkipSuperpowers
-```
-
-| 选项 | 说明 |
-|------|------|
-| `-SkipECC` | 跳过 ECC 安装提示 |
-| `-SkipSuperpowers` | 跳过 Superpowers 安装提示 |
-| `-SkipOpenSpec` | 跳过 OpenSpec 安装提示 |
-| `-SkipCcDiscipline` | 跳过 cc-discipline 安装提示 |
-
----
-
 ## 仓库结构
 
 ```
