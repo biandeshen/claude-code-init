@@ -78,12 +78,13 @@ echo -e "  ${YELLOW}bash $CC_DISCIPLINE_PATH/init.sh${NC}"
 echo_step "复制校验脚本到 scripts/"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 TARGET_SCRIPTS_DIR="$PROJECT_PATH/scripts"
-if [ -d "$SCRIPTS_DIR" ]; then
+# 检查源目录是否存在且非空
+if [ -d "$SCRIPTS_DIR" ] && [ "$(ls -A "$SCRIPTS_DIR" 2>/dev/null)" ]; then
     mkdir -p "$TARGET_SCRIPTS_DIR"
     cp -r "$SCRIPTS_DIR/"* "$TARGET_SCRIPTS_DIR/"
     echo_success "已复制校验脚本到 scripts/"
 else
-    echo_info "scripts 目录不存在，跳过"
+    echo_info "scripts 目录为空或不存在，跳过"
 fi
 
 # 8. 复制 Pre-commit 配置
@@ -188,6 +189,13 @@ echo ""
 echo -e "位置: ${PROJECT_PATH}"
 echo ""
 echo -e "${CYAN}下一步:${NC}"
+echo "  1. 编辑 CLAUDE.md 写入项目特定的架构规则"
+echo "  2. 编辑 SOUL.md 定义项目的 AI 人格"
+echo "  3. 启动 Claude Code，开始开发"
+echo ""
+echo -e "如需更新规范，运行:"
+echo -e "  git -C \"$SCRIPT_DIR\" pull"
+echo ""
 echo "  1. 编辑 CLAUDE.md 写入项目特定的架构规则"
 echo "  2. 编辑 SOUL.md 定义项目的 AI 人格"
 echo "  3. 启动 Claude Code，开始开发"

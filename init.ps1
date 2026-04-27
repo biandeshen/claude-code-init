@@ -37,6 +37,14 @@ if (-not (Test-Path $ProjectPath)) {
 Set-Location $ProjectPath
 $ProjectPath = (Get-Location).Path
 
+# 1.1. 检查 git 命令是否存在
+$gitCmd = Get-Command git -ErrorAction SilentlyContinue
+if (-not $gitCmd) {
+    Write-Warn "未找到 git 命令，请先安装 Git"
+    Write-Host "  下载地址: https://git-scm.com/download/win" -ForegroundColor Yellow
+    exit 1
+}
+
 # 2. 初始化 Git
 if (-not (Test-Path ".git")) {
     Write-Step "初始化 Git 仓库"
@@ -115,13 +123,21 @@ if (Test-Path $PrecommitConfig) {
 
 # 9. 安装 Pre-commit hooks
 Write-Step "安装 Pre-commit Hooks"
-$precommitInstallCmd = "pre-commit install"
-Write-Info "执行: $precommitInstallCmd"
-try {
-    Invoke-Expression $precommitInstallCmd
+
+# 检查 Python 是否可用
+$pythonCmd = Get-Command python -ErrorAction SilentlyContinue
+if ($pythonCmd) {
+    # 检查 pre-commit 是否已安装
+    $precommitCheck = python -c "import pre_commit" 2>$null
+    if (-not $precommitCheck) {
+        Write-Info "安装 pre-commit..."
+        python -m pip install pre-commit
+    }
+    Write-Info "执行: pre-commit install"
+    pre-commit install
     Write-Success "Pre-commit Hooks 已安装"
-} catch {
-    Write-Warn "Pre-commit 未安装，将显示安装说明"
+} else {
+    Write-Warn "未找到 Python，无法安装 pre-commit"
     Write-Host "  pip install pre-commit" -ForegroundColor Yellow
     Write-Host "  pre-commit install" -ForegroundColor Yellow
 }
