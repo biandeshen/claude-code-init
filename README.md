@@ -7,6 +7,8 @@ Claude Code 开发环境一键初始化工具箱。
 - 一键初始化 Claude Code 开发环境
 - 自动安装 ECC (Everything Claude Code)、Superpowers、OpenSpec、cc-discipline
 - 复制覆盖层模板 (CLAUDE.md、SOUL.md、PLAN_TEMPLATE.md)
+- 复制 Python 校验脚本 (密钥检查、函数长度、依赖方向等)
+- 自动配置 Pre-commit Hooks
 - 自动配置 .gitignore
 
 ## 仓库结构
@@ -20,10 +22,19 @@ claude-code-init/
 │   ├── CLAUDE_Template.md
 │   ├── SOUL_Template.md
 │   └── PLAN_Template.md
-└── commands/              # 自定义斜杠命令
-    ├── review.md          # /review - 代码审查
-    ├── commit.md          # /commit - 规范提交
-    └── architect.md       # /architect - 架构分析
+├── commands/              # 自定义斜杠命令
+│   ├── review.md          # /review - 代码审查
+│   ├── commit.md          # /commit - 规范提交
+│   └── architect.md        # /architect - 架构分析
+├── scripts/               # Python 校验脚本
+│   ├── check_secrets.py       # 密钥安全检查
+│   ├── check_function_length.py # 函数长度检查
+│   ├── check_dependencies.py  # 依赖方向检查
+│   ├── check_import_order.py   # import 顺序检查
+│   └── check_project_structure.py # 项目结构检查
+├── configs/               # 配置文件
+│   └── .pre-commit-config.yaml  # Pre-commit 配置
+└── _archived/             # 归档的规范文档
 ```
 
 ## 快速开始
@@ -76,6 +87,44 @@ cd claude-code-init
 | `/review` | 代码审查 |
 | `/commit` | 规范提交 |
 | `/architect` | 架构分析 |
+
+## 校验脚本
+
+初始化后会复制 `scripts/` 目录到项目，包含以下 Python 校验脚本：
+
+| 脚本 | 说明 | 检查时机 |
+|------|------|----------|
+| `check_secrets.py` | 检测硬编码密钥、API Keys | Pre-commit |
+| `check_function_length.py` | 检查函数长度 (≤50行) | Pre-commit |
+| `check_dependencies.py` | 检查模块依赖方向 | Pre-commit |
+| `check_import_order.py` | 检查 import 顺序 | Pre-commit |
+| `check_project_structure.py` | 检查项目结构完整性 | Pre-commit |
+
+### 手动运行
+
+```bash
+# 运行所有检查
+python scripts/check_secrets.py
+python scripts/check_function_length.py
+python scripts/check_dependencies.py
+python scripts/check_import_order.py
+python scripts/check_project_structure.py
+
+# 或使用 pre-commit
+pre-commit run --all-files
+```
+
+### 自定义依赖规则
+
+通过 `.dependency-rules.json` 文件自定义依赖规则：
+
+```json
+{
+    "src": {"forbidden": ["lib"]},
+    "lib": {"forbidden": ["lib"]},
+    "tests": {"forbidden": []}
+}
+```
 
 ## 更新规范
 

@@ -90,7 +90,43 @@ if (-not $SkipCcDiscipline) {
     Write-Info "跳过 cc-discipline 安装"
 }
 
-# 7. 复制覆盖层模板
+# 7. 复制 Python 校验脚本
+Write-Step "复制校验脚本到 scripts/"
+$ScriptsDir = Join-Path $ScriptDir "scripts"
+$TargetScriptsDir = "$ProjectPath\scripts"
+if (Test-Path $ScriptsDir) {
+    New-Item -ItemType Directory -Force -Path $TargetScriptsDir | Out-Null
+    Copy-Item -Path "$ScriptsDir\*" -Destination $TargetScriptsDir -Force -Recurse
+    Write-Success "已复制校验脚本到 scripts/"
+} else {
+    Write-Info "scripts 目录不存在，跳过"
+}
+
+# 8. 复制 Pre-commit 配置
+Write-Step "复制 Pre-commit 配置"
+$PrecommitConfig = Join-Path $ScriptDir "configs\.pre-commit-config.yaml"
+$TargetPrecommitConfig = "$ProjectPath\.pre-commit-config.yaml"
+if (Test-Path $PrecommitConfig) {
+    Copy-Item -Path $PrecommitConfig -Destination $TargetPrecommitConfig -Force
+    Write-Success "已复制 .pre-commit-config.yaml"
+} else {
+    Write-Info "Pre-commit 配置不存在，跳过"
+}
+
+# 9. 安装 Pre-commit hooks
+Write-Step "安装 Pre-commit Hooks"
+$precommitInstallCmd = "pre-commit install"
+Write-Info "执行: $precommitInstallCmd"
+try {
+    Invoke-Expression $precommitInstallCmd
+    Write-Success "Pre-commit Hooks 已安装"
+} catch {
+    Write-Warn "Pre-commit 未安装，将显示安装说明"
+    Write-Host "  pip install pre-commit" -ForegroundColor Yellow
+    Write-Host "  pre-commit install" -ForegroundColor Yellow
+}
+
+# 10. 复制覆盖层模板
 Write-Step "复制覆盖层模板"
 $TemplateDir = Join-Path $ScriptDir "templates"
 if (Test-Path $TemplateDir) {
@@ -118,7 +154,7 @@ if (Test-Path $TemplateDir) {
     Write-Warn "模板目录不存在，跳过模板复制"
 }
 
-# 8. 复制自定义命令
+# 11. 复制自定义命令
 Write-Step "复制自定义命令"
 $CommandsDir = Join-Path $ScriptDir "commands"
 $TargetCommandsDir = "$ProjectPath\.claude\commands"
@@ -130,7 +166,7 @@ if (Test-Path $CommandsDir) {
     Write-Info "命令目录不存在，跳过"
 }
 
-# 9. 创建本地偏好文件 (gitignored)
+# 12. 创建本地偏好文件 (gitignored)
 Write-Step "创建 CLAUDE.local.md (本地偏好)"
 $localMd = @"
 # 本地个人偏好
@@ -152,7 +188,7 @@ $localMd = @"
 $localMd | Out-File -FilePath "$ProjectPath\CLAUDE.local.md" -Encoding utf8
 Write-Success "已创建 CLAUDE.local.md"
 
-# 10. 更新 .gitignore
+# 13. 更新 .gitignore
 Write-Step "更新 .gitignore"
 $gitignorePath = "$ProjectPath\.gitignore"
 if (-not (Test-Path $gitignorePath)) {

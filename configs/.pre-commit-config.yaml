@@ -1,0 +1,112 @@
+# Pre-commit 配置
+# 使用方式：
+#   1. 安装 pre-commit: pip install pre-commit
+#   2. 初始化: pre-commit install
+#   3. 手动运行: pre-commit run --all-files
+
+repos:
+  # ============================================================
+  # 自定义检查脚本
+  # ============================================================
+
+  # 1. 项目结构检查
+  - repo: local
+    hooks:
+      - id: check-project-structure
+        name: Check project structure
+        entry: python scripts/check_project_structure.py
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # 2. 依赖方向检查
+  - repo: local
+    hooks:
+      - id: check-dependencies
+        name: Check dependency direction
+        entry: python scripts/check_dependencies.py
+        language: system
+        files: ^(src|lib|tests|app|core|skills)/.*\.py$
+        stages: [pre-commit]
+
+  # 3. 函数长度检查
+  - repo: local
+    hooks:
+      - id: check-function-length
+        name: Check function length (<=50 lines)
+        entry: python scripts/check_function_length.py
+        language: system
+        files: \.py$
+        stages: [pre-commit]
+
+  # 4. import 顺序检查
+  - repo: local
+    hooks:
+      - id: check-import-order
+        name: Check import order
+        entry: python scripts/check_import_order.py
+        language: system
+        files: \.py$
+        stages: [pre-commit]
+
+  # 5. 密钥安全检查
+  - repo: local
+    hooks:
+      - id: check-secrets
+        name: Security check (secrets)
+        entry: python scripts/check_secrets.py
+        language: system
+        types: [yaml, python]
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # ============================================================
+  # 代码格式检查 (需要 pip install)
+  # ============================================================
+
+  # 6. ruff 代码格式检查
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        types_or: [python, pyi]
+      - id: ruff-format
+        types_or: [python, pyi]
+
+  # 7. mypy 类型检查
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        additional_dependencies: []
+        types: [python]
+        args: [--ignore-missing-imports]
+
+  # ============================================================
+  # 通用检查 (无需额外依赖)
+  # ============================================================
+
+  # 8. 通用 Git hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # 9. 禁止提交 certain files
+  - repo: local
+    hooks:
+      - id: forbid-binary-files
+        name: Forbid binary files
+        entry: python -c "import sys; [sys.exit(1) if b'\x00' in open(f, 'rb').read() else None for f in sys.argv[1:]]"
+        language: system
+        types: [binary]
+        stages: [pre-commit]

@@ -74,7 +74,41 @@ fi
 echo_info "请在项目目录执行:"
 echo -e "  ${YELLOW}bash $CC_DISCIPLINE_PATH/init.sh${NC}"
 
-# 7. 复制覆盖层模板
+# 7. 复制 Python 校验脚本
+echo_step "复制校验脚本到 scripts/"
+SCRIPTS_DIR="$SCRIPT_DIR/scripts"
+TARGET_SCRIPTS_DIR="$PROJECT_PATH/scripts"
+if [ -d "$SCRIPTS_DIR" ]; then
+    mkdir -p "$TARGET_SCRIPTS_DIR"
+    cp -r "$SCRIPTS_DIR/"* "$TARGET_SCRIPTS_DIR/"
+    echo_success "已复制校验脚本到 scripts/"
+else
+    echo_info "scripts 目录不存在，跳过"
+fi
+
+# 8. 复制 Pre-commit 配置
+echo_step "复制 Pre-commit 配置"
+PRECOMMIT_CONFIG="$SCRIPT_DIR/configs/.pre-commit-config.yaml"
+TARGET_PRECOMMIT_CONFIG="$PROJECT_PATH/.pre-commit-config.yaml"
+if [ -f "$PRECOMMIT_CONFIG" ]; then
+    cp "$PRECOMMIT_CONFIG" "$TARGET_PRECOMMIT_CONFIG"
+    echo_success "已复制 .pre-commit-config.yaml"
+else
+    echo_info "Pre-commit 配置不存在，跳过"
+fi
+
+# 9. 安装 Pre-commit hooks
+echo_step "安装 Pre-commit Hooks"
+if command -v pre-commit &> /dev/null; then
+    pre-commit install
+    echo_success "Pre-commit Hooks 已安装"
+else
+    echo_warn "Pre-commit 未安装，显示安装说明:"
+    echo -e "  ${YELLOW}pip install pre-commit${NC}"
+    echo -e "  ${YELLOW}pre-commit install${NC}"
+fi
+
+# 10. 复制覆盖层模板
 echo_step "复制覆盖层模板"
 TEMPLATE_DIR="$SCRIPT_DIR/templates"
 if [ -d "$TEMPLATE_DIR" ]; then
@@ -99,7 +133,7 @@ else
     echo_warn "模板目录不存在，跳过模板复制"
 fi
 
-# 8. 复制自定义命令
+# 11. 复制自定义命令
 echo_step "复制自定义命令"
 COMMANDS_DIR="$SCRIPT_DIR/commands"
 TARGET_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
@@ -111,7 +145,7 @@ else
     echo_info "命令目录不存在，跳过"
 fi
 
-# 9. 创建本地偏好文件 (gitignored)
+# 12. 创建本地偏好文件 (gitignored)
 echo_step "创建 CLAUDE.local.md (本地偏好)"
 cat > "$PROJECT_PATH/CLAUDE.local.md" << 'EOF'
 # 本地个人偏好
@@ -132,7 +166,7 @@ cat > "$PROJECT_PATH/CLAUDE.local.md" << 'EOF'
 EOF
 echo_success "已创建 CLAUDE.local.md"
 
-# 10. 更新 .gitignore
+# 13. 更新 .gitignore
 echo_step "更新 .gitignore"
 if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
     echo "CLAUDE.local.md" > "$PROJECT_PATH/.gitignore"
