@@ -14,6 +14,13 @@
 
 ## 前置条件（一辈子一次）
 
+### 检查 Claude Code 版本
+
+确保 Claude Code 版本 >= 2.0（`/plugin` 命令需要）：
+```bash
+claude --version
+```
+
 在 Claude Code 会话中完成插件安装：
 
 ```
@@ -175,7 +182,7 @@ pre-commit run --all-files
 ## 跳过某些工具
 
 ```powershell
-.\init.ps1 -ProjectPath "C:\path" -SkipECC -SkipSuperpowers
+.\init.ps1 -ProjectPath "你的项目路径" -SkipECC -SkipSuperpowers
 ```
 
 | 选项 | 说明 |

@@ -4,6 +4,8 @@
 #   2. 初始化: pre-commit install
 #   3. 手动运行: pre-commit run --all-files
 
+exclude: '^scripts/'
+
 repos:
   # ============================================================
   # 自定义检查脚本
