@@ -5,6 +5,9 @@
 
 set -e
 
+# 启用 nullglob，避免空通配符展开问题
+shopt -s nullglob
+
 PROJECT_PATH="${1:-.}"
 
 # 颜色输出

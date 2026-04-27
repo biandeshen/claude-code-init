@@ -35,15 +35,20 @@ SECRET_PATTERNS = [
     r"[a-zA-Z0-9]{40,}",                # 40位+ 字符串
 ]
 
-# 白名单（允许的值）
+# 白名单（允许的值）- 使用子串匹配
 WHITELIST = [
     "${",           # 环境变量引用
-    "your_",        # 示例值
-    "xxx",          # 示例值
+    "your_",       # your_secret_key
+    "your_secret",
+    "xxx",         # xxx_api_key
     "placeholder",  # 占位符
-    "example",      # 示例
+    "example",      # example_key
+    "changeme",    # changeme_password
+    "test_",        # test_token
+    "dummy",        # dummy_key
     "localhost",    # 本地地址
-    "127.0.0.1",    # 本地地址
+    "127.0.0.1",   # 本地地址
+    "::1",          # IPv6 本地地址
 ]
 
 
@@ -142,8 +147,9 @@ def check_python_files(file_paths: list) -> list:
                     if len(parts) == 2:
                         value = parts[1].strip().strip('"').strip("'")
 
-                        # 跳过白名单
-                        if any(wl in value for wl in WHITELIST):
+                        # 跳过白名单（子串匹配，不区分大小写）
+                        value_lower = value.lower()
+                        if any(wl.lower() in value_lower for wl in WHITELIST):
                             continue
 
                         # 跳过空值和 os.environ 调用

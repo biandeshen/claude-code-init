@@ -8,16 +8,19 @@
 # 1. 克隆脚手架
 git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code-init
 
-# 2. 安装插件（在 Claude Code 中）
+# 2. 添加到 PATH（PowerShell）
+$env:Path += ";$HOME\tools\claude-code-init"
+
+# 3. 安装插件（在 Claude Code 中）
 /plugin marketplace add affaan-m/everything-claude-code
 /plugin install everything-claude-code@everything-claude-code
 /plugin marketplace add obra/superpowers-marketplace
 /plugin install superpowers@superpowers-marketplace
 
-# 3. 初始化新项目
-~/tools/claude-code-init/init.ps1 -ProjectPath "你的项目路径"
+# 4. 初始化新项目
+init.ps1 -ProjectPath "你的项目路径"
 
-# 4. 开始开发
+# 5. 开始开发
 cd your-project
 claude
 ```

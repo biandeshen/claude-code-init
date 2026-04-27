@@ -42,20 +42,23 @@ $env:Path += ";~/tools/claude-code-init"
 
 ## 新项目初始化（每个项目一次）
 
-### Windows PowerShell
-
-```powershell
-# 方式一：添加 PATH 后直接用
-init-project -ProjectPath "你的项目路径"
-
-# 方式二：直接运行脚本
-~/tools/claude-code-init/init.ps1 -ProjectPath "你的项目路径"
-```
-
-### Unix/macOS
+### 方式一：npx 一键初始化（推荐）
 
 ```bash
-./init.sh /path/to/your-project
+npx claude-code-init --project-path ./my-project
+```
+
+### 方式二：手动克隆后运行
+
+```bash
+# 克隆脚手架
+git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code-init
+
+# Windows PowerShell
+~/tools/claude-code-init/init.ps1 -ProjectPath "你的项目路径"
+
+# Unix/macOS
+~/tools/claude-code-init/init.sh /path/to/your-project
 ```
 
 初始化后自动具备：ECC 全家桶、Superpowers、OpenSpec、cc-discipline、校验脚本和 Pre-commit 配置。
@@ -221,13 +224,20 @@ pre-commit run --all-files
 
 ## 维护
 
+> ⚠️ **重要**：重新运行 `init.ps1`/`init.sh` 会覆盖项目中已修改的模板文件（CLAUDE.md、SOUL.md 等）。如需更新规范到最新版本，推荐只拉取脚手架本身：
+> ```bash
+> git -C ~/tools/claude-code-init pull
+> ```
+
 - **ECC / Superpowers**：收到更新提示后 `/plugin update`
-- **脚手架**：`git -C ~/tools/claude-code-init pull`
-- 已有项目重新应用：重新运行 `init.ps1`/`init.sh`
+- **脚手架更新**：`git -C ~/tools/claude-code-init pull`
+- **覆盖模板**：`init.ps1 -ProjectPath "你的项目"`（会覆盖现有模板）
 
 ---
 
 ## 跳过某些工具
+
+> 当前版本的 `-Skip` 参数仅控制安装提示的显示，不执行真正的自动化安装。ECC/Superpowers 插件需要在 Claude Code 中手动安装。
 
 ```powershell
 .\init.ps1 -ProjectPath "你的项目路径" -SkipECC -SkipSuperpowers
@@ -235,10 +245,10 @@ pre-commit run --all-files
 
 | 选项 | 说明 |
 |------|------|
-| `-SkipECC` | 跳过 ECC 安装 |
-| `-SkipSuperpowers` | 跳过 Superpowers 安装 |
-| `-SkipOpenSpec` | 跳过 OpenSpec 安装 |
-| `-SkipCcDiscipline` | 跳过 cc-discipline 安装 |
+| `-SkipECC` | 跳过 ECC 安装提示 |
+| `-SkipSuperpowers` | 跳过 Superpowers 安装提示 |
+| `-SkipOpenSpec` | 跳过 OpenSpec 安装提示 |
+| `-SkipCcDiscipline` | 跳过 cc-discipline 安装提示 |
 
 ---
 
@@ -249,6 +259,8 @@ claude-code-init/
 ├── README.md              # 快速开始入口
 ├── GUIDE.md               # 完整使用文档
 ├── SECURITY.md            # 安全策略
+├── package.json           # npm 包配置（支持 npx）
+├── index.js               # npx 入口脚本
 ├── init.ps1 / init.sh      # 初始化脚本
 ├── templates/              # 覆盖层模板
 │   ├── CLAUDE_Template.md
@@ -258,15 +270,14 @@ claude-code-init/
 │   ├── review.md
 │   ├── commit.md
 │   └── architect.md
-├── scripts/                # Python 校验脚本
+├── scripts/               # Python 校验脚本
 │   ├── check_secrets.py
 │   ├── check_function_length.py
 │   ├── check_dependencies.py
 │   ├── check_import_order.py
 │   └── check_project_structure.py
-├── configs/                # 配置文件
-│   └── .pre-commit-config.yaml
-└── _archived/              # 归档的规范文档
+└── configs/               # 配置文件
+    └── .pre-commit-config.yaml
 ```
 
 ---
