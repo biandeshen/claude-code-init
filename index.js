@@ -31,6 +31,17 @@ const scriptDir = __dirname;
 const isWindows = process.platform === 'win32';
 const isMac = process.platform === 'darwin';
 
+// 检查系统依赖
+function checkDependency(cmd, name) {
+    try {
+        execSync(`${cmd} --version`, { stdio: 'pipe' });
+        return true;
+    } catch {
+        console.error(`[错误] 未找到 ${name}，请先安装。`);
+        return false;
+    }
+}
+
 console.log('='.repeat(50));
 console.log('  Claude Code 项目脚手架初始化');
 console.log('='.repeat(50));
@@ -39,10 +50,36 @@ console.log(`目标目录: ${path.resolve(projectPath)}`);
 console.log(`操作系统: ${isWindows ? 'Windows' : isMac ? 'macOS' : 'Linux'}`);
 console.log('');
 
+// 检查系统依赖
+console.log('[检查] 验证系统依赖...');
+const deps = [
+    ['git', 'Git'],
+    ['python', 'Python'],
+];
+if (isWindows) deps.push(['pwsh', 'PowerShell']);
+else deps.push(['bash', 'Bash']);
+
+const missingDeps = [];
+for (const [cmd, name] of deps) {
+    if (!checkDependency(cmd, name)) {
+        missingDeps.push(name);
+    }
+}
+
+if (missingDeps.length > 0) {
+    console.error('');
+    console.error('[错误] 系统依赖检查失败，缺少: ' + missingDeps.join(', '));
+    console.error('');
+    console.error('请安装缺失的依赖后重试。');
+    process.exit(1);
+}
+console.log('[成功] 系统依赖检查通过');
+console.log('');
+
 try {
     if (isWindows) {
         // Windows: 使用 PowerShell
-        console.log('执行: init.ps1');
+        console.log('[执行] init.ps1');
         const initScript = path.join(scriptDir, 'init.ps1');
         execSync(`pwsh -File "${initScript}" -ProjectPath "${path.resolve(projectPath)}"`, {
             stdio: 'inherit',
@@ -50,7 +87,7 @@ try {
         });
     } else {
         // Unix/macOS: 使用 Bash
-        console.log('执行: init.sh');
+        console.log('[执行] init.sh');
         const initScript = path.join(scriptDir, 'init.sh');
         execSync(`bash "${initScript}" "${path.resolve(projectPath)}"`, {
             stdio: 'inherit',
@@ -69,6 +106,17 @@ try {
     console.log('');
 
 } catch (error) {
-    console.error('初始化失败:', error.message);
-    process.exit(1);
+    console.error('');
+    console.error('='.repeat(50));
+    console.error('  初始化失败！');
+    console.error('='.repeat(50));
+    console.error('');
+    console.error('常见原因：');
+    console.error('  1. Git 未正确安装或未添加到 PATH');
+    console.error('  2. Python 未安装');
+    console.error('  3. 目标目录无写入权限');
+    console.error('  4. 网络问题导致 git clone 失败');
+    console.error('');
+    console.error('请查看上方错误信息进行排查。');
+    process.exit(error.status || 1);
 }

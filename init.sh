@@ -70,10 +70,15 @@ echo -e "  ${YELLOW}npx kld-sdd${NC}"
 # 6. 安装 cc-discipline (物理防火墙)
 echo_step "安装 cc-discipline (物理防火墙 Hooks)"
 CC_DISCIPLINE_PATH="$HOME/.cc-discipline"
+CC_DISCIPLINE_BRANCH="main"  # 锁定分支以确保可重复性
 if [ ! -d "$CC_DISCIPLINE_PATH" ]; then
-    echo_info "克隆 cc-discipline 仓库..."
-    git clone https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
+    echo_info "克隆 cc-discipline 仓库 (分支: $CC_DISCIPLINE_BRANCH)..."
+    git clone -b "$CC_DISCIPLINE_BRANCH" https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
+    echo_success "已克隆 cc-discipline"
+else
+    echo_info "cc-discipline 已存在，如需更新请手动执行: git -C $CC_DISCIPLINE_PATH pull"
 fi
+echo_warn "即将执行第三方脚本: $HOME/.cc-discipline/init.sh"
 echo_info "请在项目目录执行:"
 echo -e "  ${YELLOW}bash $CC_DISCIPLINE_PATH/init.sh${NC}"
 
@@ -192,13 +197,6 @@ echo ""
 echo -e "位置: ${PROJECT_PATH}"
 echo ""
 echo -e "${CYAN}下一步:${NC}"
-echo "  1. 编辑 CLAUDE.md 写入项目特定的架构规则"
-echo "  2. 编辑 SOUL.md 定义项目的 AI 人格"
-echo "  3. 启动 Claude Code，开始开发"
-echo ""
-echo -e "如需更新规范，运行:"
-echo -e "  git -C \"$SCRIPT_DIR\" pull"
-echo ""
 echo "  1. 编辑 CLAUDE.md 写入项目特定的架构规则"
 echo "  2. 编辑 SOUL.md 定义项目的 AI 人格"
 echo "  3. 启动 Claude Code，开始开发"

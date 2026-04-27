@@ -265,9 +265,36 @@ claude-code-init/
 
 ---
 
-## 版本
+## 常见问题
 
-v1.2.0 | 2026-04-28
+### Q: 初始化后 `claude` 启动报错 "plugin not found"
+A: ECC 和 Superpowers 需要手动在 Claude Code 中安装，`init.ps1` 仅打印安装命令。详见 README 步骤 3。
+
+### Q: `pre-commit install` 失败
+A: 确认 Python 版本 >= 3.8，执行 `pip install pre-commit` 后重试。
+
+### Q: 如何更新已有项目的规范？
+A: `git -C ~/tools/claude-code-init pull` 仅更新脚手架。如需覆盖模板，重新运行 `init.ps1`（会覆盖 CLAUDE.md 等文件，建议先备份）。
+
+### Q: npx 运行报 "command not found"
+A: 确保 Node.js >= 18 已安装。也可以使用手动方式：
+```bash
+git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code-init
+~/tools/claude-code-init/init.ps1 -ProjectPath "你的项目"
+```
+
+---
+
+## 版本历史
+
+| 版本 | 日期 | 变更 |
+|------|------|------|
+| v1.4.1 | 2026-04-28 | 移除误导性 Skip 参数文档、添加系统依赖检查、修复静默失败 |
+| v1.4.0 | 2026-04-28 | 移除 _archived/、SECURITY.md 重写、SOUL.md 五级制复杂度评估 |
+| v1.3.0 | 2026-04-28 | 删除 _archived/、增强 README 警告、修复硬化路径 |
+| v1.2.0 | 2026-04-28 | 初始版本基础功能 |
+
+---
 
 ## License
 

@@ -88,18 +88,18 @@ if (-not $SkipOpenSpec) {
 if (-not $SkipCcDiscipline) {
     Write-Step "安装 cc-discipline (物理防火墙 Hooks)"
     $CcDisciplinePath = "$HOME\.cc-discipline"
+    $CcDisciplineCommit = "main"  # 锁定分支以确保可重复性
     if (-not (Test-Path $CcDisciplinePath)) {
         Write-Warn "即将从第三方仓库下载代码: https://github.com/TechHU-GS/cc-discipline"
-        Write-Info "克隆 cc-discipline 仓库..."
-        git clone https://github.com/TechHU-GS/cc-discipline.git $CcDisciplinePath
-        Write-Warn "即将执行第三方脚本: $HOME/.cc-discipline/init.sh"
-        Write-Info "请在项目目录执行:"
-        Write-Host "  bash `$HOME/.cc-discipline/init.sh" -ForegroundColor Yellow
+        Write-Info "克隆 cc-discipline 仓库 (分支: $CcDisciplineCommit)..."
+        git clone -b $CcDisciplineCommit https://github.com/TechHU-GS/cc-discipline.git $CcDisciplinePath
+        Write-Success "已克隆 cc-discipline"
     } else {
-        Write-Warn "即将执行第三方脚本: $HOME/.cc-discipline/init.sh"
-        Write-Info "请在项目目录执行:"
-        Write-Host "  bash `$HOME/.cc-discipline/init.sh" -ForegroundColor Yellow
+        Write-Info "cc-discipline 已存在，如需更新请手动执行: git -C $CcDisciplinePath pull"
     }
+    Write-Warn "即将执行第三方脚本: $HOME/.cc-discipline/init.sh"
+    Write-Info "请在项目目录执行:"
+    Write-Host "  bash `$HOME/.cc-discipline/init.sh" -ForegroundColor Yellow
 } else {
     Write-Info "跳过 cc-discipline 安装"
 }
