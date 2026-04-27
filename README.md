@@ -31,15 +31,16 @@ claude-code-init/
 ### 首次使用
 
 ```bash
-# 克隆仓库到本地
-git clone https://github.com/你的账号/claude-code-init.git E:\工具\claude-code-init
+# 克隆仓库到本地（克隆到任意位置）
+git clone https://github.com/你的账号/claude-code-init.git
+cd claude-code-init
 ```
 
 ### 新建项目
 
 ```powershell
-# Windows PowerShell
-E:\工具\claude-code-init\init.ps1 -ProjectPath "E:\产品\我的新项目"
+# Windows PowerShell（在 claude-code-init 目录下执行）
+.\init.ps1 -ProjectPath "C:\path\to\your-project"
 ```
 
 ```bash
@@ -80,20 +81,19 @@ E:\工具\claude-code-init\init.ps1 -ProjectPath "E:\产品\我的新项目"
 
 ```bash
 # 进入仓库目录
-cd E:\工具\claude-code-init
+cd claude-code-init
 
 # 拉取最新规范
 git pull
-
-# 已有项目重新应用
-E:\工具\claude-code-init\init.ps1 -ProjectPath "E:\产品\我的项目"
 ```
+
+> 已有项目重新应用：重新运行 init.ps1/init.sh 即可
 
 ## 选项
 
 ```powershell
 # 跳过某些工具的安装提示
-.\init.ps1 -ProjectPath "E:\产品\我的项目" -SkipECC -SkipSuperpowers
+.\init.ps1 -ProjectPath "C:\path\to\your-project" -SkipECC -SkipSuperpowers
 ```
 
 | 选项 | 说明 |
