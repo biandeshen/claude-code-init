@@ -128,9 +128,9 @@ total = sum(scores)  # calculate total
 ### README
 
 ```markdown
-# Plector
+# MyProject
 
-Plector 是一个智能体框架...
+MyProject 是一个示例项目...
 
 ## 快速开始
 
@@ -213,7 +213,7 @@ json_data = {"name": "张三"}
 
 ```python
 # ✅ 正确
-project_name = "Plector"
+project_name = "MyProject"
 logo_url = "https://example.com/logo.png"
 ```
 
