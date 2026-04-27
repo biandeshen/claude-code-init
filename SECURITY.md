@@ -7,7 +7,7 @@
 - 模板内容包含敏感信息泄露
 
 ## 报告安全漏洞
-如有安全漏洞，请发邮件至 biandeshen@outlook.com，切勿公开提 Issue。
+如有安全漏洞，请发邮件至 biandeshen [at] outlook [dot] com，切勿公开提 Issue。
 
 ## 第三方依赖
 | 依赖 | 来源 |

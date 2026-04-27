@@ -76,11 +76,14 @@ fi
 # 6. 安装 cc-discipline (物理防火墙) - 自动执行
 echo_step "安装 cc-discipline (物理防火墙 Hooks)"
 CC_DISCIPLINE_PATH="$HOME/.cc-discipline"
-CC_DISCIPLINE_BRANCH="main"  # 锁定分支以确保可重复性
+CC_DISCIPLINE_COMMIT="916da00691128fde44599928d76c129f3d08b8f1"  # 锁定版本 2026-04-26
 if [ ! -d "$CC_DISCIPLINE_PATH" ]; then
-    echo_info "克隆 cc-discipline 仓库 (分支: $CC_DISCIPLINE_BRANCH)..."
-    git clone -b "$CC_DISCIPLINE_BRANCH" https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
-    echo_success "已克隆 cc-discipline"
+    echo_info "克隆 cc-discipline 仓库..."
+    git clone -b main https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
+    cd "$CC_DISCIPLINE_PATH"
+    git checkout "$CC_DISCIPLINE_COMMIT"
+    cd "$PROJECT_PATH"
+    echo_success "已克隆 cc-discipline (commit: ${CC_DISCIPLINE_COMMIT:0:7})"
 else
     echo_info "cc-discipline 已存在，如需更新请手动执行: git -C $CC_DISCIPLINE_PATH pull"
 fi
