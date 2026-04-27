@@ -27,14 +27,14 @@
 克隆项目脚手架到本地（位置任意）：
 
 ```bash
-git clone https://github.com/你的账号/claude-code-init.git <你的工具目录>/claude-code-init
+git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code-init
 ```
 
 可选：添加到 PATH 方便调用：
 
 ```powershell
 # PowerShell Profile 中添加
-$env:Path += ";<你的工具目录>\claude-code-init"
+$env:Path += ";~/tools/claude-code-init"
 ```
 
 ---
@@ -46,7 +46,7 @@ $env:Path += ";<你的工具目录>\claude-code-init"
 init-project -ProjectPath "新项目路径"
 
 # 方式二：直接运行脚本
-<你的工具目录>\claude-code-init\init.ps1 -ProjectPath "新项目路径"
+~/tools/claude-code-init/init.ps1 -ProjectPath "新项目路径"
 ```
 
 Unix/macOS：
@@ -62,7 +62,7 @@ Unix/macOS：
 ## 开始开发
 
 ```bash
-cd 你的项目
+cd your-project
 claude
 ```
 
@@ -167,7 +167,7 @@ pre-commit run --all-files
 ## 维护
 
 - **ECC / Superpowers**：收到更新提示后 `/plugin update`
-- **脚手架**：`git -C <你的工具目录>/claude-code-init pull`
+- **脚手架**：`git -C ~/tools/claude-code-init pull`
 - 已有项目重新应用：重新运行 `init.ps1`/`init.sh`
 
 ---

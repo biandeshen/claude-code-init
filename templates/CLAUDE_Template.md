@@ -11,25 +11,25 @@
 
 | 索引 | 说明 | 位置 |
 |------|------|------|
-| **Claude Code 工具规范** | 跨项目通用规范 | [E:/笔记/Claude Code规范/DOCS_INDEX.md](file:///E:/笔记/Claude Code规范/DOCS_INDEX.md) |
+| **Claude Code 工具规范** | 跨项目通用规范 | [./_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) |
 | **项目文档** | 项目专用文档 | [docs/DOCS_INDEX.md](docs/DOCS_INDEX.md) |
 
 ---
 
 ## Claude Code 工具规范
 
-> ⚠️ 这些是通用规范，存放在 `E:/笔记/Claude Code规范/`，由 Git 统一维护。
+> ⚠️ 这些是通用规范，存放在 `_archived/`，由 Git 统一维护。
 
 | 规范 | 说明 | 位置 |
 |------|------|------|
-| 行为规则 | 假设验证、错误熔断、变更记录、主动升级 | [DOCS_INDEX.md](file:///E:/笔记/Claude Code规范/DOCS_INDEX.md) → Agent_Behavior_Rules.md |
-| Plan 模板 | 任务计划格式、执行日志 | [DOCS_INDEX.md](file:///E:/笔记/Claude Code规范/DOCS_INDEX.md) → PLAN_Template.md |
-| 前端规范 | 考古学家+外科医生模式 | [DOCS_INDEX.md](file:///E:/笔记/Claude Code规范/DOCS_INDEX.md) → Frontend_Modification_Rules.md |
-| 提交规范 | feat/fix/docs 等 type | [DOCS_INDEX.md](file:///E:/笔记/Claude Code规范/DOCS_INDEX.md) → Commit_Convention.md |
-| 代码规范 | Python 命名、导入、函数设计 | [DOCS_INDEX.md](file:///E:/笔记/Claude Code规范/DOCS_INDEX.md) → Coding_Convention.md |
-| 语言约定 | 中文对话/英文代码 | [DOCS_INDEX.md](file:///E:/笔记/Claude Code规范/DOCS_INDEX.md) → Language_Convention.md |
+| 行为规则 | 假设验证、错误熔断、变更记录、主动升级 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Agent_Behavior_Rules.md |
+| Plan 模板 | 任务计划格式、执行日志 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → PLAN_Template.md |
+| 前端规范 | 考古学家+外科医生模式 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Frontend_Modification_Rules.md |
+| 提交规范 | feat/fix/docs 等 type | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Commit_Convention.md |
+| 代码规范 | Python 命名、导入、函数设计 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Coding_Convention.md |
+| 语言约定 | 中文对话/英文代码 | [_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) → Language_Convention.md |
 
-完整索引：[E:/笔记/Claude Code规范/DOCS_INDEX.md](file:///E:/笔记/Claude Code规范/DOCS_INDEX.md)
+完整索引：[./_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md)
 
 ---
 
@@ -55,7 +55,7 @@
 
 | 内容 | 位置 |
 |------|------|
-| **Claude Code 工具规范索引** | [E:/笔记/Claude Code规范/DOCS_INDEX.md](file:///E:/笔记/Claude Code规范/DOCS_INDEX.md) |
+| **Claude Code 工具规范索引** | [./_archived/DOCS_INDEX.md](_archived/DOCS_INDEX.md) |
 | **项目文档索引** | [docs/DOCS_INDEX.md](docs/DOCS_INDEX.md) |
 | **元认知规则** | [SOUL.md](SOUL.md) |
 
@@ -67,4 +67,4 @@
 
 ---
 
-*核心原则：工具是工具，项目是项目。Claude Code 工具规范在 `E:/笔记/Claude Code规范/`，项目规范在 `docs/`*
+*核心原则：工具是工具，项目是项目。Claude Code 工具规范在 `_archived/`，项目规范在 `docs/`*
