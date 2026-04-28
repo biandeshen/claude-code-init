@@ -203,8 +203,12 @@ if [ -d "$HOOKS_SOURCE_DIR" ]; then
     echo_success "已复制 Hooks 到 .claude/hooks/"
 fi
 if [ -f "$SETTINGS_SOURCE" ]; then
-    cp "$SETTINGS_SOURCE" "$SETTINGS_TARGET"
-    echo_success "已复制 settings.json 到 .claude/"
+    if [ -f "$SETTINGS_TARGET" ]; then
+        echo_warn ".claude/settings.json 已存在，如需合并 Hook 配置请手动处理"
+    else
+        cp "$SETTINGS_SOURCE" "$SETTINGS_TARGET"
+        echo_success "已复制 settings.json 到 .claude/"
+    fi
 fi
 
 # 12. 创建本地偏好文件 (gitignored)

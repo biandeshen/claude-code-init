@@ -1,53 +1,57 @@
 #!/bin/bash
 # .claude/hooks/smart-context.sh
-# 基于当前操作上下文，自动推荐合适的 Skill
+# 场景感知自动推荐 Skill，基于当前操作上下文提供智能建议
+# 不依赖 jq，使用纯 shell 实现
 
-# 从 stdin 读取 Claude Code 传递的事件数据
-event_data=$(cat)
+event_data=$(cat 2>/dev/null)
+if [ -z "$event_data" ]; then
+    exit 0
+fi
 
-# 提取当前操作类型和文件路径
-tool_name=$(echo "$event_data" | jq -r '.tool_name // ""' 2>/dev/null)
-file_path=$(echo "$event_data" | jq -r '.tool_input.file_path // ""' 2>/dev/null)
-command=$(echo "$event_data" | jq -r '.tool_input.command // ""' 2>/dev/null)
+# 提取 tool_name
+tool_name=$(echo "$event_data" | sed -n 's/.*"tool_name"\s*:\s*"\([^"]*\)".*/\1/p')
+
+# 提取 file_path
+file_path=$(echo "$event_data" | sed -n 's/.*"file_path"\s*:\s*"\([^"]*\)".*/\1/p')
+
+# 提取 command
+command=$(echo "$event_data" | sed -n 's/.*"command"\s*:\s*"\([^"]*\)".*/\1/p')
 
 suggestion=""
 
-# ─── 场景匹配 ───
-
-# 1. 编辑了测试文件 → 推荐 TDD
-if echo "$file_path" | grep -qE "(^|/)tests?/.*\.(py|ts|js|go|rs)$"; then
-    suggestion="检测到你正在编辑测试文件。建议使用「tdd-workflow」技能来强制执行红-绿-重构循环。"
+# ─── 场景 1：编辑测试文件 → 推荐 TDD ───
+if echo "$file_path" | grep -qE "(^|/)tests?/" 2>/dev/null; then
+    suggestion="检测到你正在编辑测试文件。建议使用「tdd-workflow」技能来强制执行红-绿-重构循环，输入 /tdd-workflow 手动触发。"
 fi
 
-# 2. 连续修改同一个文件超过 3 次 → 推荐系统化调试
-edit_count=$(echo "$event_data" | jq -r '.consecutive_edits // 0' 2>/dev/null)
-if [ "$edit_count" -ge 3 ] 2>/dev/null; then
-    suggestion="已连续编辑同一文件 $edit_count 次。建议暂停并启用「systematic-debug」技能进行根因分析。"
+# ─── 场景 2：编辑安全相关文件 → 推荐安全审查 ───
+if echo "$file_path" | grep -qiE "(auth|login|password|token|secret|session|encrypt|jwt|oauth)" 2>/dev/null; then
+    if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+    suggestion="${suggestion}检测到你正在修改安全相关代码。建议使用「code-review」技能重点审查安全性，输入 /code-review 手动触发。"
 fi
 
-# 3. 执行了 git commit → 推荐代码审查
-if echo "$command" | grep -q "git commit"; then
-    suggestion="代码已提交。建议在推送前使用「code-review」技能进行最终安全检查。"
+# ─── 场景 3：编辑涉及数据库的文件 → 推荐架构评审 ───
+if echo "$file_path" | grep -qiE "(migration|schema|model|repository|dao|db/)" 2>/dev/null; then
+    if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+    suggestion="${suggestion}检测到你正在修改数据库相关代码。如果涉及 Schema 变更，建议先用「brainstorming」技能确认方案。"
 fi
 
-# 4. 编辑了涉及安全相关的文件 → 推荐安全审查
-if echo "$file_path" | grep -qiE "(auth|login|password|token|secret|session|jwt|oauth|permission|acl)"; then
-    suggestion="检测到你正在修改安全相关代码。建议使用「code-review」技能重点审查安全性。"
+# ─── 场景 4：执行 git commit → 推荐代码审查 ───
+if echo "$command" | grep -q "git commit" 2>/dev/null; then
+    if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+    suggestion="${suggestion}代码已提交。建议在推送前使用「code-review」技能进行最终安全检查。"
 fi
 
-# 5. 提交信息包含 refactor → 推荐重构检查
-if echo "$command" | grep -qE "git (commit|add).*refactor"; then
-    suggestion="检测到重构提交。建议使用「safe-refactoring」技能验证重构的安全性。"
-fi
-
-# 6. 编辑了数据库相关文件 → 提示数据安全
-if echo "$file_path" | grep -qiE "(db|database|migration|schema|sql|model\.py|repository)"; then
-    suggestion="检测到数据库相关修改。请确保已备份数据，并使用「code-review」检查数据操作安全性。"
+# ─── 场景 5：执行 git push --force → 警告 ───
+if echo "$command" | grep -q "git push" 2>/dev/null; then
+    if echo "$command" | grep -q "\-\-force" 2>/dev/null; then
+        if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+        suggestion="${suggestion}⚠️ 检测到 git push --force。请确认你了解这将对远程仓库产生的影响。"
+    fi
 fi
 
 # ─── 输出建议 ───
 if [ -n "$suggestion" ]; then
-    # 输出为 JSON，Claude Code 会将其注入到对话上下文
     cat <<EOF
 {
   "hookSpecificOutput": {

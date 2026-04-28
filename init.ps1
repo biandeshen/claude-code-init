@@ -241,8 +241,12 @@ if (Test-Path $HooksSourceDir) {
     Write-Success "已复制 Hooks 到 .claude/hooks/"
 }
 if (Test-Path $SettingsSource) {
-    Copy-Item -Path $SettingsSource -Destination $SettingsTarget -Force
-    Write-Success "已复制 settings.json 到 .claude/"
+    if (Test-Path $SettingsTarget) {
+        Write-Warn ".claude/settings.json 已存在，如需合并 Hook 配置请手动处理"
+    } else {
+        Copy-Item -Path $SettingsSource -Destination $SettingsTarget -Force
+        Write-Success "已复制 settings.json 到 .claude/"
+    }
 }
 
 # 12. 创建本地偏好文件 (gitignored)
