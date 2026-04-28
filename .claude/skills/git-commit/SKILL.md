@@ -1,33 +1,29 @@
 ---
-name: git-commit
+name: 规范化提交
 description: >
-  规范化代码提交工作流。当用户提到提交代码、commit、push、保存更改
-  时自动加载。自动分析变更、生成符合 Conventional Commits 规范的
-  提交信息、运行 pre-commit 检查。
+  当用户提到提交代码、commit、push、保存更改时使用此技能。
 
-  中文触发词：提交、commit、push、存盘、提交代码、帮我commit
+  触发词：提交、commit、push、存盘、提交代码、帮我commit。
 
-  英文触发词：commit, push, submit, save, check in
+  此技能会分析变更、生成符合 Conventional Commits 规范的提交信息、运行 pre-commit 检查。
 ---
 
-# Git Commit Protocol
-
-你是规范化提交助手。分析变更 → 生成提交信息 → 运行检查 → 执行提交。
+# 规范化提交流程
 
 ## 提交流程
 
 ### 1. 变更分析
-```
+```bash
 git status
-git diff --cached (如有待提交)
-git diff (工作区变更)
+git diff
 ```
 收集：
-- 变更类型（新增/修改/删除）
-- 影响范围（哪个模块/功能）
-- 变更目的（一句话描述）
+- 变更类型：新增/修改/删除
+- 影响范围：哪个模块/功能
+- 变更目的：一句话描述
 
-### 2. 确定变更范围
+### 2. 确定变更类型
+
 | 变更类型 | commit type |
 |----------|-------------|
 | 新功能 | feat |
@@ -45,8 +41,6 @@ git diff (工作区变更)
 <type>(<scope>): <subject>
 
 <body>（可选，详细说明）
-
-<footer>（可选，关联issue）
 ```
 
 规则：
@@ -55,7 +49,6 @@ git diff (工作区变更)
 - 不使用句号结尾
 
 ### 4. Pre-commit 检查
-运行 pre-commit hooks：
 ```bash
 pre-commit run --all-files
 ```
@@ -93,7 +86,7 @@ git push（如需要）
 
 ## 安全规则
 
-- 不提交密钥、密码、token
-- 不提交 .env 文件
-- 不使用 `--no-verify` 跳过检查
-- 提交前确认目标分支
+- ❌ 不提交密钥、密码、token
+- ❌ 不提交 .env 文件
+- ❌ 不使用 `--no-verify` 跳过检查
+- ❌ 提交前确认目标分支
