@@ -21,11 +21,11 @@ suggestion=""
 
 # ─── 场景 1：编辑测试文件 → 推荐 TDD ───
 if echo "$file_path" | grep -qE "(^|/)tests?/" 2>/dev/null; then
-    suggestion="检测到你正在编辑测试文件。建议使用「tdd-workflow」技能来强制执行红-绿-重构循环，输入 /tdd-workflow 手动触发。"
+    suggestion="检测到你正在编辑测试文件。建议使用「tdd-workflow」技能来强制执行红-绿-重构循环，输入 /tdd-workflow 手动触发。 | "
 fi
 
 # ─── 场景 2：编辑安全相关文件 → 推荐安全审查 ───
-if echo "$file_path" | grep -qiE "(auth|login|password|token|secret|session|encrypt|jwt|oauth|crypto|ssl|tls|hash|cipher|cert|sign|key)" 2>/dev/null; then
+if echo "$file_path" | grep -qiE "(auth|login|password|token|secret|session|encrypt|jwt|oauth|crypto|ssl|tls|hash|cipher|cert|sign|rsa_key|api_key|private_key|secret_key)" 2>/dev/null; then
     if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
     suggestion="${suggestion}检测到你正在修改安全相关代码。建议使用「code-review」技能重点审查安全性，输入 /code-review 手动触发。"
 fi

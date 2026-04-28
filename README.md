@@ -52,7 +52,9 @@ claude
 ## 功能
 
 - **项目配置**：自动生成 CLAUDE.md + SOUL.md + PLAN_TEMPLATE.md 覆盖层模板
-- **工作流引擎**：智能 Skills 路由 + 8 个自定义命令（审查/提交/修复/重构/解释/校验）
+- **智能 Skills 路由**：11 个可自动触发的 Skills（Router + 审查/提交/TDD/调试/重构/修复/解释/校验等）
+- **工作流引擎**：8 个自定义命令（/review/fix/refactor/explain/validate/commit/architect/help）
+- **场景感知 Hooks**：smart-context.sh 根据操作上下文自动推荐 Skill
 - **质量保障**：5 个校验脚本 + Pre-commit hooks + cc-discipline 物理防火墙
 - **AI 增强**：ECC 生态 + Superpowers + OpenSpec SDD 工作流
 
