@@ -1,64 +1,61 @@
 ---
-name: 开发工作流路由
+name: workflow-router
 description: >
-  当用户提到开发流程自动化任务时使用此技能。
+  智能工作流路由器。根据用户意图自动选择最合适的开发工作流。
+  当用户提到以下场景时自动加载：代码审查、提交代码、修复错误、重构代码、
+  解释代码、架构评审、运行校验、测试执行、开发新功能。
 
-  触发词包括但不限于：审查代码、代码审查、review、提交、commit、
-  修复、修bug、重构、解释代码、跑校验、安全检查、架构评审、设计方案、
-  测试，写测试、跑测试、部署、发版。
+  中文触发词：审查、检查、看看、review一下、提交、commit、修复、fix、
+  重构、refactor、解释、explain、评审、架构、校验、validate、测试、
+  开发新功能、帮我看看代码、帮我检查一下、代码质量
 
-  此技能会分析用户的意图，自动选择并调用最合适的下游技能或命令。
+  英文触发词：review, commit, fix, refactor, explain, validate, test,
+  check, architecture, design, bug, error, debug, quality, security,
+  audit, refactor, restructure, deploy
 ---
 
-# 开发工作流智能路由器
+# Development Workflow Router
 
-你是智能任务调度员。仔细分析用户的输入，判断出最准确的意图，然后加载对应的技能或执行对应的命令。
+你是智能工作流路由器。分析用户请求后，自动路由到最合适的技能。
 
-## 决策逻辑
+## 决策树
 
-| 用户意图（关键词） | 动作 | 示例 |
-| :--- | :--- | :--- |
-| 审查、检查、review | 启动「代码审查」技能 | "帮我审查下这段代码" |
-| 提交、commit、push | 执行 `/commit` 命令 | "提交代码" |
-| 架构、方案、设计 | 执行 `/architect` 命令 | "评审一下这个微服务方案" |
-| 修复、bug、报错 | 启动「自动修复」技能 | "修复这个空指针异常" |
-| 重构、整理、优化 | 启动「安全重构」技能 | "重构这个老旧的DAO层" |
-| 解释、这段代码、不理解 | 执行 `/explain` 命令 | "解释下 user_service.py" |
-| 测试，写测试、跑测试 | 执行测试命令 | "帮我写个单元测试" |
-| 安全检查、漏洞、加密 | 启动「代码审查」技能（强化安全） | "检查下登录接口的安全性" |
-| 校验、规范检查、pre-commit | 执行 `/validate` 命令 | "跑一遍所有项目校验脚本" |
+### Step 1: 意图分类
 
-## 路由原则
+| 意图 | 触发关键词 | 路由目标 |
+|------|-----------|----------|
+| 代码审查 | 审查、检查、review、检查代码、质量 | → code-review |
+| 提交代码 | 提交、commit、push、存盘 | → git-commit |
+| 修复错误 | 修复、fix、bug、错误、报错、调试 | → error-fix |
+| 安全重构 | 重构、refactor、清理代码 | → safe-refactor |
+| 代码解释 | 解释、explain、看看这段代码、读懂 | → code-explain |
+| 项目校验 | 校验、validate、检查项目 | → project-validate |
+| 架构评审 | 架构、architect、设计方案 | → /architect |
+| 测试执行 | 运行测试、test、pytest、npm test | → 执行测试命令 |
+| 复杂功能 | 新功能、feature、复杂、跨模块 | → OpenSpec SDD |
 
-- **意图清晰时**：直接加载对应技能或执行命令
-- **意图模糊或多步骤时**（如"审查代码然后提交"）：按顺序逐一执行
-- **无法匹配时**：回复暂时没有相关工作流，询问是否需要创建
+### Step 2: 路由规则
 
-## 多步编排
+- **意图明确时**：立即加载对应 Skill 的 SKILL.md
+- **意图模糊时**（如"帮我检查一下然后提交"）：按顺序加载多个 Skill
+- **无匹配时**：询问用户具体需求，建议创建新 Skill
+
+### Step 3: 多步编排
 
 | 场景 | 工作流顺序 |
 |------|-----------|
-| 审查后提交 | 代码审查 → /commit |
-| 修复后提交 | 自动修复 → /commit |
-| 重构后审查 | 安全重构 → 代码审查 |
+| 检查后提交 | code-review → git-commit |
+| 修复后提交 | error-fix → git-commit |
+| 重构后审查 | safe-refactor → code-review |
 | 评审后开发 | /architect → OpenSpec SDD |
-| 安全敏感变更 | 代码审查（强化安全）→ /architect → OpenSpec SDD |
+| 安全敏感变更 | code-review(强调安全) → /architect → OpenSpec SDD |
 
-## 高风险操作熔断
+### Step 4: 高风险操作熔断
 
 以下操作必须确认后才能执行：
 - `rm -rf`、`DROP TABLE`、`git push --force`
 - 生产环境部署、数据库迁移
 - 任何涉及删除不可恢复数据的操作
-
-## 复杂决策时的多角色协作
-
-对于架构评审或复杂技术决策：
-1. 启动 **plan-agent** 设计实现方案
-2. 启动 **code-reviewer** 分析风险和安全问题
-3. 综合两者输出，形成完整建议
-
-需要时使用 web search 验证技术方案的时效性。
 
 ## 输出格式
 
@@ -71,3 +68,12 @@ description: >
 2. [步骤2]
 ...
 ```
+
+## 复杂决策时的多角色协作
+
+对于架构评审或复杂技术决策：
+1. 启动 **plan-agent** 设计实现方案
+2. 启动 **code-reviewer** 分析风险和安全问题
+3. 综合两者输出，形成完整建议
+
+需要时使用 web search 验证技术方案的时效性。

@@ -1,15 +1,19 @@
 ---
-name: 项目校验
+name: project-validate
 description: >
-  当用户提到运行校验、检查项目、完整性检查时使用此技能。
+  项目完整性校验工作流。当用户提到运行校验、检查项目、validate、
+  检查代码规范、完整性检查时自动加载。
+  运行结构检查、密钥安全、函数长度、依赖方向、import顺序五项检查。
 
-  触发词：校验、validate、检查项目、完整性、代码规范检查、
-  运行检查、帮我检查。
+  中文触发词：校验、validate、检查项目、完整性、代码规范检查、
+  运行检查、帮我检查
 
-  此技能运行结构检查、密钥安全、函数长度、依赖方向、import顺序五项检查。
+  英文触发词：validate, check, lint, verify, check project, validation
 ---
 
-# 项目校验协议
+# Project Validate Protocol
+
+你是项目质量校验专家。运行全面检查，确保项目符合规范。
 
 ## 校验流程
 
