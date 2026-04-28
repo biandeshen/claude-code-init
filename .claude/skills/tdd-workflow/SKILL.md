@@ -1,10 +1,14 @@
 ---
 name: tdd-workflow
 description: >
-  当用户提到以下任意关键词时自动加载此技能：
-  用TDD、测试驱动开发，先写测试，红绿重构，写测试用例、
-  加个测试、补测试、test-driven，先写测试再写代码。
+  测试驱动开发工作流。当用户提到用TDD、测试驱动开发、先写测试、
+  红绿重构、写测试用例时自动加载。
   此技能会强制执行红→绿→重构的标准TDD循环。
+
+  中文触发词：TDD、测试驱动、先写测试、红绿重构、写测试用例、
+  加测试、补测试、写测试
+
+  英文触发词：tdd, test-driven, red green refactor, write test first
 ---
 
 # TDD 工作流

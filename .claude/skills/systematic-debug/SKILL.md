@@ -1,10 +1,14 @@
 ---
 name: systematic-debug
 description: >
-  当用户提到以下任意关键词时自动加载此技能：
-  有bug、报错、调试、debug、定位问题、排查、修bug、
-  不工作，出错、异常、崩溃、失败，空指针、undefined。
+  系统化调试工作流。当用户提到有bug、报错、调试、定位问题、排查、
+  修bug、不工作、出错时自动加载。
   此技能会执行系统化的根因分析流程，禁止盲目试错。
+
+  中文触发词：调试、debug、定位、排查、修bug、有bug、报错、错误、
+  出错、异常、崩溃、失败、空指针、undefined
+
+  英文触发词：debug, debug, fix, troubleshoot, investigate, issue, problem, error, crash
 ---
 
 # 系统化调试流程

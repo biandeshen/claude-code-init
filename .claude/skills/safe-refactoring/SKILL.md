@@ -1,10 +1,14 @@
 ---
 name: safe-refactoring
 description: >
-  当用户提到以下任意关键词时自动加载此技能：
-  重构、整理代码、优化结构、提取方法、重命名、改善、
-  代码太乱，太长了、refactor、restructure、clean up。
+  安全重构工作流。当用户提到重构、整理代码、优化结构、提取方法、
+  重命名、改善代码结构时自动加载。
   此技能会在先写保护测试的前提下安全执行重构。
+
+  中文触发词：重构、refactor、清理、重写、整理代码、让代码更清晰、
+  代码优化、改善结构、提取方法、重命名
+
+  英文触发词：refactor, restructure, clean up, improve code, reorganize
 ---
 
 # 安全重构流程
