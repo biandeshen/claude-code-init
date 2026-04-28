@@ -62,12 +62,14 @@ pre-commit run --all-files
 - 如有失败，分析原因并修复
 - 不得跳过检查（除非用户明确要求）
 
-### 5. 执行提交
+### 5. Push 确认
 ```bash
 git add <files>
 git commit -m "<message>"
-git push（如需要）
 ```
+- `git push`：自动执行
+- `git push --force` / `git push --force-with-lease`：必须先展示将要覆盖的 commits 并请求人工确认
+- **禁止在 main/master 分支上执行 force push**，无论是否确认
 
 ## 输出格式
 
