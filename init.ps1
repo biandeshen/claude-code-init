@@ -75,6 +75,19 @@ if (-not $SkipSuperpowers) {
     Write-Info "跳过 Superpowers 安装"
 }
 
+# 4.1 阻断性确认
+Write-Host ""
+Write-Host "==============================================" -ForegroundColor Yellow
+Write-Host " 重要：以上 ECC 和 Superpowers 插件需要在 Claude Code 中手动安装" -ForegroundColor Yellow
+Write-Host " 如果你已完成安装，请输入 y 继续；否则请输入 n 退出" -ForegroundColor Yellow
+Write-Host "==============================================" -ForegroundColor Yellow
+$confirm = Read-Host "是否已完成插件安装？(y/n)"
+if ($confirm -ne "y") {
+    Write-Host "请先完成插件安装，再重新运行此脚本。" -ForegroundColor Red
+    exit 1
+}
+Write-Success "已确认插件安装"
+
 # 5. 安装 OpenSpec (SDD) - 自动执行
 if (-not $SkipOpenSpec) {
     Write-Step "安装 OpenSpec (SDD 工作流)"

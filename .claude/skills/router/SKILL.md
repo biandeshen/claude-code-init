@@ -7,11 +7,13 @@ description: >
   architecture review, technical design, fixing errors, bugs, debugging,
   refactoring, restructuring, explaining code, understanding logic, running
   validation checks, pre-commit, complex feature development, new capability,
-  major changes, or any development task that requires tool orchestration.
+  major changes, test execution, running tests, writing tests, or any
+  development task that requires tool orchestration.
 
   Triggers: commit, submit, push, review, check, fix, error, bug, debug,
-  refactor, restructure, explain, understand, validate, lint, test, security,
-  architecture, design, feature, new, complex, deploy, production, database
+  refactor, restructure, explain, understand, validate, lint, test, tests,
+  pytest, npm test, security, architecture, design, feature, new, complex,
+  deploy, production, database
 ---
 
 # Development Workflow Router
@@ -34,6 +36,7 @@ unless the task is genuinely ambiguous.
 | Refactoring | User wants to restructure code without changing behavior |
 | Code Explanation | User wants to understand existing code |
 | Validation | User wants to run project checks (lint, secrets, structure) |
+| Test Execution | User wants to run tests, write tests, or check test coverage |
 | Complex Feature | User wants to build a new feature that spans multiple modules |
 | Quick Change | User wants a small edit (typo, rename, minor tweak) |
 
@@ -61,6 +64,11 @@ unless the task is genuinely ambiguous.
 
 **Validation**
 → Execute `/validate` command (run all check scripts in `.claude/scripts/`)
+
+**Test Execution**
+→ If running existing tests: execute the project's test command directly (e.g., `pytest`, `npm test`, `cargo test`)
+→ If writing new tests: use Superpowers TDD workflow with `用 TDD 方式写测试`
+→ If analyzing test coverage: use ECC `/ut` for unit test generation
 
 **Complex Feature**
 → Start OpenSpec SDD workflow:

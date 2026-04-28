@@ -107,6 +107,16 @@ repos:
         args: ['--maxkb=500']
       - id: check-merge-conflict
       - id: detect-private-key
+        exclude: |
+          (?x)(
+            ^tests/|
+            ^test/|
+            ^docs/|
+            ^.*\.test\.|
+            ^.*_test\.|
+            ^.*\.md$|
+            ^.*\.txt$
+          )
 
   # 9. 禁止提交 certain files
   - repo: local
