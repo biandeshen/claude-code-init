@@ -229,6 +229,22 @@ if (Test-Path $SkillsDir) {
     Write-Info "Skills 目录不存在，跳过"
 }
 
+# 11.2 复制 Hooks 和 settings.json
+Write-Step "复制 Hooks 和设置"
+$HooksSourceDir = Join-Path $ScriptDir ".claude\hooks"
+$HooksTargetDir = "$ProjectPath\.claude\hooks"
+$SettingsSource = Join-Path $ScriptDir ".claude\settings.json"
+$SettingsTarget = "$ProjectPath\.claude\settings.json"
+if (Test-Path $HooksSourceDir) {
+    New-Item -ItemType Directory -Force -Path $HooksTargetDir | Out-Null
+    Copy-Item -Path "$HooksSourceDir\*" -Destination $HooksTargetDir -Force -Recurse
+    Write-Success "已复制 Hooks 到 .claude/hooks/"
+}
+if (Test-Path $SettingsSource) {
+    Copy-Item -Path $SettingsSource -Destination $SettingsTarget -Force
+    Write-Success "已复制 settings.json 到 .claude/"
+}
+
 # 12. 创建本地偏好文件 (gitignored)
 Write-Step "创建 CLAUDE.local.md (本地偏好)"
 $localMd = @"

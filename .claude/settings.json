@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit",
+        "command": "bash .claude/hooks/smart-context.sh"
+      },
+      {
+        "matcher": "Bash",
+        "command": "bash .claude/hooks/smart-context.sh"
+      }
+    ]
+  }
+}

@@ -191,6 +191,22 @@ else
     echo_info "Skills 目录不存在，跳过"
 fi
 
+# 11.2 复制 Hooks 和 settings.json
+echo_step "复制 Hooks 和设置"
+HOOKS_SOURCE_DIR="$SCRIPT_DIR/.claude/hooks"
+HOOKS_TARGET_DIR="$PROJECT_PATH/.claude/hooks"
+SETTINGS_SOURCE="$SCRIPT_DIR/.claude/settings.json"
+SETTINGS_TARGET="$PROJECT_PATH/.claude/settings.json"
+if [ -d "$HOOKS_SOURCE_DIR" ]; then
+    mkdir -p "$HOOKS_TARGET_DIR"
+    cp -r "$HOOKS_SOURCE_DIR/"* "$HOOKS_TARGET_DIR/"
+    echo_success "已复制 Hooks 到 .claude/hooks/"
+fi
+if [ -f "$SETTINGS_SOURCE" ]; then
+    cp "$SETTINGS_SOURCE" "$SETTINGS_TARGET"
+    echo_success "已复制 settings.json 到 .claude/"
+fi
+
 # 12. 创建本地偏好文件 (gitignored)
 echo_step "创建 CLAUDE.local.md (本地偏好)"
 cat > "$PROJECT_PATH/CLAUDE.local.md" << 'EOF'
