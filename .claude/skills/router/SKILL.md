@@ -1,136 +1,79 @@
 ---
-name: router
+name: workflow-router
 description: >
-  Intelligent workflow router for development tasks. Automatically determines
-  which tools and workflows to use based on the task type. Use this skill when
-  the user mentions: committing code, submitting changes, review, code quality,
-  architecture review, technical design, fixing errors, bugs, debugging,
-  refactoring, restructuring, explaining code, understanding logic, running
-  validation checks, pre-commit, complex feature development, new capability,
-  major changes, test execution, running tests, writing tests, or any
-  development task that requires tool orchestration.
+  智能工作流路由器。根据用户意图自动选择最合适的开发工作流。
+  当用户提到以下场景时自动加载：代码审查、提交代码、修复错误、重构代码、
+  解释代码、架构评审、运行校验、测试执行、开发新功能。
 
-  Triggers: commit, submit, push, review, check, fix, error, bug, debug,
-  refactor, restructure, explain, understand, validate, lint, test, tests,
-  pytest, npm test, security, architecture, design, feature, new, complex,
-  deploy, production, database
+  中文触发词：审查、检查、看看、review一下、提交、commit、修复、fix、
+  重构、refactor、解释、explain、评审、架构、校验、validate、测试、
+  开发新功能、帮我看看代码、帮我检查一下、代码质量
+
+  英文触发词：review, commit, fix, refactor, explain, validate, test,
+  check, architecture, design, bug, error, debug, quality, security,
+  audit, refactor, restructure, deploy
 ---
 
 # Development Workflow Router
 
-## Core Principle
-When the user describes a development task, analyze it and route to the
-correct workflow automatically. Do NOT ask the user which workflow to use
-unless the task is genuinely ambiguous.
+你是智能工作流路由器。分析用户请求后，自动路由到最合适的技能。
 
-## Decision Tree
+## 决策树
 
-### Step 1: Classify the task
+### Step 1: 意图分类
 
-| Task Type | Indicators |
-|------------|------------|
-| Code Commit | User wants to save/submit/push changes |
-| Code Review | User wants quality/security check before or after writing code |
-| Architecture Review | User is evaluating a technical decision or system design |
-| Error Fixing | User has a bug, error, test failure, or unexpected behavior |
-| Refactoring | User wants to restructure code without changing behavior |
-| Code Explanation | User wants to understand existing code |
-| Validation | User wants to run project checks (lint, secrets, structure) |
-| Test Execution | User wants to run tests, write tests, or check test coverage |
-| Complex Feature | User wants to build a new feature that spans multiple modules |
-| Quick Change | User wants a small edit (typo, rename, minor tweak) |
+| 意图 | 触发关键词 | 路由目标 |
+|------|-----------|----------|
+| 代码审查 | 审查、检查、review、检查代码、质量 | → code-review |
+| 提交代码 | 提交、commit、push、存盘 | → git-commit |
+| 修复错误 | 修复、fix、bug、错误、报错、调试 | → error-fix |
+| 安全重构 | 重构、refactor、清理代码 | → safe-refactor |
+| 代码解释 | 解释、explain、看看这段代码、读懂 | → code-explain |
+| 项目校验 | 校验、validate、检查项目 | → project-validate |
+| 架构评审 | 架构、architect、设计方案 | → /architect |
+| 测试执行 | 运行测试、test、pytest、npm test | → 执行测试命令 |
+| 复杂功能 | 新功能、feature、复杂、跨模块 | → OpenSpec SDD |
 
-### Step 2: Select workflow based on classification
+### Step 2: 路由规则
 
-**Code Commit**
-→ Execute `/commit` command (analyze changes → Conventional Commits → pre-commit)
+- **意图明确时**：立即加载对应 Skill 的 SKILL.md
+- **意图模糊时**（如"帮我检查一下然后提交"）：按顺序加载多个 Skill
+- **无匹配时**：询问用户具体需求，建议创建新 Skill
 
-**Code Review**
-→ Execute `/review` command (security, correctness, performance, maintainability, test coverage)
+### Step 3: 多步编排
 
-**Architecture Review**
-→ Execute `/architect <方案描述>` command (multi-dimensional analysis with priority-ranked recommendations)
+| 场景 | 工作流顺序 |
+|------|-----------|
+| 检查后提交 | code-review → git-commit |
+| 修复后提交 | error-fix → git-commit |
+| 重构后审查 | safe-refactor → code-review |
+| 评审后开发 | /architect → OpenSpec SDD |
+| 安全敏感变更 | code-review(强调安全) → /architect → OpenSpec SDD |
 
-**Error Fixing**
-→ Execute `/fix` command (collect info → root cause hypothesis → solution comparison → execute → verify → commit)
-→ If the same fix fails twice, STOP and request human intervention
-→ If editing the same file more than 5 times, STOP and re-analyze
+### Step 4: 高风险操作熔断
 
-**Refactoring**
-→ Execute `/refactor` command (define boundaries → protective tests → incremental refactoring → verify → commit)
+以下操作必须确认后才能执行：
+- `rm -rf`、`DROP TABLE`、`git push --force`
+- 生产环境部署、数据库迁移
+- 任何涉及删除不可恢复数据的操作
 
-**Code Explanation**
-→ Execute `/explain <target>` command (overview → architecture → data flow → key decisions → risks)
-
-**Validation**
-→ Execute `/validate` command (run all check scripts in `.claude/scripts/`)
-
-**Test Execution**
-→ If running existing tests: execute the project's test command directly (e.g., `pytest`, `npm test`, `cargo test`)
-→ If writing new tests: use Superpowers TDD workflow with `用 TDD 方式写测试`
-→ If analyzing test coverage: use ECC `/ut` for unit test generation
-
-**Complex Feature**
-→ Start OpenSpec SDD workflow:
-  1. `/opsx:propose <feature-name>` — Why
-  2. `/opsx:spec <feature-name>` — What
-  3. `/opsx:design <feature-name>` — How
-  4. `/opsx:task <feature-name>` — Break down into atomic steps
-  5. `/opsx:check <feature-name>` — Quality gate
-  6. `/opsx:apply <feature-name>` — Execute
-  7. `/opsx:archive <feature-name>` — Archive
-
-**Quick Change**
-→ Execute directly without formal workflow
-
-### Step 3: Multi-step orchestration
-
-| Scenario | Workflows (in order) |
-|----------|---------------------|
-| "Submit after review" | `/review` → (if passes) → `/commit` |
-| "Review architecture before building" | `/architect` → (if approved) → OpenSpec SDD |
-| "Fix error and submit" | `/fix` → (after fix verified) → `/commit` |
-| "Refactor and review" | `/refactor` → (after refactoring) → `/review` |
-| Security-sensitive changes | `/review` (emphasize security) → `/architect` → OpenSpec SDD |
-
-### Step 4: ECC & Superpowers integration
-
-- **ECC**: Use `/bob` agent for complex full-stack tasks, `/plan` for exploratory planning, `/gen-docs` for documentation generation
-- **Superpowers**: Use `TDD way` for test-driven development, `subagent-driven development` for parallel task execution, `find root cause` for systematic debugging
-
-### Step 5: Safety Rules
-
-- For any task involving `rm -rf`, `DROP TABLE`, `git push --force`: MUST confirm with user before proceeding
-- If cc-discipline blocks an edit (5+ edits to same file): STOP and perform root cause analysis
-- If the same approach fails twice: STOP and request human intervention
-- Never skip pre-commit hooks unless explicitly instructed by user
-- For deploy/production/database migration: confirm with user before proceeding
-
-## Multi-Agent Thinking (for complex decisions)
-
-For architecture reviews or complex technical decisions:
-1. Launch a **plan-agent** to design the implementation approach
-2. Launch a **code-reviewer** to analyze potential risks and security concerns
-3. Synthesize their outputs into a comprehensive recommendation
-
-Use web search when:
-- Evaluating third-party libraries or tools
-- Checking best practices for unfamiliar technologies
-- Validating that a technical approach is current
-
-## Output Format
-
-When routing a task, output:
+## 输出格式
 
 ```markdown
-**Task Analysis**: [one-line description of the task]
-
-**Selected Workflow**: [workflow name]
-
-**Reason**: [why this workflow was chosen]
-
-**Execution Plan**:
-1. [Step 1]
-2. [Step 2]
+**任务分析**: [一句话描述]
+**选定工作流**: [技能名称]
+**路由理由**: [为什么选择这个工作流]
+**执行计划**:
+1. [步骤1]
+2. [步骤2]
 ...
 ```
+
+## 复杂决策时的多角色协作
+
+对于架构评审或复杂技术决策：
+1. 启动 **plan-agent** 设计实现方案
+2. 启动 **code-reviewer** 分析风险和安全问题
+3. 综合两者输出，形成完整建议
+
+需要时使用 web search 验证技术方案的时效性。
