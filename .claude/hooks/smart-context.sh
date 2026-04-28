@@ -25,7 +25,7 @@ if echo "$file_path" | grep -qE "(^|/)tests?/" 2>/dev/null; then
 fi
 
 # ─── 场景 2：编辑安全相关文件 → 推荐安全审查 ───
-if echo "$file_path" | grep -qiE "(auth|login|password|token|secret|session|encrypt|jwt|oauth)" 2>/dev/null; then
+if echo "$file_path" | grep -qiE "(auth|login|password|token|secret|session|encrypt|jwt|oauth|crypto|ssl|tls|hash|cipher|cert|sign|key)" 2>/dev/null; then
     if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
     suggestion="${suggestion}检测到你正在修改安全相关代码。建议使用「code-review」技能重点审查安全性，输入 /code-review 手动触发。"
 fi
@@ -44,7 +44,12 @@ fi
 
 # ─── 场景 5：执行 git push --force → 警告 ───
 if echo "$command" | grep -q "git push" 2>/dev/null; then
-    if echo "$command" | grep -q "\-\-force" 2>/dev/null; then
+    if echo "$command" | grep -q "\-\-force-with-lease" 2>/dev/null; then
+        # --force-with-lease 是相对安全的变体
+        if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+        suggestion="${suggestion}检测到 git push --force-with-lease。请确认远程分支未被其他人更新。"
+    elif echo "$command" | grep -q "\-\-force\b" 2>/dev/null; then
+        # 裸 --force 才是真正的危险操作
         if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
         suggestion="${suggestion}⚠️ 检测到 git push --force。请确认你了解这将对远程仓库产生的影响。"
     fi
