@@ -51,10 +51,10 @@ claude
 
 ## 功能
 
-- **一键初始化**：ECC + Superpowers + OpenSpec + cc-discipline
-- **覆盖层模板**：CLAUDE.md + SOUL.md + PLAN_TEMPLATE.md
-- **校验脚本**：密钥检查、函数长度、依赖方向、import 顺序
-- **AI 复杂度评估**：自动判断任务类型并选择执行模式
+- **项目配置**：自动生成 CLAUDE.md + SOUL.md + PLAN_TEMPLATE.md 覆盖层模板
+- **工作流引擎**：智能 Skills 路由 + 8 个自定义命令（审查/提交/修复/重构/解释/校验）
+- **质量保障**：5 个校验脚本 + Pre-commit hooks + cc-discipline 物理防火墙
+- **AI 增强**：ECC 生态 + Superpowers + OpenSpec SDD 工作流
 
 ## AI 复杂度评估
 
