@@ -1,0 +1,30 @@
+# Git
+.git/
+.gitignore
+
+# GitHub
+.github/
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# 本地文件
+CLAUDE.local.md
+
+# 文档（可选发布）
+docs/
+GUIDE.md
+
+# 测试（暂无）
+*.test.js
+*.spec.js

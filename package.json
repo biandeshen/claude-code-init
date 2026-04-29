@@ -2,9 +2,20 @@
   "name": "claude-code-init",
   "version": "1.4.1",
   "description": "Claude Code 项目脚手架：一键初始化开发环境",
+  "main": "index.js",
   "bin": {
     "claude-code-init": "./index.js"
   },
+  "files": [
+    "index.js",
+    "init.ps1",
+    "init.sh",
+    "templates/",
+    "commands/",
+    "scripts/",
+    "configs/",
+    ".claude/"
+  ],
   "scripts": {
     "start": "node index.js"
   },

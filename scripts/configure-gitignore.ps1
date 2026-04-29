@@ -1,4 +1,4 @@
-# scripts/configure-gitignore.ps1
+﻿# scripts/configure-gitignore.ps1
 # 用途：单独运行此脚本，更改 AI 配置文件的 .gitignore 策略
 # 用法：.\scripts\configure-gitignore.ps1 [-ProjectPath <路径>]
 

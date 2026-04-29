@@ -30,6 +30,7 @@ Write-Host ""
 
 # 1. 确认目标目录
 Write-Step "确认目标目录: $ProjectPath"
+$OriginalPath = $ProjectPath  # 保存原始路径用于日志
 if (-not (Test-Path $ProjectPath)) {
     New-Item -ItemType Directory -Force -Path $ProjectPath | Out-Null
     Write-Success "已创建目录"
@@ -296,7 +297,9 @@ Write-Host "==============================================" -ForegroundColor Gre
 Write-Host "  初始化完成！" -ForegroundColor Green
 Write-Host "==============================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "位置: $ProjectPath" -ForegroundColor White
+# 显示用户输入的原始路径，而非解析后的绝对路径
+$displayPath = if ($OriginalPath) { $OriginalPath } else { "." }
+Write-Host "位置: $displayPath" -ForegroundColor White
 Write-Host ""
 Write-Host "下一步:" -ForegroundColor Cyan
 Write-Host "  1. 编辑 CLAUDE.md 写入项目特定的架构规则" -ForegroundColor White
