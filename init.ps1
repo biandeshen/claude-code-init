@@ -299,7 +299,9 @@ $unattendedScripts = @(
     "tmux-session.sh",
     "ralph-setup.sh",
     "PROMPT.md",
-    "configure-gitignore.sh"
+    "configure-gitignore.sh",
+    "trigger-optimizer.sh",
+    "weekly-report.sh"
 )
 foreach ($script in $unattendedScripts) {
     $src = Join-Path $ScriptDir "scripts\$script"
@@ -318,7 +320,9 @@ $gstackCommands = @(
     "qa.md",
     "plan-ceo-review.md",
     "overnight.md",
-    "overnight-report.md"
+    "overnight-report.md",
+    "capabilities.md",
+    "status.md"
 )
 $targetCommandsDir = Join-Path $ProjectPath ".claude\commands"
 foreach ($cmd in $gstackCommands) {
@@ -335,22 +339,53 @@ Write-Host "  - tmux-session.sh: 启动无人值守会话" -ForegroundColor Gray
 Write-Host "  - ralph-setup.sh: 安装 Ralph Wiggum 插件" -ForegroundColor Gray
 Write-Host "  - /team: 启动 Agent 团队" -ForegroundColor Gray
 Write-Host "  - /qa: 质量保证测试" -ForegroundColor Gray
+Write-Host "  - trigger-optimizer.sh: 分析 Skills 触发优化建议" -ForegroundColor Gray
+Write-Host "  - weekly-report.sh: 生成本周使用报告" -ForegroundColor Gray
+
+# 16. 运行环境检查
+Write-Step "运行环境完整性检查"
+$checkEnvScript = Join-Path $ScriptDir "scripts\check-env.sh"
+if (Test-Path $checkEnvScript) {
+    Write-Info "环境检查脚本已复制到项目"
+}
 
 # 完成
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Green
-Write-Host "  初始化完成！" -ForegroundColor Green
+Write-Host "  Claude Code 开发环境初始化完成！" -ForegroundColor Green
 Write-Host "==============================================" -ForegroundColor Green
 Write-Host ""
-# 显示用户输入的原始路径，而非解析后的绝对路径
-$displayPath = if ($OriginalPath) { $OriginalPath } else { "." }
-Write-Host "位置: $displayPath" -ForegroundColor White
+Write-Host "你现在拥有：" -ForegroundColor Cyan
+Write-Host "  ✅ 11 个可自动触发的 Skills（审查/提交/TDD/调试/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）" -ForegroundColor White
+Write-Host "  ✅ 10+ 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status）" -ForegroundColor White
+Write-Host "  ✅ 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）" -ForegroundColor White
+Write-Host "  ✅ 6 个项目完整性校验脚本" -ForegroundColor White
+Write-Host "  ✅ Pre-commit 自动检查（9 个检查项）" -ForegroundColor White
+Write-Host "  ✅ 无人值守长任务环境（tmux + Ralph Wiggum 循环）" -ForegroundColor White
+Write-Host "  ✅ Agent Teams 并行开发/审查（/team）" -ForegroundColor White
+Write-Host "  ✅ gstack 角色体系（CEO审查/架构审查/QA测试/一键发布）" -ForegroundColor White
+Write-Host "  ✅ Skills 触发优化工具（trigger-optimizer.sh）" -ForegroundColor White
+Write-Host "  ✅ 周报生成工具（weekly-report.sh）" -ForegroundColor White
 Write-Host ""
-Write-Host "下一步:" -ForegroundColor Cyan
-Write-Host "  1. 编辑 CLAUDE.md 写入项目特定的架构规则" -ForegroundColor White
-Write-Host "  2. 编辑 SOUL.md 定义项目的 AI 人格" -ForegroundColor White
+Write-Host "下一步：" -ForegroundColor Yellow
+Write-Host "  1. 编辑 CLAUDE.md 写入项目特有的架构规则" -ForegroundColor White
+Write-Host "  2. 编辑 SOUL.md 定义此项目的 AI 人格" -ForegroundColor White
 Write-Host "  3. 启动 Claude Code，开始开发" -ForegroundColor White
+Write-Host "  4. 输入 /help 查看完整使用指南" -ForegroundColor White
+Write-Host "  5. 输入 /status 查看项目状态仪表盘" -ForegroundColor White
+Write-Host "  6. 输入 /capabilities 按场景查看全部能力" -ForegroundColor White
 Write-Host ""
+
+# 17. 全局偏好设置引导（跨所有项目生效）
+Write-Host "[建议] 设置全局偏好（跨所有项目生效）：" -ForegroundColor Yellow
+$globalClaude = "$env:USERPROFILE\.claude\CLAUDE.md"
+Write-Host "  将你的通用编码偏好写入 $globalClaude" -ForegroundColor Gray
+Write-Host "  例如：" -ForegroundColor Gray
+Write-Host "  - 所有函数必须有类型标注" -ForegroundColor Gray
+Write-Host "  - 偏好 Python 3.12+ 语法" -ForegroundColor Gray
+Write-Host "  - 注释使用中文" -ForegroundColor Gray
+Write-Host ""
+
 Write-Host "如需更新规范，运行:" -ForegroundColor Gray
 Write-Host "  git -C `"$ScriptDir`" pull" -ForegroundColor Gray
 Write-Host ""

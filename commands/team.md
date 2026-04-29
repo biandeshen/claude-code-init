@@ -33,11 +33,68 @@
 | 调试排查 | 3-5 | 多个调查者并行验证不同假设 |
 | 功能开发 | 3 | 前端 + 后端 + 测试 |
 
+## Teammate 工作区隔离（必须遵守）
+
+### 启动隔离工作区
+
+使用 `git worktree` 创建隔离的工作区：
+
+```bash
+git worktree add /tmp/teammate-{id} {branch}
+cd /tmp/teammate-{id}
+```
+
+### 为什么需要隔离
+
+- 避免 teammate 之间互相覆盖文件
+- 确保每个 teammate 的修改独立可追溯
+- 完成后由 Lead 决定是否合并
+
+### Teammate 完成后
+
+1. 在自己的 worktree 中 git commit
+2. Lead 审查后 git merge 到主分支
+3. 清理 worktree：`git worktree remove /tmp/teammate-{id}`
+
+## 通信模式（必须遵守）
+
+### 禁止直接通信
+
+teammate 之间**禁止**互相发送消息。所有汇报通过 Lead 中转。
+
+### 标准汇报格式
+
+每个 teammate 完成任务后，必须向 Lead 输出结构化汇报：
+
+```markdown
+## Teammate {id} 汇报
+
+### 完成的任务
+- [x] 任务1：说明
+- [x] 任务2：说明
+
+### 修改的文件
+| 文件 | 改动类型 | 说明 |
+|------|----------|------|
+| src/auth.py | 修改 | 修复 SQL 注入 |
+
+### 测试结果
+- 通过：15/15
+- 失败：0
+
+### 需要 Lead 关注的问题
+- 无
+```
+
+### Lead 汇总
+
+Lead 收集所有 teammate 汇报后，整合为一个综合报告输出给用户。
+
 ## 最佳实践
 
 1. **任务拆分**：每个 Agent 分配 5-6 个自包含的原子任务
 2. **文件所有权**：避免两个 Agent 编辑同一文件
-3. **直接通信**：Agent 之间可直接按名字发消息，无需 Lead 中转
+3. **隔离工作区**：使用 git worktree 避免冲突
 4. **进度检查**：定期使用 `/messages` 检查团队状态
 
 ## 限制
@@ -48,5 +105,5 @@
 
 ## 相关命令
 
-- `/messages` - 查看团队状态
+- `/messages` - 查看 teammate 汇报
 - `/clean` - 清理团队资源

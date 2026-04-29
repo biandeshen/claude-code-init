@@ -259,7 +259,7 @@ echo ""
 echo_step "配置无人值守长任务"
 echo_info "正在复制无人值守脚本..."
 
-UNATTENDED_SCRIPTS="tmux-session.sh ralph-setup.sh PROMPT.md"
+UNATTENDED_SCRIPTS="tmux-session.sh ralph-setup.sh PROMPT.md configure-gitignore.sh trigger-optimizer.sh weekly-report.sh"
 for script in $UNATTENDED_SCRIPTS; do
     src="$SCRIPT_DIR/scripts/$script"
     dst="$PROJECT_PATH/scripts/$script"
@@ -272,7 +272,7 @@ done
 
 # 15. 配置 gstack 命令
 echo_step "配置 gstack 角色命令"
-GSTACK_COMMANDS="team.md messages.md qa.md plan-ceo-review.md overnight.md overnight-report.md"
+GSTACK_COMMANDS="team.md messages.md qa.md plan-ceo-review.md overnight.md overnight-report.md capabilities.md status.md"
 TARGET_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
 for cmd in $GSTACK_COMMANDS; do
     src="$SCRIPT_DIR/commands/$cmd"
@@ -289,21 +289,53 @@ echo -e "  ${GRAY}- tmux-session.sh: 启动无人值守会话${NC}"
 echo -e "  ${GRAY}- ralph-setup.sh: 安装 Ralph Wiggum 插件${NC}"
 echo -e "  ${GRAY}- /team: 启动 Agent 团队${NC}"
 echo -e "  ${GRAY}- /qa: 质量保证测试${NC}"
+echo -e "  ${GRAY}- trigger-optimizer.sh: 分析 Skills 触发优化建议${NC}"
+echo -e "  ${GRAY}- weekly-report.sh: 生成本周使用报告${NC}"
+
+# 16. 运行环境检查
+echo ""
+echo_step "运行环境完整性检查"
+if [ -f "$SCRIPT_DIR/scripts/check-env.sh" ]; then
+    echo_info "环境检查脚本已复制到项目"
+fi
 
 # 完成
 echo ""
 echo -e "${GREEN}==============================================${NC}"
-echo -e "${GREEN}  初始化完成！${NC}"
+echo -e "${GREEN}  Claude Code 开发环境初始化完成！${NC}"
 echo -e "${GREEN}==============================================${NC}"
 echo ""
-# 显示用户输入的原始路径，而非解析后的绝对路径
-echo -e "位置: ${ORIGINAL_PATH}"
+echo -e "${CYAN}你现在拥有：${NC}"
+echo -e "  ${GREEN}✅${NC} 11 个可自动触发的 Skills（审查/提交/TDD/调试/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）"
+echo -e "  ${GREEN}✅${NC} 10+ 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status）"
+echo -e "  ${GREEN}✅${NC} 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）"
+echo -e "  ${GREEN}✅${NC} 6 个项目完整性校验脚本"
+echo -e "  ${GREEN}✅${NC} Pre-commit 自动检查（9 个检查项）"
+echo -e "  ${GREEN}✅${NC} 无人值守长任务环境（tmux + Ralph Wiggum 循环）"
+echo -e "  ${GREEN}✅${NC} Agent Teams 并行开发/审查（/team）"
+echo -e "  ${GREEN}✅${NC} gstack 角色体系（CEO审查/架构审查/QA测试/一键发布）"
+echo -e "  ${GREEN}✅${NC} Skills 触发优化工具（trigger-optimizer.sh）"
+echo -e "  ${GREEN}✅${NC} 周报生成工具（weekly-report.sh）"
 echo ""
-echo -e "${CYAN}下一步:${NC}"
-echo "  1. 编辑 CLAUDE.md 写入项目特定的架构规则"
-echo "  2. 编辑 SOUL.md 定义项目的 AI 人格"
+echo -e "${YELLOW}下一步：${NC}"
+echo "  1. 编辑 CLAUDE.md 写入项目特有的架构规则"
+echo "  2. 编辑 SOUL.md 定义此项目的 AI 人格"
 echo "  3. 启动 Claude Code，开始开发"
+echo "  4. 输入 /help 查看完整使用指南"
+echo "  5. 输入 /status 查看项目状态仪表盘"
+echo "  6. 输入 /capabilities 按场景查看全部能力"
 echo ""
+
+# 17. 全局偏好设置引导（跨所有项目生效）
+echo -e "${YELLOW}[建议] 设置全局偏好（跨所有项目生效）：${NC}"
+GLOBAL_CLAUDE="$HOME/.claude/CLAUDE.md"
+echo -e "  ${GRAY}将你的通用编码偏好写入 $GLOBAL_CLAUDE${NC}"
+echo -e "  ${GRAY}例如：${NC}"
+echo -e "  ${GRAY}- 所有函数必须有类型标注${NC}"
+echo -e "  ${GRAY}- 偏好 Python 3.12+ 语法${NC}"
+echo -e "  ${GRAY}- 注释使用中文${NC}"
+echo ""
+
 echo -e "如需更新规范，运行:"
 echo -e "  git -C \"$SCRIPT_DIR\" pull"
 echo ""

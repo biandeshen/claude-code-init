@@ -4,8 +4,8 @@
 # 功能：
 #   - 创建/重连 tmux 会话
 #   - 自动加载项目 .claude/settings.json
-#   - Ralph Wiggum 循环执行
-#   - 任务完成后生成 reports/summary.md
+#   - 安全限制：--max-turns, --max-budget-usd, --max-files-changed, --max-lines-changed
+#   - 无人值守专用路由 router-unattended
 # 用法：
 #   bash scripts/tmux-session.sh                    # 使用默认任务文件
 #   bash scripts/tmux-session.sh scripts/PROMPT.md # 指定任务文件
@@ -27,6 +27,13 @@ echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
 echo_success() { echo -e "${GREEN}[成功]${NC} $1"; }
 echo_warn() { echo -e "${YELLOW}[警告]${NC} $1"; }
 echo_fail() { echo -e "${RED}[失败]${NC} $1"; }
+echo_info() { echo -e "[信息] $1"; }
+
+# 默认安全参数
+MAX_TURNS="${MAX_TURNS:-50}"
+MAX_BUDGET="${MAX_BUDGET:-10.00}"
+MAX_FILES="${MAX_FILES:-20}"
+MAX_LINES="${MAX_LINES:-500}"
 
 # 检查依赖
 check_deps() {
@@ -57,6 +64,10 @@ setup_reports() {
 | 开始时间 | $(date '+%Y-%m-%d %H:%M:%S') |
 | 会话名 | $SESSION_NAME |
 | 任务文件 | $PROMPT_FILE |
+| 最大轮次 | $MAX_TURNS |
+| 最大预算 | \$$MAX_BUDGET |
+| 最大文件数 | $MAX_FILES |
+| 最大行数 | $MAX_LINES |
 
 ## 已完成任务
 
@@ -116,43 +127,62 @@ if [ ! -f "$PROMPT_FILE" ]; then
 - 无 lint 错误
 - 每完成一个任务必须 git commit
 
-## 约束条件
-- 最多重试 3 次，然后记录到 reports/blocked.md 继续下一个
-- 不要执行 git push --force
-- 每完成一个任务，在 reports/task-001.md 中写一段不超过 5 行的总结
+## 硬限制
+- 最多修改 $MAX_FILES 个文件，超过则停止并记录到 `reports/overlimit.md`
+- 最多修改 $MAX_LINES 行代码
+- 禁止执行 `rm -rf`、`git push --force`、`DROP TABLE`
+- 违反任一硬限制立即停止并记录
+- 最多重试 3 次，然后记录到 `reports/blocked.md` 继续下一个
 EOF
 fi
 
-# 构建 Claude Code 命令（关键：加载项目配置）
-# 使用 --settings 参数确保 cc-discipline 等规则生效
-CLAUDE_CMD="claude -p \"\$(cat $PROMPT_FILE)\" \
-  --settings \"$PROJECT_DIR/.claude/settings.json\" \
-  --max-turns 50 \
-  --max-budget-usd 10.00 \
-  --permission-mode acceptEdits \
-  --max-input-rate 5000 \
-  --max-output-rate 10000"
+# 构建 Claude Code 命令（关键：加载项目配置 + 安全限制）
+CLAUDE_SETTINGS="$PROJECT_DIR/.claude/settings.json"
+ROUTER_UNATTENDED="$PROJECT_DIR/.claude/skills/router-unattended/SKILL.md"
+
+# 基础参数
+BASE_PARAMS="--max-turns $MAX_TURNS --max-budget-usd $MAX_BUDGET --max-input-rate 5000 --max-output-rate 10000"
+
+# 如果有项目配置，加载它
+if [ -f "$CLAUDE_SETTINGS" ]; then
+    SETTINGS_PARAM="--settings \"$CLAUDE_SETTINGS\""
+    echo_info "加载项目配置: $CLAUDE_SETTINGS"
+else
+    SETTINGS_PARAM=""
+    echo_warn "未找到项目配置，使用受限模式"
+fi
+
+# 如果有无人值守专用路由，加载它
+if [ -f "$ROUTER_UNATTENDED" ]; then
+    ROUTER_PARAM="--skill router-unattended"
+    echo_info "加载无人值守专用路由"
+else
+    echo_info "使用默认路由"
+fi
+
+# 构建完整命令
+CLAUDE_CMD="claude -p \"\$(cat $PROMPT_FILE)\" $SETTINGS_PARAM $ROUTER_PARAM $BASE_PARAMS --permission-mode acceptEdits"
 
 # 发送初始化命令
 tmux send-keys -t "$SESSION_NAME" "cd \"$PROJECT_DIR\"" Enter
 sleep 1
 
-# 启动 Ralph Wiggum 循环（如果可用）
-if claude --help 2>/dev/null | grep -q "ralph"; then
-    echo_info "检测到 Ralph Wiggum 插件，使用 /ralph-loop"
-    tmux send-keys -t "$SESSION_NAME" "/ralph-loop \"\$(cat $PROMPT_FILE)\" --max-iterations 100" Enter
-else
-    # 使用原生 while 循环作为备选
-    echo_info "使用原生循环作为备选方案"
-    tmux send-keys -t "$SESSION_NAME" "while true; do" Enter
-    tmux send-keys -t "$SESSION_NAME" "  claude -p \"\$(cat $PROMPT_FILE)\" \\" Enter
-    tmux send-keys -t "$SESSION_NAME" "    --settings \"$PROJECT_DIR/.claude/settings.json\" \\" Enter
-    tmux send-keys -t "$SESSION_NAME" "    --max-turns 50 \\" Enter
-    tmux send-keys -t "$SESSION_NAME" "    --max-budget-usd 10.00 \\" Enter
-    tmux send-keys -t "$SESSION_NAME" "    --permission-mode acceptEdits" Enter
-    tmux send-keys -t "$SESSION_NAME" "  sleep 2" Enter
-    tmux send-keys -t "$SESSION_NAME" "done" Enter
+# 启动 Claude Code
+echo_info "启动 Claude Code..."
+echo_info "参数: --max-turns $MAX_TURNS --max-budget-usd \$$MAX_BUDGET --max-files $MAX_FILES --max-lines $MAX_LINES"
+
+tmux send-keys -t "$SESSION_NAME" "while true; do" Enter
+tmux send-keys -t "$SESSION_NAME" "  claude -p \"\$(cat $PROMPT_FILE)\" \\" Enter
+if [ -n "$SETTINGS_PARAM" ]; then
+    tmux send-keys -t "$SESSION_NAME" "    $SETTINGS_PARAM \\" Enter
 fi
+if [ -n "$ROUTER_PARAM" ]; then
+    tmux send-keys -t "$SESSION_NAME" "    $ROUTER_PARAM \\" Enter
+fi
+tmux send-keys -t "$SESSION_NAME" "    $BASE_PARAMS \\" Enter
+tmux send-keys -t "$SESSION_NAME" "    --permission-mode acceptEdits" Enter
+tmux send-keys -t "$SESSION_NAME" "  sleep 2" Enter
+tmux send-keys -t "$SESSION_NAME" "done" Enter
 
 echo ""
 echo_success "无人值守会话已启动"
@@ -162,8 +192,13 @@ echo "  重连会话: tmux attach -t $SESSION_NAME"
 echo "  分离会话: Ctrl+B, D"
 echo "  终止会话: tmux kill-session -t $SESSION_NAME"
 echo ""
+echo -e "${CYAN}安全限制：${NC}"
+echo "  最大轮次: $MAX_TURNS"
+echo "  最大预算: \$$MAX_BUDGET"
+echo "  最大文件数: $MAX_FILES"
+echo "  最大行数: $MAX_LINES"
+echo ""
 echo -e "${CYAN}任务文件：${NC} $PROMPT_FILE"
-echo -e "${CYAN}项目目录：${NC} $PROJECT_DIR"
 echo -e "${CYAN}报告目录：${NC} $PROJECT_DIR/reports"
 echo ""
 echo "完成后查看汇总:"

@@ -68,6 +68,31 @@ if echo "$command" | grep -qE "rm\s+-(rRf)" 2>/dev/null; then
     fi
 fi
 
+# ─── 场景 7：语义级安全检测（函数名检测）───
+# 获取最近编辑的函数名
+edited_function=$(git diff HEAD 2>/dev/null | grep "^@@" -A5 | grep -oP "(def|function|class|fn)\s+\K\w+" | head -1)
+
+# 语义级安全检测
+if echo "$edited_function" | grep -qiE "(encrypt|decrypt|hash|token|auth|login|password|secret|sanitize|validate)" 2>/dev/null; then
+    if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+    suggestion="${suggestion}检测到你正在编辑安全敏感函数「$edited_function」，建议使用「code-review」技能重点审查安全性。"
+fi
+
+# ─── 场景 8：夜间无人值守推荐 ───
+current_hour=$(date +%H 2>/dev/null || echo "12")
+if [ "$current_hour" -ge 18 ] && [ "$current_hour" -le 23 ]; then
+    if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+    suggestion="${suggestion}已到夜间，是否需要设置无人值守过夜任务？输入 'bash scripts/tmux-session.sh scripts/PROMPT.md' 启动"
+fi
+
+# ─── 自动记忆关键决策 ───
+if echo "$suggestion" | grep -qiE "(5分|SDD|安全审查|重大变更)" 2>/dev/null; then
+    # 触发记忆功能记录此决策
+    memory_hint="此任务涉及重大决策，建议使用 /memory 记录决策理由"
+    if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+    suggestion="${suggestion}💡 涉及重大决策，可使用 /memory 记录"
+fi
+
 # ─── 输出建议 ───
 if [ -n "$suggestion" ]; then
     cat <<EOF
