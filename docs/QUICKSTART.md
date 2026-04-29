@@ -47,6 +47,14 @@ AI 自动加载 code-review 技能，输出分级审查报告。
 bash scripts/tmux-session.sh scripts/PROMPT.md
 ```
 
+### 7. 进阶：云端定时任务（Routines）
+
+```bash
+/routine 每晚 2 点运行测试并修复 lint 错误
+```
+
+Claude Code 云端 Routines 可以在你关机后自动执行任务。
+
 ---
 
 ## 常见流程示例

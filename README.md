@@ -64,7 +64,6 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 | `/fix` | 自动修复 Bug |
 | `/commit` | 规范提交 |
 | `/refactor` | 安全重构 |
-| `/fix` | 自动修复 Bug |
 | `/explain <目标>` | 代码解释 |
 | `/validate` | 运行校验脚本 |
 | `/team <数量> <任务>` | 启动 Agent 团队并行工作 |

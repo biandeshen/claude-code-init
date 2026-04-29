@@ -24,10 +24,21 @@ if echo "$file_path" | grep -qE "(^|/)tests?/" 2>/dev/null; then
     suggestion="检测到你正在编辑测试文件。建议使用「tdd-workflow」技能来强制执行红-绿-重构循环，输入 /tdd-workflow 手动触发。 | "
 fi
 
-# ─── 场景 2：编辑安全相关文件 → 推荐安全审查 ───
+# ─── 场景 2：编辑安全相关文件 → 确定性加载 code-review ───
 if echo "$file_path" | grep -qiE "(auth|login|password|token|secret|session|encrypt|jwt|oauth|crypto|ssl|tls|hash|cipher|cert|sign|rsa_key|api_key|private_key|secret_key)" 2>/dev/null; then
     if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
-    suggestion="${suggestion}检测到你正在修改安全相关代码。建议使用「code-review」技能重点审查安全性，输入 /code-review 手动触发。"
+    suggestion="${suggestion}检测到你正在修改安全相关代码。「code-review」技能已自动加载。"
+    # 确定性 Skill 激活（不依赖语义匹配）
+    cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "skillToActivate": "code-review",
+    "suggestion": "$suggestion"
+  }
+}
+EOF
+    exit 0
 fi
 
 # ─── 场景 3：编辑涉及数据库的文件 → 推荐架构评审 ───
@@ -97,7 +108,13 @@ fi
 current_hour=$(date +%H 2>/dev/null || echo "12")
 if [ "$current_hour" -ge 18 ] && [ "$current_hour" -le 23 ]; then
     if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
-    suggestion="${suggestion}已到夜间，是否需要设置无人值守过夜任务？输入 'bash scripts/tmux-session.sh scripts/PROMPT.md' 启动"
+    suggestion="${suggestion}已到夜间，是否设置云端 Routine 定时执行？输入 /routine 创建定时任务。"
+fi
+
+# ─── 场景 9：首次审查后推荐 Agent Teams ───
+if echo "$command" | grep -q "/review" 2>/dev/null; then
+    if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+    suggestion="${suggestion}首次使用代码审查？试试 /team 3 启动三人生审查，覆盖安全、性能和测试三个维度。"
 fi
 
 # ─── 自动记忆关键决策 ───
