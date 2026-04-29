@@ -286,13 +286,15 @@ if [ "$USE_PWSH" = false ]; then
             if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
                 cat > "$PROJECT_PATH/.gitignore" << 'EOF'
 
-# Claude Code 开发环境配置（已全部忽略）
 # === claude-code-init ===
+# Claude Code 开发环境配置（已全部忽略）
 .claude/
+.pre-commit-config.yaml
 CLAUDE.md
 SOUL.md
 PLAN_TEMPLATE.md
 openspec/
+docs/
 # === claude-code-init ===
 EOF
             else
@@ -303,10 +305,12 @@ EOF
 # === claude-code-init ===
 # Claude Code 开发环境配置（已全部忽略）
 .claude/
+.pre-commit-config.yaml
 CLAUDE.md
 SOUL.md
 PLAN_TEMPLATE.md
 openspec/
+docs/
 # === claude-code-init ===
 EOF
             fi
@@ -371,10 +375,12 @@ EOF
 # === claude-code-init ===
 # Claude Code 开发环境配置（已全部忽略）
 .claude/
+.pre-commit-config.yaml
 CLAUDE.md
 SOUL.md
 PLAN_TEMPLATE.md
 openspec/
+docs/
 # === claude-code-init ===
 EOF
             else
@@ -385,10 +391,12 @@ EOF
 # === claude-code-init ===
 # Claude Code 开发环境配置（已全部忽略）
 .claude/
+.pre-commit-config.yaml
 CLAUDE.md
 SOUL.md
 PLAN_TEMPLATE.md
 openspec/
+docs/
 # === claude-code-init ===
 EOF
             fi

@@ -26,8 +26,8 @@ $gitignorePath = Join-Path $ProjectPath ".gitignore"
 # 读取已有内容，移除之前 claude-code-init 写入的规则块
 if (Test-Path $gitignorePath) {
     $existing = Get-Content $gitignorePath -Raw
-    # 移除从 "# Claude Code" 开始到下一个空行结束的块
-    $existing = $existing -replace "(?ms)# Claude Code.*?(?=\r?\n\r?\n|\r?\n$)", ""
+    # 移除 claude-code-init 标记的块
+    $existing = $existing -replace "(?ms)# === claude-code-init ===.*?# === claude-code-init ===", ""
     $existing = $existing.TrimEnd()
 } else {
     $existing = ""
@@ -36,12 +36,15 @@ if (Test-Path $gitignorePath) {
 switch ($choice) {
     "1" {
         $rules = @(
+            "# === claude-code-init ===",
             "# Claude Code 开发环境配置（已全部忽略）",
             ".claude/",
+            ".pre-commit-config.yaml",
             "CLAUDE.md",
             "SOUL.md",
             "PLAN_TEMPLATE.md",
-            "openspec/"
+            "openspec/",
+            "docs/"
         )
         Write-Host "[OK] 已将所有 AI 配置文件加入 .gitignore" -ForegroundColor Green
     }
@@ -61,12 +64,15 @@ switch ($choice) {
     }
     default {
         $rules = @(
+            "# === claude-code-init ===",
             "# Claude Code 开发环境配置（已全部忽略）",
             ".claude/",
+            ".pre-commit-config.yaml",
             "CLAUDE.md",
             "SOUL.md",
             "PLAN_TEMPLATE.md",
-            "openspec/"
+            "openspec/",
+            "docs/"
         )
         Write-Host "[OK] 已按默认处理（全部忽略）" -ForegroundColor Yellow
     }
