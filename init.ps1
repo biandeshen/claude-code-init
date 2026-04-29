@@ -298,7 +298,8 @@ Write-Info "正在复制无人值守脚本..."
 $unattendedScripts = @(
     "tmux-session.sh",
     "ralph-setup.sh",
-    "PROMPT.md"
+    "PROMPT.md",
+    "configure-gitignore.sh"
 )
 foreach ($script in $unattendedScripts) {
     $src = Join-Path $ScriptDir "scripts\$script"

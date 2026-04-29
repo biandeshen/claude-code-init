@@ -236,173 +236,22 @@ echo_success "已创建 CLAUDE.local.md"
 # 13. 处理 .gitignore（调用独立脚本）
 echo ""
 echo_step "处理 AI 开发配置文件"
-echo_info "正在调用 configure-gitignore.ps1..."
 
-# 检测 PowerShell 是否可用
+# 优先使用 PowerShell 脚本
 if command -v pwsh &> /dev/null || command -v powershell &> /dev/null; then
-    # 使用 PowerShell 脚本（需要交互式模式）
     CONFIGURE_SCRIPT="$SCRIPT_DIR/scripts/configure-gitignore.ps1"
     if [ -f "$CONFIGURE_SCRIPT" ]; then
-        # 调用 PowerShell 脚本，使用 -ExecutionPolicy Bypass 确保执行
         if command -v pwsh &> /dev/null; then
-            echo "$choice" | pwsh -NoProfile -ExecutionPolicy Bypass -File "$CONFIGURE_SCRIPT" -ProjectPath "$PROJECT_PATH" 2>/dev/null || true
+            pwsh -NoProfile -ExecutionPolicy Bypass -File "$CONFIGURE_SCRIPT" -ProjectPath "$PROJECT_PATH"
         else
-            echo "$choice" | powershell -NoProfile -ExecutionPolicy Bypass -File "$CONFIGURE_SCRIPT" -ProjectPath "$PROJECT_PATH" 2>/dev/null || true
+            powershell -NoProfile -ExecutionPolicy Bypass -File "$CONFIGURE_SCRIPT" -ProjectPath "$PROJECT_PATH"
         fi
-        # 检查是否成功配置
-        if [ -f "$PROJECT_PATH/.gitignore" ] && grep -q "claude-code-init" "$PROJECT_PATH/.gitignore"; then
-            echo_success ".gitignore 已更新"
-        else
-            echo_warn "PowerShell 脚本执行可能未成功，尝试使用内置逻辑"
-            USE_PWSH=false
-        fi
-    else
-        echo_warn "configure-gitignore.ps1 不存在，使用内置逻辑"
-        USE_PWSH=false
     fi
+# 回退到 Bash 脚本
+elif [ -f "$SCRIPT_DIR/scripts/configure-gitignore.sh" ]; then
+    bash "$SCRIPT_DIR/scripts/configure-gitignore.sh" "$PROJECT_PATH"
 else
-    echo_info "PowerShell 未安装，使用内置逻辑"
-    USE_PWSH=false
-fi
-
-# 如果 PowerShell 不可用或脚本不存在，使用内置逻辑
-if [ "$USE_PWSH" = false ]; then
-    echo ""
-    echo -e "${CYAN}==============================================${NC}"
-    echo -e "${CYAN}  如何处理 AI 开发配置文件？${NC}"
-    echo -e "${CYAN}==============================================${NC}"
-    echo ""
-    echo -e "  ${YELLOW}1)${NC} 全部忽略（推荐）—— 将所有 AI 配置文件加入 .gitignore"
-    echo -e "  ${YELLOW}2)${NC} 部分提交 —— 提交团队共享配置，仅忽略个人偏好文件"
-    echo -e "  ${YELLOW}3)${NC} 全部提交 —— 所有 AI 配置提交到仓库"
-    echo ""
-
-    read -p "请选择 (1/2/3，默认 1): " choice
-    choice=${choice:-1}
-
-    case $choice in
-        1)
-            # 全部忽略
-            if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
-                cat > "$PROJECT_PATH/.gitignore" << 'EOF'
-
-# === claude-code-init ===
-# Claude Code 开发环境配置（已全部忽略）
-.claude/
-.pre-commit-config.yaml
-CLAUDE.md
-SOUL.md
-PLAN_TEMPLATE.md
-openspec/
-docs/
-# === claude-code-init ===
-EOF
-            else
-                # 移除旧的 claude-code-init 块
-                sed -i '/# === claude-code-init ===/,/# === claude-code-init ===/d' "$PROJECT_PATH/.gitignore"
-                cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
-
-# === claude-code-init ===
-# Claude Code 开发环境配置（已全部忽略）
-.claude/
-.pre-commit-config.yaml
-CLAUDE.md
-SOUL.md
-PLAN_TEMPLATE.md
-openspec/
-docs/
-# === claude-code-init ===
-EOF
-            fi
-            echo_success "已将所有 AI 配置文件加入 .gitignore，项目保持干净"
-            ;;
-        2)
-            # 部分提交：仅忽略个人偏好文件
-            if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
-                cat > "$PROJECT_PATH/.gitignore" << 'EOF'
-
-# === claude-code-init ===
-# Claude Code 个人本地文件（务必忽略）
-CLAUDE.local.md
-# === claude-code-init ===
-EOF
-            else
-                if ! grep -q "CLAUDE.local.md" "$PROJECT_PATH/.gitignore"; then
-                    # 移除旧的 claude-code-init 块
-                    sed -i '/# === claude-code-init ===/,/# === claude-code-init ===/d' "$PROJECT_PATH/.gitignore"
-                    cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
-
-# === claude-code-init ===
-# Claude Code 个人本地文件（务必忽略）
-CLAUDE.local.md
-# === claude-code-init ===
-EOF
-                fi
-            fi
-            echo_success "已忽略个人偏好文件，团队共享配置（CLAUDE.md 等）保留为可提交"
-            ;;
-        3)
-            # 全部提交
-            if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
-                cat > "$PROJECT_PATH/.gitignore" << 'EOF'
-
-# === claude-code-init ===
-# Claude Code 个人本地文件
-CLAUDE.local.md
-# === claude-code-init ===
-EOF
-            else
-                if ! grep -q "CLAUDE.local.md" "$PROJECT_PATH/.gitignore"; then
-                    # 移除旧的 claude-code-init 块
-                    sed -i '/# === claude-code-init ===/,/# === claude-code-init ===/d' "$PROJECT_PATH/.gitignore"
-                    cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
-
-# === claude-code-init ===
-# Claude Code 个人本地文件
-CLAUDE.local.md
-# === claude-code-init ===
-EOF
-                fi
-            fi
-            echo_success "所有 AI 配置文件提交就绪"
-            ;;
-        *)
-            echo_warn "无效选择，默认全部忽略"
-            # 默认全部忽略
-            if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
-                cat > "$PROJECT_PATH/.gitignore" << 'EOF'
-
-# === claude-code-init ===
-# Claude Code 开发环境配置（已全部忽略）
-.claude/
-.pre-commit-config.yaml
-CLAUDE.md
-SOUL.md
-PLAN_TEMPLATE.md
-openspec/
-docs/
-# === claude-code-init ===
-EOF
-            else
-                # 移除旧的 claude-code-init 块
-                sed -i '/# === claude-code-init ===/,/# === claude-code-init ===/d' "$PROJECT_PATH/.gitignore"
-                cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
-
-# === claude-code-init ===
-# Claude Code 开发环境配置（已全部忽略）
-.claude/
-.pre-commit-config.yaml
-CLAUDE.md
-SOUL.md
-PLAN_TEMPLATE.md
-openspec/
-docs/
-# === claude-code-init ===
-EOF
-            fi
-            echo_success "已按默认处理"
-            ;;
-    esac
+    echo_warn "未找到配置脚本，跳过 .gitignore 配置"
 fi
 
 # 14. 配置无人值守长任务
