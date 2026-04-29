@@ -3,19 +3,28 @@
 [![Version](https://img.shields.io/badge/version-1.4.1-blue)](https://github.com/biandeshen/claude-code-init)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> ⚠️ **重要提醒**：此脚本仅提供模板文件。**核心插件 (ECC/Superpowers) 必须在 Claude Code 中手动交互安装**，详见下方步骤 3。
+一键搭建「AI辅助开发」工作环境。Claude Code 接入后，AI 会自动评估任务复杂度并选择最佳执行模式。
 
-一键初始化 Claude Code 开发环境，AI 自动评估任务复杂度并选择执行模式。
+## 它能帮你做什么？
+
+| 场景 | 效果 |
+|------|------|
+| 代码写完了 | 自动审查安全问题、性能问题、测试覆盖 |
+| Bug 修完了 | 自动提交 + 规范检查 |
+| 遇到复杂需求 | AI 自动拆分任务，复杂项目走 TDD |
+| 想重构但怕改坏 | 安全重构模式，只改味道不改变逻辑 |
+| 提交前不确定 | 一键检查敏感信息泄露 |
+| 夜间让它跑任务 | 无人值守模式，自动循环执行 |
 
 ## 快速开始
 
 ### 方式一：npx 一键初始化（推荐）
 
 ```bash
-# 初始化项目文件
+# 初始化项目
 npx claude-code-init --project-path ./my-project
 
-# 安装核心插件（必须手动操作）
+# 安装核心插件（在 Claude Code 中执行）
 /plugin marketplace add affaan-m/everything-claude-code
 /plugin install everything-claude-code@everything-claude-code
 /plugin marketplace add obra/superpowers-marketplace
@@ -29,61 +38,41 @@ claude
 ### 方式二：手动克隆
 
 ```bash
-# 1. 克隆脚手架
+# 克隆脚手架
 git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code-init
 
-# 2. 添加到 PATH（PowerShell）
-$env:Path += ";$HOME\tools\claude-code-init"
+# 初始化项目（Windows）
+.\init.ps1 -ProjectPath "你的项目路径"
 
-# 3. ⚠️ 安装插件（必须，在 Claude Code 中手动操作）
-/plugin marketplace add affaan-m/everything-claude-code
-/plugin install everything-claude-code@everything-claude-code
-/plugin marketplace add obra/superpowers-marketplace
-/plugin install superpowers@superpowers-marketplace
-
-# 4. 初始化新项目
-init.ps1 -ProjectPath "你的项目路径"
-
-# 5. 开始开发
-cd your-project
-claude
+# 初始化项目（macOS/Linux）
+./init.sh ./your-project
 ```
-
-## 功能
-
-- **项目配置**：自动生成 CLAUDE.md + SOUL.md + PLAN_TEMPLATE.md 覆盖层模板
-- **智能 Skills 路由**：11 个可自动触发的 Skills（Router + 审查/提交/TDD/调试/重构/修复/解释/校验等）
-- **工作流引擎**：8 个自定义命令（/review/fix/refactor/explain/validate/commit/architect/help）
-- **场景感知 Hooks**：smart-context.sh 根据操作上下文自动推荐 Skill
-- **质量保障**：5 个校验脚本 + Pre-commit hooks + cc-discipline 物理防火墙
-- **AI 增强**：ECC 生态 + Superpowers + OpenSpec SDD 工作流
-
-## AI 复杂度评估
-
-AI 自动评估任务复杂度并选择执行模式：
-- 0 分：直接执行
-- 1-2 分：Plan + 执行
-- 3-4 分：Plan + TDD
-- 5 分+：完整流程（/opsx:propose）
-
-> 完整评估规则见 [SOUL.md → 复杂度自动评估规则](templates/SOUL_Template.md)
-
-单文件编辑超过5次强制中断。
 
 ## 常用命令
 
 | 命令 | 作用 |
 |------|------|
-| `/help` | 智能帮助（场景导航 + 命令清单） |
+| `/review` | 代码审查（安全 + 性能 + 测试） |
+| `/fix` | 自动修复 Bug |
 | `/commit` | 规范提交 |
-| `/review` | 代码审查 |
-| `/architect <方案>` | 架构评审 |
-| `/fix` | 自动修复 |
 | `/refactor` | 安全重构 |
+| `/tdd` | 测试驱动开发 |
 | `/explain <目标>` | 代码解释 |
 | `/validate` | 运行校验脚本 |
+| `/help` | 查看所有命令 |
 
-> 💡 `/help <命令>` 查看命令详情，`/<命令>` 直接执行。例如：`/help review` 查看审查命令怎么用，`/review` 直接开始审查。
+> 输入 `/help <命令>` 查看详情，`/<命令>` 直接执行。例如：`/review` 直接开始审查。
+
+## 工作原理
+
+1. **复杂度评估**：AI 自动评估任务复杂度（0-5分）
+2. **自动分流**：
+   - 简单任务 → 直接执行
+   - 中等任务 → Plan + 执行
+   - 复杂任务 → TDD 或完整流程
+3. **安全保障**：Pre-commit Hooks 拦截敏感信息泄露
+
+> 详细规则见 [SOUL.md](templates/SOUL_Template.md)
 
 ## 完整文档
 

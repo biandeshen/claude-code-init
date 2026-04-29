@@ -55,6 +55,19 @@ if echo "$command" | grep -q "git push" 2>/dev/null; then
     fi
 fi
 
+# ─── 场景 6：执行 rm -rf 等危险删除命令 → 警告 ───
+if echo "$command" | grep -qE "rm\s+-(rRf)" 2>/dev/null; then
+    if echo "$command" | grep -qE "rm\s+-(rRf).*\$|rm\s+-(rRf).*~" 2>/dev/null; then
+        # 变量展开或 ~ 可能是危险模式
+        if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+        suggestion="${suggestion}⚠️ 检测到包含变量或通配符的删除命令，可能误删重要文件。"
+    elif echo "$command" | grep -qE "rm\s+-(rRf)\s+/" 2>/dev/null; then
+        # rm -rf / 是最危险的命令
+        if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+        suggestion="${suggestion}⚠️ 危险！检测到 rm -rf / 命令，这会删除系统文件。"
+    fi
+fi
+
 # ─── 输出建议 ───
 if [ -n "$suggestion" ]; then
     cat <<EOF
