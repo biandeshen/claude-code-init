@@ -50,15 +50,19 @@ switch ($choice) {
     }
     "2" {
         $rules = @(
+            "# === claude-code-init ===",
             "# Claude Code 个人本地文件（务必忽略）",
-            "CLAUDE.local.md"
+            "CLAUDE.local.md",
+            "# === claude-code-init ==="
         )
         Write-Host "[OK] 已忽略个人偏好文件，其他配置可提交" -ForegroundColor Green
     }
     "3" {
         $rules = @(
+            "# === claude-code-init ===",
             "# Claude Code 个人本地文件",
-            "CLAUDE.local.md"
+            "CLAUDE.local.md",
+            "# === claude-code-init ==="
         )
         Write-Host "[OK] 所有 AI 配置文件提交就绪" -ForegroundColor Green
     }

@@ -15,6 +15,8 @@
 | 想重构但怕改坏 | 安全重构模式，只改味道不改变逻辑 |
 | 提交前不确定 | 一键检查敏感信息泄露 |
 | 夜间让它跑任务 | 无人值守模式，自动循环执行 |
+| 多角度并行审查 | 启动 Agent Teams，3-5 个专家同时工作 |
+| 需要质量保证 | `/qa` 全面的浏览器自动化测试 |
 
 ## 快速开始
 
@@ -59,9 +61,35 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 | `/tdd` | 测试驱动开发 |
 | `/explain <目标>` | 代码解释 |
 | `/validate` | 运行校验脚本 |
+| `/team <数量> <任务>` | 启动 Agent 团队并行工作 |
+| `/qa <目标>` | 质量保证测试 |
+| `/plan-ceo-review <需求>` | 产品需求审查 |
 | `/help` | 查看所有命令 |
 
 > 输入 `/help <命令>` 查看详情，`/<命令>` 直接执行。例如：`/review` 直接开始审查。
+
+## 进阶功能
+
+### 无人值守长任务
+让 AI 在你离开后继续工作：
+```bash
+# macOS/Linux
+bash scripts/tmux-session.sh scripts/PROMPT.md
+
+# Windows
+tmux new-session -d -s claude-overnight
+tmux send-keys -t claude-overnight "claude -p \$(cat scripts/PROMPT.md) --max-turns 50 --max-budget-usd 10.00" Enter
+tmux attach -t claude-overnight
+```
+
+### Agent Teams
+并行启动多个 AI 专家同时工作：
+```bash
+/team 3 审查 PR #142        # 3 个审查专家并行
+/team 5 排查登录失败问题    # 5 个调查者验证假设
+```
+
+> 更多进阶功能见 [完整使用指南](GUIDE.md)
 
 ## 工作原理
 

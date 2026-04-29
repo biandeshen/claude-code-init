@@ -105,7 +105,8 @@ if (-not $SkipOpenSpec) {
 # 6. 安装 cc-discipline (物理防火墙) - 自动执行
 if (-not $SkipCcDiscipline) {
     Write-Step "安装 cc-discipline (物理防火墙 Hooks)"
-    $CcDisciplinePath = "$HOME\.cc-discipline"
+    # $HOME 在 PowerShell 5.x+ 均可用，此处使用 $HOME 确保跨平台兼容
+    $CcDisciplinePath = if ($HOME) { "$HOME\.cc-discipline" } else { "$env:USERPROFILE\.cc-discipline" }
     $CcDisciplineCommit = "916da00691128fde44599928d76c129f3d08b8f1"  # 锁定版本 2026-04-26
     if (-not (Test-Path $CcDisciplinePath)) {
         Write-Warn "即将从第三方仓库下载代码: https://github.com/TechHU-GS/cc-discipline"
