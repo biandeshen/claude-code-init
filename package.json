@@ -1,7 +1,7 @@
 {
-  "name": "claude-code-init",
-  "version": "1.4.1",
-  "description": "Claude Code 项目脚手架：一键初始化开发环境",
+  "name": "@biandeshen/claude-code-init",
+  "version": "1.5.0",
+  "description": "Claude Code 通用开发环境脚手架，一键初始化 AI 编码规范与自动化工作流",
   "main": "index.js",
   "bin": {
     "claude-code-init": "./index.js"
@@ -14,7 +14,9 @@
     "commands/",
     "scripts/",
     "configs/",
-    ".claude/"
+    ".claude/skills/",
+    ".claude/hooks/",
+    ".claude/agents/"
   ],
   "scripts": {
     "start": "node index.js"

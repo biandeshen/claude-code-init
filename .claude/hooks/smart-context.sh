@@ -55,7 +55,22 @@ if echo "$command" | grep -q "git push" 2>/dev/null; then
     fi
 fi
 
-# ─── 场景 6：执行 rm -rf 等危险删除命令 → 警告 ───
+# ─── 场景 6：rm -rf 物理阻断（最高优先级）───
+# 检测危险删除命令——物理阻断，Claude Code 无法绕过
+if echo "$command" | grep -qE "rm\s+-rf\s+(/|~|\.\.|\.)" 2>/dev/null; then
+    cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "检测到危险命令 rm -rf，已自动阻止。如需执行，请在终端中手动操作并确认。"
+  }
+}
+EOF
+    exit 2
+fi
+
+# ─── 场景 7：执行 rm -rf 等危险删除命令 → 警告 ───
 if echo "$command" | grep -qE "rm\s+-(rRf)" 2>/dev/null; then
     if echo "$command" | grep -qE "rm\s+-(rRf).*\$|rm\s+-(rRf).*~" 2>/dev/null; then
         # 变量展开或 ~ 可能是危险模式
@@ -95,6 +110,10 @@ fi
 
 # ─── 输出建议 ───
 if [ -n "$suggestion" ]; then
+    # 记录触发日志
+    LOG_FILE="$HOME/.claude-skill-usage.log"
+    echo "$(date -Iseconds 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S') | smart-context | $suggestion" >> "$LOG_FILE" 2>/dev/null || true
+
     cat <<EOF
 {
   "hookSpecificOutput": {

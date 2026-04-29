@@ -13,7 +13,7 @@
 | 元认知层 | 任务自动分级（0-5分复杂度评估） | SOUL.md 内置算法 | 已完成 |
 | 元认知层 | AI 人格定义 + 行为约束 | CLAUDE.md + SOUL.md | 已完成 |
 | 智能路由层 | 60+ 中英文触发词自动匹配 | router Skill 决策树 | 已完成 |
-| 智能路由层 | 11 个 Skills 覆盖全开发周期 | code-review/tdd-workflow/systematic-debug 等 | 已完成 |
+| 智能路由层 | 11 个 Skills 覆盖全开发周期 | code-review/tdd-workflow/error-fix 等 | 已完成 |
 | 智能路由层 | 场景感知推荐 | smart-context.sh Hook | 已完成 |
 | 行为约束层 | 物理阻断（单文件编辑5次阻断） | cc-discipline（streak-breaker + pre-edit-guard + post-error-remind） | 已完成 |
 | 行为约束层 | 代码提交前自动检查 | Pre-commit hooks（9 个检查项） | 已完成 |

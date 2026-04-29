@@ -184,6 +184,15 @@ tmux send-keys -t "$SESSION_NAME" "    --permission-mode acceptEdits" Enter
 tmux send-keys -t "$SESSION_NAME" "  sleep 2" Enter
 tmux send-keys -t "$SESSION_NAME" "done" Enter
 
+# 无人值守任务完成后自动通知
+notify_completion() {
+    if [ "$(uname)" = "Darwin" ]; then
+        osascript -e "display notification \"Claude Code 过夜任务已完成\" with title \"claude-code-init\""
+    elif [ "$(uname)" = "Linux" ] && command -v notify-send &>/dev/null; then
+        notify-send "claude-code-init" "过夜任务已完成"
+    fi
+}
+
 echo ""
 echo_success "无人值守会话已启动"
 echo ""

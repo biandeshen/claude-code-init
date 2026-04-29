@@ -1,9 +1,15 @@
 # Claude Code 通用开发环境
 
-[![Version](https://img.shields.io/badge/version-1.4.1-blue)](https://github.com/biandeshen/claude-code-init)
+[![Version](https://img.shields.io/github/package-json/v/biandeshen/claude-code-init)](https://github.com/biandeshen/claude-code-init)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-一键搭建「AI辅助开发」工作环境。Claude Code 接入后，AI 会自动评估任务复杂度并选择最佳执行模式。
+## 前置条件
+
+- **Claude Code ≥ 2.0**（确认方法：在终端输入 `claude --version`，版本号应 ≥ 2.0。如低于此版本，请先升级 Claude Code）
+- Git
+- Python 3.8+
+- Node.js 18+
+- Windows PowerShell 7+（推荐）或 Git Bash
 
 ## 它能帮你做什么？
 
@@ -58,7 +64,7 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 | `/fix` | 自动修复 Bug |
 | `/commit` | 规范提交 |
 | `/refactor` | 安全重构 |
-| `/tdd` | 测试驱动开发 |
+| `/fix` | 自动修复 Bug |
 | `/explain <目标>` | 代码解释 |
 | `/validate` | 运行校验脚本 |
 | `/team <数量> <任务>` | 启动 Agent 团队并行工作 |

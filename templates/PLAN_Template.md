@@ -5,16 +5,11 @@
 
 ---
 
-## 与 OpenSpec 的关系
+## 这个文件与 OpenSpec 的关系
 
-- **OpenSpec** 管规划阶段（Propose→Spec→Design→Task→Check），是**事前审核**
-- **Plan.md** 管执行阶段（任务追踪 + 执行日志），是**事后记录**
-- 两者互补，不是替代关系
-
-当项目使用 OpenSpec 时：
-1. 用 OpenSpec 完成设计阶段
-2. 将 OpenSpec 的输出作为 Plan.md 的输入
-3. 用 Plan.md 追踪 OpenSpec 任务列表的执行
+- OpenSpec 管"事前规划"（Propose→Spec→Design→Task→Check）——在 `openspec/changes/` 下
+- 这个 Plan.md 管"事后记录"（执行日志）——在本项目根目录
+- **不要用 Plan.md 做事前设计，那是 OpenSpec 的活**
 
 ---
 

@@ -2,14 +2,12 @@
 # scripts/check-env.sh
 # Claude Code 开发环境完整性检查
 
-echo "=== Claude Code 开发环境检查 ==="
-echo ""
+# 加载公共函数库
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/common.sh"
 
-# 颜色
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
+echo -e "${CYAN}=== Claude Code 开发环境检查 ===${NC}"
+echo ""
 
 CHECK_OK="${GREEN}✅${NC}"
 CHECK_FAIL="${RED}❌${NC}"
