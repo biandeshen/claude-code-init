@@ -291,6 +291,47 @@ if (Test-Path $gitignoreScript) {
     Write-Warn "configure-gitignore.ps1 未找到，跳过 .gitignore 配置"
 }
 
+# 14. 配置无人值守长任务（可选）
+Write-Step "配置无人值守长任务"
+Write-Info "正在复制无人值守脚本..."
+$unattendedScripts = @(
+    "tmux-session.sh",
+    "ralph-setup.sh",
+    "PROMPT.md"
+)
+foreach ($script in $unattendedScripts) {
+    $src = Join-Path $ScriptDir "scripts\$script"
+    $dst = Join-Path $ProjectPath "scripts\$script"
+    if (Test-Path $src) {
+        Copy-Item -Path $src -Destination $dst -Force -ErrorAction SilentlyContinue
+        Write-Info "已复制 $script"
+    }
+}
+
+# 15. 配置 gstack 命令（可选）
+Write-Step "配置 gstack 角色命令"
+$gstackCommands = @(
+    "team.md",
+    "messages.md",
+    "qa.md",
+    "plan-ceo-review.md"
+)
+$targetCommandsDir = Join-Path $ProjectPath ".claude\commands"
+foreach ($cmd in $gstackCommands) {
+    $src = Join-Path $ScriptDir "commands\$cmd"
+    if (Test-Path $src) {
+        Copy-Item -Path $src -Destination $targetCommandsDir -Force -ErrorAction SilentlyContinue
+        Write-Info "已复制 $cmd"
+    }
+}
+
+Write-Host ""
+Write-Host "无人值守功能已配置。" -ForegroundColor Yellow
+Write-Host "  - tmux-session.sh: 启动无人值守会话" -ForegroundColor Gray
+Write-Host "  - ralph-setup.sh: 安装 Ralph Wiggum 插件" -ForegroundColor Gray
+Write-Host "  - /team: 启动 Agent 团队" -ForegroundColor Gray
+Write-Host "  - /qa: 质量保证测试" -ForegroundColor Gray
+
 # 完成
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Green

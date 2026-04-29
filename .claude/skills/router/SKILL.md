@@ -4,14 +4,18 @@ description: >
   智能工作流路由器。根据用户意图自动选择最合适的开发工作流。
   当用户提到以下场景时自动加载：代码审查、提交代码、修复错误、重构代码、
   解释代码、架构评审、运行校验、测试执行，开发新功能。
+  无人值守长任务（过夜、overnight）、Agent Teams（团队、并行）、
+  gstack 角色命令（qa、需求审查、ceo）。
 
   中文触发词：审查、检查、看看、review一下、提交、commit、修复、fix、
   重构、refactor、解释、explain、评审、架构、校验、validate、测试、
-  开发新功能、帮我看看代码、帮我检查一下、代码质量
+  开发新功能、帮我看看代码、帮我检查一下、代码质量、团队、并行、
+  过夜、夜间、无人值守、qa、需求审查、架构评审
 
   英文触发词：review, commit, fix, refactor, explain, validate, test,
   check, architecture, design, bug, error, debug, quality, security,
-  audit, refactor, restructure, deploy
+  audit, refactor, restructure, deploy, team, parallel, overnight,
+  unattended, qa, ceo-review, eng-review
 ---
 
 # Development Workflow Router
@@ -38,6 +42,11 @@ description: >
 | 记忆、记住这个、偏好 | 执行 ECC 的 `/memory` | "记住我偏好 Python 类型标注" |
 | 上下文、token、用量 | 执行 ECC 的 `/ctx` | "看看当前上下文用了多少" |
 | 制定计划、开发计划 | 执行 ECC 的 `/plan` | "帮我制定这个模块的开发计划" |
+| **过夜、夜间、无人值守、overnight** | 执行 `bash scripts/tmux-session.sh` | "让 AI 过夜跑重构任务" |
+| **团队、team、并行审查、并行排查** | 执行 `/team` 命令 | "启动 3 个 Agent 并行审查" |
+| **qa、测试验证、质量保证** | 执行 `/qa` 命令 | "跑一遍完整 QA 测试" |
+| **需求审查、ceo-review** | 执行 `/plan-ceo-review` 命令 | "帮我审视下这个需求" |
+| **架构评审、eng-review** | 执行 `/plan-eng-review` 命令 | "评审一下技术架构" |
 
 ## 路由规则
 

@@ -405,6 +405,42 @@ EOF
     esac
 fi
 
+# 14. 配置无人值守长任务
+echo ""
+echo_step "配置无人值守长任务"
+echo_info "正在复制无人值守脚本..."
+
+UNATTENDED_SCRIPTS="tmux-session.sh ralph-setup.sh PROMPT.md"
+for script in $UNATTENDED_SCRIPTS; do
+    src="$SCRIPT_DIR/scripts/$script"
+    dst="$PROJECT_PATH/scripts/$script"
+    if [ -f "$src" ]; then
+        mkdir -p "$PROJECT_PATH/scripts"
+        cp "$src" "$dst" 2>/dev/null || true
+        echo_info "已复制 $script"
+    fi
+done
+
+# 15. 配置 gstack 命令
+echo_step "配置 gstack 角色命令"
+GSTACK_COMMANDS="team.md messages.md qa.md plan-ceo-review.md"
+TARGET_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
+for cmd in $GSTACK_COMMANDS; do
+    src="$SCRIPT_DIR/commands/$cmd"
+    if [ -f "$src" ]; then
+        mkdir -p "$TARGET_COMMANDS_DIR"
+        cp "$src" "$TARGET_COMMANDS_DIR/" 2>/dev/null || true
+        echo_info "已复制 $cmd"
+    fi
+done
+
+echo ""
+echo -e "${YELLOW}无人值守功能已配置。${NC}"
+echo -e "  ${GRAY}- tmux-session.sh: 启动无人值守会话${NC}"
+echo -e "  ${GRAY}- ralph-setup.sh: 安装 Ralph Wiggum 插件${NC}"
+echo -e "  ${GRAY}- /team: 启动 Agent 团队${NC}"
+echo -e "  ${GRAY}- /qa: 质量保证测试${NC}"
+
 # 完成
 echo ""
 echo -e "${GREEN}==============================================${NC}"
