@@ -232,18 +232,66 @@ cat > "$PROJECT_PATH/CLAUDE.local.md" << 'EOF'
 EOF
 echo_success "已创建 CLAUDE.local.md"
 
-# 13. 更新 .gitignore
-echo_step "更新 .gitignore"
+# 13. 配置 .gitignore
+echo_step "配置 .gitignore"
 if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
-    echo "CLAUDE.local.md" > "$PROJECT_PATH/.gitignore"
+    cat > "$PROJECT_PATH/.gitignore" << 'EOF'
+# ═══════════════════════════════════════════════════════════════
+# Claude Code 开发环境配置
+# ═══════════════════════════════════════════════════════════════
+# 以下 AI 开发文件建议提交（团队共享）：
+#   CLAUDE.md        - 项目级 AI 约定
+#   SOUL.md          - AI 人格与复杂度评估规则
+#   PLAN_TEMPLATE.md - 任务计划模板
+#   .claude/commands/ - 自定义命令
+#   .claude/skills/   - 技能集
+#   .claude/hooks/    - Hook 脚本
+#   .claude/settings.json - Hook 配置
+#   .claude/scripts/  - 校验脚本
+#   .claude/rules/    - cc-discipline 规则
+#   openspec/        - SDD 工作流产物
+#
+# 若你不想提交任何 AI 工具配置，取消下面一行的注释：
+# .claude/
+
+# ═══════════════════════════════════════════════════════════════
+# 个人本地文件（必须忽略）
+# ═══════════════════════════════════════════════════════════════
+CLAUDE.local.md
+EOF
+    echo_success "已创建 .gitignore（CLAUDE.local.md 已自动忽略）"
 else
     if ! grep -q "CLAUDE.local.md" "$PROJECT_PATH/.gitignore"; then
-        echo "" >> "$PROJECT_PATH/.gitignore"
-        echo "# Claude Code 本地偏好" >> "$PROJECT_PATH/.gitignore"
-        echo "CLAUDE.local.md" >> "$PROJECT_PATH/.gitignore"
+        cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
+
+# ═══════════════════════════════════════════════════════════════
+# Claude Code 开发环境配置
+# ═══════════════════════════════════════════════════════════════
+# 以下 AI 开发文件建议提交（团队共享）：
+#   CLAUDE.md        - 项目级 AI 约定
+#   SOUL.md          - AI 人格与复杂度评估规则
+#   PLAN_TEMPLATE.md - 任务计划模板
+#   .claude/commands/ - 自定义命令
+#   .claude/skills/   - 技能集
+#   .claude/hooks/    - Hook 脚本
+#   .claude/settings.json - Hook 配置
+#   .claude/scripts/  - 校验脚本
+#   .claude/rules/    - cc-discipline 规则
+#   openspec/        - SDD 工作流产物
+#
+# 若你不想提交任何 AI 工具配置，取消下面一行的注释：
+# .claude/
+
+# ═══════════════════════════════════════════════════════════════
+# 个人本地文件（必须忽略）
+# ═══════════════════════════════════════════════════════════════
+CLAUDE.local.md
+EOF
+        echo_success "已追加 Claude Code 配置到 .gitignore"
+    else
+        echo_info ".gitignore 已包含必要规则，跳过"
     fi
 fi
-echo_success "已更新 .gitignore"
 
 # 完成
 echo ""

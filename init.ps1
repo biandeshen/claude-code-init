@@ -281,18 +281,46 @@ $localMd = @"
 $localMd | Out-File -FilePath "$ProjectPath\CLAUDE.local.md" -Encoding utf8
 Write-Success "已创建 CLAUDE.local.md"
 
-# 13. 更新 .gitignore
-Write-Step "更新 .gitignore"
+# 13. 配置 .gitignore
+Write-Step "配置 .gitignore"
 $gitignorePath = "$ProjectPath\.gitignore"
+$aiGitignoreContent = @"
+# ═══════════════════════════════════════════════════════════════
+# Claude Code 开发环境配置
+# ═══════════════════════════════════════════════════════════════
+# 以下 AI 开发文件建议提交（团队共享）：
+#   CLAUDE.md        - 项目级 AI 约定
+#   SOUL.md          - AI 人格与复杂度评估规则
+#   PLAN_TEMPLATE.md - 任务计划模板
+#   .claude/commands/ - 自定义命令
+#   .claude/skills/   - 技能集
+#   .claude/hooks/    - Hook 脚本
+#   .claude/settings.json - Hook 配置
+#   .claude/scripts/  - 校验脚本
+#   .claude/rules/    - cc-discipline 规则
+#   openspec/        - SDD 工作流产物
+#
+# 若你不想提交任何 AI 工具配置，取消下面一行的注释：
+# .claude/
+
+# ═══════════════════════════════════════════════════════════════
+# 个人本地文件（必须忽略）
+# ═══════════════════════════════════════════════════════════════
+CLAUDE.local.md
+"@
+
 if (-not (Test-Path $gitignorePath)) {
-    "CLAUDE.local.md" | Out-File -FilePath $gitignorePath -Encoding utf8
+    $aiGitignoreContent | Out-File -FilePath $gitignorePath -Encoding utf8
+    Write-Success "已创建 .gitignore（CLAUDE.local.md 已自动忽略）"
 } else {
-    $gitignore = Get-Content $gitignorePath -Raw
-    if ($gitignore -notmatch "CLAUDE\.local\.md") {
-        Add-Content -Path $gitignorePath -Value "`n# Claude Code 本地偏好`nCLAUDE.local.md"
+    $existingContent = Get-Content $gitignorePath -Raw
+    if ($existingContent -notmatch "CLAUDE\.local\.md") {
+        Add-Content -Path $gitignorePath -Value $aiGitignoreContent
+        Write-Success "已追加 Claude Code 配置到 .gitignore"
+    } else {
+        Write-Info ".gitignore 已包含必要规则，跳过"
     }
 }
-Write-Success "已更新 .gitignore"
 
 # 完成
 Write-Host ""
