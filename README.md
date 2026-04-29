@@ -102,6 +102,21 @@ tmux attach -t claude-overnight
 
 > 详细规则见 [SOUL.md](templates/SOUL_Template.md)
 
+## 版本兼容性
+
+| 组件 | 最低版本 | 推荐版本 |
+|------|----------|----------|
+| Claude Code | 2.0 | 最新稳定版 |
+| Node.js | 16 | 18+ |
+| Python | 3.8 | 3.10+ |
+| Git | 2.30 | 最新稳定版 |
+| PowerShell (Windows) | 5.1 | 7+ |
+| tmux (Unix/macOS) | 3.0 | 最新稳定版 |
+
+## 遇到问题？
+
+👉 [常见问题排查指南](docs/TROUBLESHOOTING.md)
+
 ## 完整文档
 
 👉 [查看完整使用指南](GUIDE.md)

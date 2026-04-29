@@ -316,7 +316,9 @@ $gstackCommands = @(
     "team.md",
     "messages.md",
     "qa.md",
-    "plan-ceo-review.md"
+    "plan-ceo-review.md",
+    "overnight.md",
+    "overnight-report.md"
 )
 $targetCommandsDir = Join-Path $ProjectPath ".claude\commands"
 foreach ($cmd in $gstackCommands) {

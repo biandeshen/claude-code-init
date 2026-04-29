@@ -272,7 +272,7 @@ done
 
 # 15. 配置 gstack 命令
 echo_step "配置 gstack 角色命令"
-GSTACK_COMMANDS="team.md messages.md qa.md plan-ceo-review.md"
+GSTACK_COMMANDS="team.md messages.md qa.md plan-ceo-review.md overnight.md overnight-report.md"
 TARGET_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
 for cmd in $GSTACK_COMMANDS; do
     src="$SCRIPT_DIR/commands/$cmd"
