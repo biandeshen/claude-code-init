@@ -281,44 +281,74 @@ $localMd = @"
 $localMd | Out-File -FilePath "$ProjectPath\CLAUDE.local.md" -Encoding utf8
 Write-Success "已创建 CLAUDE.local.md"
 
-# 13. 配置 .gitignore
-Write-Step "配置 .gitignore"
+# 13. 询问用户如何处理 AI 配置文件
+Write-Host ""
+Write-Host "==============================================" -ForegroundColor Cyan
+Write-Host "  如何处理 AI 开发配置文件？" -ForegroundColor Cyan
+Write-Host "==============================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "  1) 全部忽略（推荐）—— 将所有 AI 配置文件加入 .gitignore"
+Write-Host "  2) 部分提交 —— 提交团队共享配置，仅忽略个人偏好文件"
+Write-Host "  3) 全部提交 —— 所有 AI 配置提交到仓库"
+Write-Host ""
+
+$choice = Read-Host "请选择 (1/2/3，默认 1)"
+if ([string]::IsNullOrWhiteSpace($choice)) { $choice = "1" }
+
 $gitignorePath = "$ProjectPath\.gitignore"
-$aiGitignoreContent = @"
-# ═══════════════════════════════════════════════════════════════
-# Claude Code 开发环境配置
-# ═══════════════════════════════════════════════════════════════
-# 以下 AI 开发文件建议提交（团队共享）：
-#   CLAUDE.md        - 项目级 AI 约定
-#   SOUL.md          - AI 人格与复杂度评估规则
-#   PLAN_TEMPLATE.md - 任务计划模板
-#   .claude/commands/ - 自定义命令
-#   .claude/skills/   - 技能集
-#   .claude/hooks/    - Hook 脚本
-#   .claude/settings.json - Hook 配置
-#   .claude/scripts/  - 校验脚本
-#   .claude/rules/    - cc-discipline 规则
-#   openspec/        - SDD 工作流产物
-#
-# 若你不想提交任何 AI 工具配置，取消下面一行的注释：
-# .claude/
 
-# ═══════════════════════════════════════════════════════════════
-# 个人本地文件（必须忽略）
-# ═══════════════════════════════════════════════════════════════
-CLAUDE.local.md
-"@
-
-if (-not (Test-Path $gitignorePath)) {
-    $aiGitignoreContent | Out-File -FilePath $gitignorePath -Encoding utf8
-    Write-Success "已创建 .gitignore（CLAUDE.local.md 已自动忽略）"
-} else {
-    $existingContent = Get-Content $gitignorePath -Raw
-    if ($existingContent -notmatch "CLAUDE\.local\.md") {
-        Add-Content -Path $gitignorePath -Value $aiGitignoreContent
-        Write-Success "已追加 Claude Code 配置到 .gitignore"
-    } else {
-        Write-Info ".gitignore 已包含必要规则，跳过"
+switch ($choice) {
+    "1" {
+        # 全部忽略
+        $ignoreRules = @(
+            "",
+            "# Claude Code 开发环境配置（已全部忽略）",
+            ".claude/",
+            "CLAUDE.md",
+            "SOUL.md",
+            "PLAN_TEMPLATE.md",
+            "openspec/"
+        )
+        if (-not (Test-Path $gitignorePath)) {
+            $ignoreRules -join "`n" | Out-File -FilePath $gitignorePath -Encoding utf8
+        } else {
+            Add-Content -Path $gitignorePath -Value ($ignoreRules -join "`n")
+        }
+        Write-Success "已将所有 AI 配置文件加入 .gitignore，项目保持干净"
+    }
+    "2" {
+        # 部分提交：仅忽略个人偏好文件
+        $ignoreRules = @(
+            "",
+            "# Claude Code 个人本地文件（务必忽略）",
+            "CLAUDE.local.md"
+        )
+        if (-not (Test-Path $gitignorePath)) {
+            $ignoreRules -join "`n" | Out-File -FilePath $gitignorePath -Encoding utf8
+        } else {
+            $existing = Get-Content $gitignorePath -Raw
+            if ($existing -notmatch "CLAUDE\.local\.md") {
+                Add-Content -Path $gitignorePath -Value ($ignoreRules -join "`n")
+            }
+        }
+        Write-Success "已忽略个人偏好文件，团队共享配置（CLAUDE.md 等）保留为可提交"
+    }
+    "3" {
+        # 全部提交
+        $ignoreRules = @(
+            "",
+            "# Claude Code 个人本地文件",
+            "CLAUDE.local.md"
+        )
+        if (-not (Test-Path $gitignorePath)) {
+            $ignoreRules -join "`n" | Out-File -FilePath $gitignorePath -Encoding utf8
+        } else {
+            $existing = Get-Content $gitignorePath -Raw
+            if ($existing -notmatch "CLAUDE\.local\.md") {
+                Add-Content -Path $gitignorePath -Value ($ignoreRules -join "`n")
+            }
+        }
+        Write-Success "所有 AI 配置文件提交就绪"
     }
 }
 

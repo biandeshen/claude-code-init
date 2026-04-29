@@ -232,66 +232,111 @@ cat > "$PROJECT_PATH/CLAUDE.local.md" << 'EOF'
 EOF
 echo_success "已创建 CLAUDE.local.md"
 
-# 13. 配置 .gitignore
-echo_step "配置 .gitignore"
-if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
-    cat > "$PROJECT_PATH/.gitignore" << 'EOF'
-# ═══════════════════════════════════════════════════════════════
-# Claude Code 开发环境配置
-# ═══════════════════════════════════════════════════════════════
-# 以下 AI 开发文件建议提交（团队共享）：
-#   CLAUDE.md        - 项目级 AI 约定
-#   SOUL.md          - AI 人格与复杂度评估规则
-#   PLAN_TEMPLATE.md - 任务计划模板
-#   .claude/commands/ - 自定义命令
-#   .claude/skills/   - 技能集
-#   .claude/hooks/    - Hook 脚本
-#   .claude/settings.json - Hook 配置
-#   .claude/scripts/  - 校验脚本
-#   .claude/rules/    - cc-discipline 规则
-#   openspec/        - SDD 工作流产物
-#
-# 若你不想提交任何 AI 工具配置，取消下面一行的注释：
-# .claude/
+# 13. 询问用户如何处理 AI 配置文件
+echo ""
+echo -e "${CYAN}==============================================${NC}"
+echo -e "${CYAN}  如何处理 AI 开发配置文件？${NC}"
+echo -e "${CYAN}==============================================${NC}"
+echo ""
+echo -e "  ${YELLOW}1)${NC} 全部忽略（推荐）—— 将所有 AI 配置文件加入 .gitignore"
+echo -e "  ${YELLOW}2)${NC} 部分提交 —— 提交团队共享配置，仅忽略个人偏好文件"
+echo -e "  ${YELLOW}3)${NC} 全部提交 —— 所有 AI 配置提交到仓库"
+echo ""
 
-# ═══════════════════════════════════════════════════════════════
-# 个人本地文件（必须忽略）
-# ═══════════════════════════════════════════════════════════════
+read -p "请选择 (1/2/3，默认 1): " choice
+choice=${choice:-1}
+
+case $choice in
+    1)
+        # 全部忽略
+        if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
+            cat > "$PROJECT_PATH/.gitignore" << 'EOF'
+
+# Claude Code 开发环境配置（已全部忽略）
+.claude/
+CLAUDE.md
+SOUL.md
+PLAN_TEMPLATE.md
+openspec/
+EOF
+        else
+            cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
+
+# Claude Code 开发环境配置（已全部忽略）
+.claude/
+CLAUDE.md
+SOUL.md
+PLAN_TEMPLATE.md
+openspec/
+EOF
+        fi
+        echo_success "已将所有 AI 配置文件加入 .gitignore，项目保持干净"
+        ;;
+    2)
+        # 部分提交：仅忽略个人偏好文件
+        if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
+            cat > "$PROJECT_PATH/.gitignore" << 'EOF'
+
+# Claude Code 个人本地文件（务必忽略）
 CLAUDE.local.md
 EOF
-    echo_success "已创建 .gitignore（CLAUDE.local.md 已自动忽略）"
-else
-    if ! grep -q "CLAUDE.local.md" "$PROJECT_PATH/.gitignore"; then
-        cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
+        else
+            if ! grep -q "CLAUDE.local.md" "$PROJECT_PATH/.gitignore"; then
+                cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
 
-# ═══════════════════════════════════════════════════════════════
-# Claude Code 开发环境配置
-# ═══════════════════════════════════════════════════════════════
-# 以下 AI 开发文件建议提交（团队共享）：
-#   CLAUDE.md        - 项目级 AI 约定
-#   SOUL.md          - AI 人格与复杂度评估规则
-#   PLAN_TEMPLATE.md - 任务计划模板
-#   .claude/commands/ - 自定义命令
-#   .claude/skills/   - 技能集
-#   .claude/hooks/    - Hook 脚本
-#   .claude/settings.json - Hook 配置
-#   .claude/scripts/  - 校验脚本
-#   .claude/rules/    - cc-discipline 规则
-#   openspec/        - SDD 工作流产物
-#
-# 若你不想提交任何 AI 工具配置，取消下面一行的注释：
-# .claude/
-
-# ═══════════════════════════════════════════════════════════════
-# 个人本地文件（必须忽略）
-# ═══════════════════════════════════════════════════════════════
+# Claude Code 个人本地文件（务必忽略）
 CLAUDE.local.md
 EOF
-        echo_success "已追加 Claude Code 配置到 .gitignore"
-    else
-        echo_info ".gitignore 已包含必要规则，跳过"
-    fi
-fi
+            fi
+        fi
+        echo_success "已忽略个人偏好文件，团队共享配置（CLAUDE.md 等）保留为可提交"
+        ;;
+    3)
+        # 全部提交
+        if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
+            cat > "$PROJECT_PATH/.gitignore" << 'EOF'
+
+# Claude Code 个人本地文件
+CLAUDE.local.md
+EOF
+        else
+            if ! grep -q "CLAUDE.local.md" "$PROJECT_PATH/.gitignore"; then
+                cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
+
+# Claude Code 个人本地文件
+CLAUDE.local.md
+EOF
+            fi
+        fi
+        echo_success "所有 AI 配置文件提交就绪"
+        ;;
+    *)
+        echo_warn "无效选择，默认全部忽略"
+        # 默认全部忽略
+        if [ ! -f "$PROJECT_PATH/.gitignore" ]; then
+            cat > "$PROJECT_PATH/.gitignore" << 'EOF'
+
+# Claude Code 开发环境配置（已全部忽略）
+.claude/
+CLAUDE.md
+SOUL.md
+PLAN_TEMPLATE.md
+openspec/
+EOF
+        else
+            cat >> "$PROJECT_PATH/.gitignore" << 'EOF'
+
+# Claude Code 开发环境配置（已全部忽略）
+.claude/
+CLAUDE.md
+SOUL.md
+PLAN_TEMPLATE.md
+openspec/
+EOF
+        fi
+        echo_success "已按默认处理"
+        ;;
+esac
 
 # 完成
 echo ""
