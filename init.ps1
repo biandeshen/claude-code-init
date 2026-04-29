@@ -1,4 +1,4 @@
-# claude-code-init - Claude Code 开发环境一键初始化
+﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
 # 版本: v1.4.1 | 2026-04-28
 
