@@ -281,75 +281,13 @@ $localMd = @"
 $localMd | Out-File -FilePath "$ProjectPath\CLAUDE.local.md" -Encoding utf8
 Write-Success "已创建 CLAUDE.local.md"
 
-# 13. 询问用户如何处理 AI 配置文件
-Write-Host ""
-Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  如何处理 AI 开发配置文件？" -ForegroundColor Cyan
-Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "  1) 全部忽略（推荐）—— 将所有 AI 配置文件加入 .gitignore"
-Write-Host "  2) 部分提交 —— 提交团队共享配置，仅忽略个人偏好文件"
-Write-Host "  3) 全部提交 —— 所有 AI 配置提交到仓库"
-Write-Host ""
-
-$choice = Read-Host "请选择 (1/2/3，默认 1)"
-if ([string]::IsNullOrWhiteSpace($choice)) { $choice = "1" }
-
-$gitignorePath = "$ProjectPath\.gitignore"
-
-switch ($choice) {
-    "1" {
-        # 全部忽略
-        $ignoreRules = @(
-            "",
-            "# Claude Code 开发环境配置（已全部忽略）",
-            ".claude/",
-            "CLAUDE.md",
-            "SOUL.md",
-            "PLAN_TEMPLATE.md",
-            "openspec/"
-        )
-        if (-not (Test-Path $gitignorePath)) {
-            $ignoreRules -join "`n" | Out-File -FilePath $gitignorePath -Encoding utf8
-        } else {
-            Add-Content -Path $gitignorePath -Value ($ignoreRules -join "`n")
-        }
-        Write-Success "已将所有 AI 配置文件加入 .gitignore，项目保持干净"
-    }
-    "2" {
-        # 部分提交：仅忽略个人偏好文件
-        $ignoreRules = @(
-            "",
-            "# Claude Code 个人本地文件（务必忽略）",
-            "CLAUDE.local.md"
-        )
-        if (-not (Test-Path $gitignorePath)) {
-            $ignoreRules -join "`n" | Out-File -FilePath $gitignorePath -Encoding utf8
-        } else {
-            $existing = Get-Content $gitignorePath -Raw
-            if ($existing -notmatch "CLAUDE\.local\.md") {
-                Add-Content -Path $gitignorePath -Value ($ignoreRules -join "`n")
-            }
-        }
-        Write-Success "已忽略个人偏好文件，团队共享配置（CLAUDE.md 等）保留为可提交"
-    }
-    "3" {
-        # 全部提交
-        $ignoreRules = @(
-            "",
-            "# Claude Code 个人本地文件",
-            "CLAUDE.local.md"
-        )
-        if (-not (Test-Path $gitignorePath)) {
-            $ignoreRules -join "`n" | Out-File -FilePath $gitignorePath -Encoding utf8
-        } else {
-            $existing = Get-Content $gitignorePath -Raw
-            if ($existing -notmatch "CLAUDE\.local\.md") {
-                Add-Content -Path $gitignorePath -Value ($ignoreRules -join "`n")
-            }
-        }
-        Write-Success "所有 AI 配置文件提交就绪"
-    }
+# 13. 配置 .gitignore
+Write-Step "配置 .gitignore"
+$gitignoreScript = Join-Path $ScriptDir "scripts\configure-gitignore.ps1"
+if (Test-Path $gitignoreScript) {
+    & $gitignoreScript -ProjectPath $ProjectPath
+} else {
+    Write-Warn "configure-gitignore.ps1 未找到，跳过 .gitignore 配置"
 }
 
 # 完成
