@@ -142,7 +142,7 @@ main() {
     echo "    /ralph-loop \"你的任务描述\" --max-iterations 50"
     echo ""
     echo "  或使用 tmux 脚本:"
-    echo "    bash scripts/tmux-session.sh scripts/PROMPT.md"
+    echo "    bash .claude/scripts/tmux-session.sh .claude/scripts/PROMPT.md"
     echo ""
 }
 

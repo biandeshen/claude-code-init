@@ -7,13 +7,14 @@
 
 ## 索引架构
 
-> **工具规范 → ECC 内置 | 项目规范 → docs/ | 元认知 → SOUL.md**
+> **工具规范 → ECC 内置 | 项目规范 → docs/ | 元认知 → SOUL.md | 功能规格 → docs/specs/**
 
 | 规范类型 | 来源 | 说明 |
 |----------|------|------|
 | **工具规范** | ECC 内置 | 156+ Skills / 38 Agents，跨项目通用 |
 | **元认知规则** | [SOUL.md](SOUL.md) | 复杂度评估、决策树、熔断机制 |
 | **项目规范** | `docs/` 目录 | 项目专用文档 |
+| **功能规格** | `docs/specs/` | 复杂功能的事前设计蓝图 |
 
 ---
 
@@ -59,7 +60,18 @@ ECC 已提供丰富的内置 Skills 和 Agents，无需额外配置：
 |------|------|
 | **元认知规则** | [SOUL.md](SOUL.md) |
 | **复杂度评估** | [SOUL.md → 复杂度自动评估规则](SOUL.md) |
+| **功能规格** | `docs/specs/` 目录 |
+| **规格模板** | [SPEC_Template.md](SPEC_Template.md) — 功能级设计蓝图模板 |
 | **项目文档** | `docs/` 目录 |
+
+---
+
+### Spec 优先原则
+
+> 复杂功能开发前，AI 必须遵循：
+> 1. 先检查 `docs/specs/` 是否有相关 Spec
+> 2. 若无 → 参考 [SPEC_Template.md](SPEC_Template.md) 创建
+> 3. Spec 定稿后再进入 SOUL.md 决策树执行
 
 ---
 

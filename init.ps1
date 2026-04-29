@@ -1,6 +1,6 @@
 ﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.4.1 | 2026-04-28
+# 版本: v1.5.0 | 2026-04-30
 
 param(
     [Parameter(Mandatory=$true)]
@@ -15,6 +15,18 @@ param(
 $ErrorActionPreference = "Stop"
 $ScriptDir = $PSScriptRoot
 
+# 路径规范化比较（处理符号链接、junction、不同路径表示形式）
+function Test-SamePath {
+    param([string]$PathA, [string]$PathB)
+    try {
+        $resolvedA = (Resolve-Path $PathA -ErrorAction Stop).ProviderPath
+        $resolvedB = (Resolve-Path $PathB -ErrorAction Stop).ProviderPath
+        return $resolvedA -eq $resolvedB
+    } catch {
+        return $false
+    }
+}
+
 # 颜色输出
 function Write-Step { param($msg) Write-Host "[步骤] $msg" -ForegroundColor Cyan }
 function Write-Success { param($msg) Write-Host "[成功] $msg" -ForegroundColor Green }
@@ -24,7 +36,7 @@ function Write-Info { param($msg) Write-Host "[信息] $msg" -ForegroundColor Gr
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  Claude Code 开发环境一键初始化 (v1.4.1)" -ForegroundColor Cyan
+Write-Host "  Claude Code 开发环境一键初始化 (v1.5.0)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -93,10 +105,11 @@ Write-Success "已确认插件安装"
 if (-not $SkipOpenSpec) {
     Write-Step "安装 OpenSpec (SDD 工作流)"
     try {
-        npx kld-sdd
+        npm install -g @fission-ai/openspec@latest
+        openspec init
         Write-Success "OpenSpec 已初始化"
     } catch {
-        Write-Warn "OpenSpec 自动安装失败，请手动执行: npx kld-sdd"
+        Write-Warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@latest && openspec init"
     }
 } else {
     Write-Info "跳过 OpenSpec 安装"
@@ -133,7 +146,7 @@ if (-not $SkipCcDiscipline) {
 Write-Step "复制校验脚本到 .claude/scripts/"
 $ScriptsDir = Join-Path $ScriptDir "scripts"
 $TargetScriptsDir = "$ProjectPath\.claude\scripts"
-if ($ScriptsDir -eq $TargetScriptsDir) {
+if (Test-SamePath $ScriptsDir $TargetScriptsDir) {
     Write-Info "源目录与目标目录相同，已跳过脚本复制"
 } elseif (Test-Path $ScriptsDir) {
     New-Item -ItemType Directory -Force -Path $TargetScriptsDir | Out-Null
@@ -189,22 +202,52 @@ if (Test-Path $TemplateDir) {
     # 复制 CLAUDE.md
     $templateCLAUDE = Join-Path $TemplateDir "CLAUDE_Template.md"
     if (Test-Path $templateCLAUDE) {
-        Copy-Item -Path $templateCLAUDE -Destination "$ProjectPath\CLAUDE.md" -Force
-        Write-Success "已复制 CLAUDE.md"
+        if (Test-Path "$ProjectPath\CLAUDE.md") {
+            Write-Warn "CLAUDE.md 已存在，跳过以避免覆盖已有配置"
+        } else {
+            Copy-Item -Path $templateCLAUDE -Destination "$ProjectPath\CLAUDE.md" -Force
+            Write-Success "已复制 CLAUDE.md"
+        }
     }
 
     # 复制 SOUL.md
     $templateSOUL = Join-Path $TemplateDir "SOUL_Template.md"
     if (Test-Path $templateSOUL) {
-        Copy-Item -Path $templateSOUL -Destination "$ProjectPath\SOUL.md" -Force
-        Write-Success "已复制 SOUL.md"
+        if (Test-Path "$ProjectPath\SOUL.md") {
+            Write-Warn "SOUL.md 已存在，跳过以避免覆盖已有配置"
+        } else {
+            Copy-Item -Path $templateSOUL -Destination "$ProjectPath\SOUL.md" -Force
+            Write-Success "已复制 SOUL.md"
+        }
     }
 
     # 复制 PLAN_TEMPLATE.md
     $templatePLAN = Join-Path $TemplateDir "PLAN_Template.md"
     if (Test-Path $templatePLAN) {
-        Copy-Item -Path $templatePLAN -Destination "$ProjectPath\PLAN_TEMPLATE.md" -Force
-        Write-Success "已复制 PLAN_TEMPLATE.md"
+        if (Test-Path "$ProjectPath\PLAN_TEMPLATE.md") {
+            Write-Warn "PLAN_TEMPLATE.md 已存在，跳过以避免覆盖已有配置"
+        } else {
+            Copy-Item -Path $templatePLAN -Destination "$ProjectPath\PLAN_TEMPLATE.md" -Force
+            Write-Success "已复制 PLAN_TEMPLATE.md"
+        }
+    }
+
+    # 复制 SPEC_Template.md
+    $templateSPEC = Join-Path $TemplateDir "SPEC_Template.md"
+    if (Test-Path $templateSPEC) {
+        if (-not (Test-Path "$ProjectPath\SPEC_Template.md")) {
+            Copy-Item -Path $templateSPEC -Destination "$ProjectPath\SPEC_Template.md" -Force
+            Write-Success "已复制 SPEC_Template.md"
+        }
+    }
+
+    # 复制 ROUTINE_Template.md
+    $templateROUTINE = Join-Path $TemplateDir "ROUTINE_Template.md"
+    if (Test-Path $templateROUTINE) {
+        if (-not (Test-Path "$ProjectPath\ROUTINE_Template.md")) {
+            Copy-Item -Path $templateROUTINE -Destination "$ProjectPath\ROUTINE_Template.md" -Force
+            Write-Success "已复制 ROUTINE_Template.md"
+        }
     }
 } else {
     Write-Warn "模板目录不存在，跳过模板复制"
@@ -214,7 +257,7 @@ if (Test-Path $TemplateDir) {
 Write-Step "复制自定义命令"
 $CommandsDir = Join-Path $ScriptDir "commands"
 $TargetCommandsDir = "$ProjectPath\.claude\commands"
-if ($CommandsDir -eq $TargetCommandsDir) {
+if (Test-SamePath $CommandsDir $TargetCommandsDir) {
     Write-Info "源目录与目标目录相同，已跳过命令复制"
 } elseif (Test-Path $CommandsDir) {
     New-Item -ItemType Directory -Force -Path $TargetCommandsDir | Out-Null
@@ -244,7 +287,7 @@ $HooksSourceDir = Join-Path $ScriptDir ".claude\hooks"
 $HooksTargetDir = "$ProjectPath\.claude\hooks"
 $SettingsSource = Join-Path $ScriptDir ".claude\settings.json"
 $SettingsTarget = "$ProjectPath\.claude\settings.json"
-if ($HooksSourceDir -ne $HooksTargetDir -and (Test-Path $HooksSourceDir)) {
+if (-not (Test-SamePath $HooksSourceDir $HooksTargetDir) -and (Test-Path $HooksSourceDir)) {
     New-Item -ItemType Directory -Force -Path $HooksTargetDir | Out-Null
     Copy-Item -Path "$HooksSourceDir\*" -Destination $HooksTargetDir -Force -Recurse
     Write-Success "已复制 Hooks 到 .claude/hooks/"
@@ -262,6 +305,7 @@ if (Test-Path $SettingsSource) {
 
 # 12. 创建本地偏好文件 (gitignored)
 Write-Step "创建 CLAUDE.local.md (本地偏好)"
+New-Item -ItemType Directory -Force -Path "$ProjectPath\.claude" | Out-Null
 $localMd = @"
 # 本地个人偏好
 # 此文件会被 .gitignore 忽略，不会提交到仓库
@@ -279,8 +323,8 @@ $localMd = @"
 
 ---
 "@
-$localMd | Out-File -FilePath "$ProjectPath\CLAUDE.local.md" -Encoding utf8
-Write-Success "已创建 CLAUDE.local.md"
+$localMd | Out-File -FilePath "$ProjectPath\.claude\CLAUDE.local.md" -Encoding utf8
+Write-Success "已创建 CLAUDE.local.md (.claude/)"
 
 # 13. 配置 .gitignore
 Write-Step "配置 .gitignore"
@@ -291,27 +335,7 @@ if (Test-Path $gitignoreScript) {
     Write-Warn "configure-gitignore.ps1 未找到，跳过 .gitignore 配置"
 }
 
-# 14. 配置无人值守长任务（可选）
-Write-Step "配置无人值守长任务"
-Write-Info "正在复制无人值守脚本..."
-$unattendedScripts = @(
-    "tmux-session.sh",
-    "ralph-setup.sh",
-    "PROMPT.md",
-    "configure-gitignore.sh",
-    "trigger-optimizer.sh",
-    "weekly-report.sh"
-)
-foreach ($script in $unattendedScripts) {
-    $src = Join-Path $ScriptDir "scripts\$script"
-    $dst = Join-Path $ProjectPath "scripts\$script"
-    if (Test-Path $src) {
-        Copy-Item -Path $src -Destination $dst -Force -ErrorAction SilentlyContinue
-        Write-Info "已复制 $script"
-    }
-}
-
-# 15. 配置 gstack 命令（可选）
+# 14. 配置 gstack 命令（可选）
 Write-Step "配置 gstack 角色命令"
 $gstackCommands = @(
     "team.md",
@@ -333,15 +357,15 @@ foreach ($cmd in $gstackCommands) {
 }
 
 Write-Host ""
-Write-Host "无人值守功能已配置。" -ForegroundColor Yellow
-Write-Host "  - tmux-session.sh: 启动无人值守会话" -ForegroundColor Gray
-Write-Host "  - ralph-setup.sh: 安装 Ralph Wiggum 插件" -ForegroundColor Gray
+Write-Host "无人值守功能可通过 .claude/scripts/ 使用。" -ForegroundColor Yellow
+Write-Host "  - tmux-session.sh: 启动无人值守会话 (.claude/scripts/)" -ForegroundColor Gray
+Write-Host "  - ralph-setup.sh: 安装 Ralph Wiggum 插件 (.claude/scripts/)" -ForegroundColor Gray
 Write-Host "  - /team: 启动 Agent 团队" -ForegroundColor Gray
 Write-Host "  - /qa: 质量保证测试" -ForegroundColor Gray
 Write-Host "  - trigger-optimizer.sh: 分析 Skills 触发优化建议" -ForegroundColor Gray
 Write-Host "  - weekly-report.sh: 生成本周使用报告" -ForegroundColor Gray
 
-# 16. 运行环境检查
+# 15. 运行环境检查
 Write-Step "运行环境完整性检查"
 $checkEnvScript = Join-Path $ScriptDir "scripts\check-env.sh"
 if (Test-Path $checkEnvScript) {

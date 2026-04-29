@@ -15,8 +15,7 @@
     "scripts/",
     "configs/",
     ".claude/skills/",
-    ".claude/hooks/",
-    ".claude/agents/"
+    ".claude/hooks/"
   ],
   "scripts": {
     "start": "node index.js"

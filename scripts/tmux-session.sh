@@ -7,13 +7,13 @@
 #   - 安全限制：--max-turns, --max-budget-usd, --max-files-changed, --max-lines-changed
 #   - 无人值守专用路由 router-unattended
 # 用法：
-#   bash scripts/tmux-session.sh                    # 使用默认任务文件
-#   bash scripts/tmux-session.sh scripts/PROMPT.md # 指定任务文件
+#   bash .claude/scripts/tmux-session.sh                    # 使用默认任务文件
+#   bash .claude/scripts/tmux-session.sh .claude/scripts/PROMPT.md # 指定任务文件
 
 set -e
 
 SESSION_NAME="${SESSION_NAME:-claude-overnight}"
-PROMPT_FILE="${1:-scripts/PROMPT.md}"
+PROMPT_FILE="${1:-.claude/scripts/PROMPT.md}"
 PROJECT_DIR="${2:-.}"
 
 # 颜色输出
@@ -208,7 +208,7 @@ echo "  最大文件数: $MAX_FILES"
 echo "  最大行数: $MAX_LINES"
 echo ""
 echo -e "${CYAN}任务文件：${NC} $PROMPT_FILE"
-echo -e "${CYAN}报告目录：${NC} $PROJECT_DIR/reports"
+echo -e "${CYAN}报告目录：${NC} $PROJECT_DIR/.claude/reports"
 echo ""
 echo "完成后查看汇总:"
-echo "  cat $PROJECT_DIR/reports/summary.md"
+echo "  cat $PROJECT_DIR/.claude/reports/summary.md"

@@ -6,7 +6,7 @@
 set -e
 
 LOG_FILE="$HOME/.claude-skill-usage.log"
-REPORTS_DIR="reports"
+REPORTS_DIR=".claude/reports"
 
 # 颜色输出
 RED='\033[0;31m'
@@ -31,6 +31,14 @@ fi
 
 echo -e "${YELLOW}报告周期：${THIS_WEEK} 至今${NC}"
 echo ""
+
+# 平台检测：为 macOS BSD find 准备兼容的时间过滤器
+if [ "$(uname)" = "Darwin" ]; then
+    FIND_TIME_FILTER="-newer /tmp/_cci_week_ref_$$"
+    touch -t "$(echo "$THIS_WEEK" | tr -d '-')0000" /tmp/_cci_week_ref_$$
+else
+    FIND_TIME_FILTER="-newermt $THIS_WEEK"
+fi
 
 # 1. Git 统计
 echo -e "${CYAN}--- Git 活动 ---${NC}"
@@ -96,7 +104,7 @@ echo ""
 echo -e "${CYAN}--- 无人值守任务 ---${NC}"
 if [ -d "$REPORTS_DIR" ]; then
     # 查找本周的 summary 文件
-    this_week_summaries=$(find "$REPORTS_DIR" -name "summary-*.md" -newermt "$THIS_WEEK" 2>/dev/null | wc -l | tr -d ' ')
+    this_week_summaries=$(find "$REPORTS_DIR" -name "summary-*.md" $FIND_TIME_FILTER 2>/dev/null | wc -l | tr -d ' ')
 
     echo "本周无人值守任务：$this_week_summaries 次"
 
@@ -112,11 +120,11 @@ if [ -d "$REPORTS_DIR" ]; then
     fi
 
     # 检查失败任务
-    failed_count=$(find "$REPORTS_DIR" -name "failed-*.md" -newermt "$THIS_WEEK" 2>/dev/null | wc -l | tr -d ' ')
+    failed_count=$(find "$REPORTS_DIR" -name "failed-*.md" $FIND_TIME_FILTER 2>/dev/null | wc -l | tr -d ' ')
     if [ "$failed_count" -gt 0 ]; then
         echo ""
         echo -e "${YELLOW}⚠️ 本周有 $failed_count 个失败任务${NC}"
-        find "$REPORTS_DIR" -name "failed-*.md" -newermt "$THIS_WEEK" 2>/dev/null | head -3 | while read f; do
+        find "$REPORTS_DIR" -name "failed-*.md" $FIND_TIME_FILTER 2>/dev/null | head -3 | while read f; do
             echo "  - $f"
         done
     fi
@@ -128,7 +136,7 @@ echo ""
 
 # 4. 代码审查统计
 echo -e "${CYAN}--- 代码审查 ---${NC}"
-review_reports=$(find "$REPORTS_DIR" -name "review-*.md" -newermt "$THIS_WEEK" 2>/dev/null | wc -l | tr -d ' ')
+review_reports=$(find "$REPORTS_DIR" -name "review-*.md" $FIND_TIME_FILTER 2>/dev/null | wc -l | tr -d ' ')
 if [ "$review_reports" -gt 0 ]; then
     echo "本周进行代码审查：$review_reports 次"
 else
@@ -160,3 +168,6 @@ echo -e "${CYAN}========================================${NC}"
 echo ""
 echo "详细日志：$LOG_FILE"
 echo ""
+
+# 清理临时时间戳文件
+rm -f /tmp/_cci_week_ref_$$

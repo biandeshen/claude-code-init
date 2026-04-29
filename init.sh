@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.4.1 | 2026-04-28
+# 版本: v1.5.0 | 2026-04-30
 
 set -e
 
@@ -31,7 +31,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.4.1)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.0)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 
@@ -81,10 +81,10 @@ echo_success "已确认插件安装"
 
 # 5. 安装 OpenSpec (SDD) - 自动执行
 echo_step "安装 OpenSpec (SDD 工作流)"
-if npx kld-sdd; then
+if npm install -g @fission-ai/openspec@latest && openspec init; then
     echo_success "OpenSpec 已初始化"
 else
-    echo_warn "OpenSpec 自动安装失败，请手动执行: npx kld-sdd"
+    echo_warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@latest && openspec init"
 fi
 
 # 6. 安装 cc-discipline (物理防火墙) - 自动执行
@@ -112,8 +112,10 @@ fi
 echo_step "复制校验脚本到 .claude/scripts/"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 TARGET_SCRIPTS_DIR="$PROJECT_PATH/.claude/scripts"
-# 检查源目录是否存在且非空
-if [ -d "$SCRIPTS_DIR" ] && [ "$(ls -A "$SCRIPTS_DIR" 2>/dev/null)" ]; then
+# 检查源目录与目标目录是否相同
+if [ "$SCRIPTS_DIR" = "$TARGET_SCRIPTS_DIR" ]; then
+    echo_info "源目录与目标目录相同，已跳过脚本复制"
+elif [ -d "$SCRIPTS_DIR" ] && [ "$(ls -A "$SCRIPTS_DIR" 2>/dev/null)" ]; then
     mkdir -p "$TARGET_SCRIPTS_DIR"
     cp -r "$SCRIPTS_DIR/"* "$TARGET_SCRIPTS_DIR/"
     echo_success "已复制校验脚本到 .claude/scripts/"
@@ -134,13 +136,25 @@ fi
 
 # 9. 安装 Pre-commit hooks
 echo_step "安装 Pre-commit Hooks"
-if command -v pre-commit &> /dev/null; then
-    pre-commit install
-    echo_success "Pre-commit Hooks 已安装"
+
+# 检查 Python 是否可用
+if command -v python3 &> /dev/null || command -v python &> /dev/null; then
+    PYTHON_CMD=$(command -v python3 || command -v python)
+    # 检查 pre-commit 是否已安装
+    $PYTHON_CMD -c "import pre_commit" 2>/dev/null || {
+        echo_info "正在安装 pre-commit..."
+        $PYTHON_CMD -m pip install --quiet pre-commit 2>/dev/null && echo_success "pre-commit 安装完成"
+    }
+    if command -v pre-commit &> /dev/null; then
+        pre-commit install
+        echo_success "Pre-commit Hooks 已安装"
+    else
+        echo_warn "pre-commit install 失败，请手动执行: pre-commit install"
+    fi
 else
-    echo_warn "Pre-commit 未安装，显示安装说明:"
-    echo -e "  ${YELLOW}pip install pre-commit${NC}"
-    echo -e "  ${YELLOW}pre-commit install${NC}"
+    echo_warn "未找到 Python，无法自动安装 pre-commit"
+    echo -e "  ${YELLOW}手动安装: pip install pre-commit${NC}"
+    echo -e "  ${YELLOW}手动安装 hooks: pre-commit install${NC}"
 fi
 
 # 10. 复制覆盖层模板
@@ -149,20 +163,44 @@ TEMPLATE_DIR="$SCRIPT_DIR/templates"
 if [ -d "$TEMPLATE_DIR" ]; then
     # 复制 CLAUDE.md
     if [ -f "$TEMPLATE_DIR/CLAUDE_Template.md" ]; then
-        cp "$TEMPLATE_DIR/CLAUDE_Template.md" "$PROJECT_PATH/CLAUDE.md"
-        echo_success "已复制 CLAUDE.md"
+        if [ -f "$PROJECT_PATH/CLAUDE.md" ]; then
+            echo_warn "CLAUDE.md 已存在，跳过以避免覆盖已有配置"
+        else
+            cp "$TEMPLATE_DIR/CLAUDE_Template.md" "$PROJECT_PATH/CLAUDE.md"
+            echo_success "已复制 CLAUDE.md"
+        fi
     fi
 
     # 复制 SOUL.md
     if [ -f "$TEMPLATE_DIR/SOUL_Template.md" ]; then
-        cp "$TEMPLATE_DIR/SOUL_Template.md" "$PROJECT_PATH/SOUL.md"
-        echo_success "已复制 SOUL.md"
+        if [ -f "$PROJECT_PATH/SOUL.md" ]; then
+            echo_warn "SOUL.md 已存在，跳过以避免覆盖已有配置"
+        else
+            cp "$TEMPLATE_DIR/SOUL_Template.md" "$PROJECT_PATH/SOUL.md"
+            echo_success "已复制 SOUL.md"
+        fi
     fi
 
     # 复制 PLAN_TEMPLATE.md
     if [ -f "$TEMPLATE_DIR/PLAN_Template.md" ]; then
-        cp "$TEMPLATE_DIR/PLAN_Template.md" "$PROJECT_PATH/PLAN_TEMPLATE.md"
-        echo_success "已复制 PLAN_TEMPLATE.md"
+        if [ -f "$PROJECT_PATH/PLAN_TEMPLATE.md" ]; then
+            echo_warn "PLAN_TEMPLATE.md 已存在，跳过以避免覆盖已有配置"
+        else
+            cp "$TEMPLATE_DIR/PLAN_Template.md" "$PROJECT_PATH/PLAN_TEMPLATE.md"
+            echo_success "已复制 PLAN_TEMPLATE.md"
+        fi
+    fi
+
+    # 复制 SPEC_Template.md
+    if [ -f "$TEMPLATE_DIR/SPEC_Template.md" ] && [ ! -f "$PROJECT_PATH/SPEC_Template.md" ]; then
+        cp "$TEMPLATE_DIR/SPEC_Template.md" "$PROJECT_PATH/SPEC_Template.md"
+        echo_success "已复制 SPEC_Template.md"
+    fi
+
+    # 复制 ROUTINE_Template.md
+    if [ -f "$TEMPLATE_DIR/ROUTINE_Template.md" ] && [ ! -f "$PROJECT_PATH/ROUTINE_Template.md" ]; then
+        cp "$TEMPLATE_DIR/ROUTINE_Template.md" "$PROJECT_PATH/ROUTINE_Template.md"
+        echo_success "已复制 ROUTINE_Template.md"
     fi
 else
     echo_warn "模板目录不存在，跳过模板复制"
@@ -214,7 +252,7 @@ fi
 
 # 12. 创建本地偏好文件 (gitignored)
 echo_step "创建 CLAUDE.local.md (本地偏好)"
-cat > "$PROJECT_PATH/CLAUDE.local.md" << 'EOF'
+cat > "$PROJECT_PATH/CLAUDE.local.md" << EOF
 # 本地个人偏好
 # 此文件会被 .gitignore 忽略，不会提交到仓库
 
@@ -231,7 +269,7 @@ cat > "$PROJECT_PATH/CLAUDE.local.md" << 'EOF'
 
 ---
 EOF
-echo_success "已创建 CLAUDE.local.md"
+echo_success "已创建 CLAUDE.local.md (.claude/)"
 
 # 13. 处理 .gitignore（调用独立脚本）
 echo ""
@@ -254,23 +292,7 @@ else
     echo_warn "未找到配置脚本，跳过 .gitignore 配置"
 fi
 
-# 14. 配置无人值守长任务
-echo ""
-echo_step "配置无人值守长任务"
-echo_info "正在复制无人值守脚本..."
-
-UNATTENDED_SCRIPTS="tmux-session.sh ralph-setup.sh PROMPT.md configure-gitignore.sh trigger-optimizer.sh weekly-report.sh"
-for script in $UNATTENDED_SCRIPTS; do
-    src="$SCRIPT_DIR/scripts/$script"
-    dst="$PROJECT_PATH/scripts/$script"
-    if [ -f "$src" ]; then
-        mkdir -p "$PROJECT_PATH/scripts"
-        cp "$src" "$dst" 2>/dev/null || true
-        echo_info "已复制 $script"
-    fi
-done
-
-# 15. 配置 gstack 命令
+# 14. 配置 gstack 命令
 echo_step "配置 gstack 角色命令"
 GSTACK_COMMANDS="team.md messages.md qa.md plan-ceo-review.md overnight.md overnight-report.md capabilities.md status.md"
 TARGET_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
@@ -326,7 +348,7 @@ echo "  5. 输入 /status 查看项目状态仪表盘"
 echo "  6. 输入 /capabilities 按场景查看全部能力"
 echo ""
 
-# 17. 全局偏好设置引导（跨所有项目生效）
+# 16. 全局偏好设置引导（跨所有项目生效）
 echo -e "${YELLOW}[建议] 设置全局偏好（跨所有项目生效）：${NC}"
 GLOBAL_CLAUDE="$HOME/.claude/CLAUDE.md"
 echo -e "  ${GRAY}将你的通用编码偏好写入 $GLOBAL_CLAUDE${NC}"

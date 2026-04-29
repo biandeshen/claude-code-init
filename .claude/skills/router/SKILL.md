@@ -42,7 +42,7 @@ description: >
 | 记忆、记住这个、偏好 | 执行 ECC 的 `/memory` | "记住我偏好 Python 类型标注" |
 | 上下文、token、用量 | 执行 ECC 的 `/ctx` | "看看当前上下文用了多少" |
 | 制定计划、开发计划 | 执行 ECC 的 `/plan` | "帮我制定这个模块的开发计划" |
-| **过夜、夜间、无人值守、overnight** | 执行 `bash scripts/tmux-session.sh` | "让 AI 过夜跑重构任务" |
+| **过夜、夜间、无人值守、overnight** | 执行 `bash .claude/scripts/tmux-session.sh` | "让 AI 过夜跑重构任务" |
 | **团队、team、并行审查、并行排查** | 执行 `/team` 命令 | "启动 3 个 Agent 并行审查" |
 | **qa、测试验证、质量保证** | 执行 `/qa` 命令 | "跑一遍完整 QA 测试" |
 | **需求审查、ceo-review** | 执行 `/plan-ceo-review` 命令 | "帮我审视下这个需求" |

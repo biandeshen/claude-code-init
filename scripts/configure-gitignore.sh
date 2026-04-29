@@ -53,21 +53,20 @@ CLAUDE.md
 SOUL.md
 PLAN_TEMPLATE.md
 openspec/
-docs/
 # === claude-code-init ==="
         echo_success "已将所有 AI 配置文件加入 .gitignore"
         ;;
     2)
         rules="# === claude-code-init ===
 # Claude Code 个人本地文件（务必忽略）
-CLAUDE.local.md
+.claude/CLAUDE.local.md
 # === claude-code-init ==="
         echo_success "已忽略个人偏好文件，其他配置可提交"
         ;;
     3)
         rules="# === claude-code-init ===
 # Claude Code 个人本地文件
-CLAUDE.local.md
+.claude/CLAUDE.local.md
 # === claude-code-init ==="
         echo_success "所有 AI 配置文件提交就绪"
         ;;
@@ -80,7 +79,6 @@ CLAUDE.md
 SOUL.md
 PLAN_TEMPLATE.md
 openspec/
-docs/
 # === claude-code-init ==="
         echo_warn "无效选择，已按默认处理（全部忽略）"
         ;;

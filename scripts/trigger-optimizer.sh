@@ -7,7 +7,7 @@ set -e
 
 LOG_FILE="$HOME/.claude-skill-usage.log"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS_DIR="$SCRIPT_DIR/../.claude/skills"
+SKILLS_DIR="$SCRIPT_DIR/../../.claude/skills"
 
 # 颜色输出
 RED='\033[0;31m'

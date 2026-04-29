@@ -25,7 +25,7 @@
 |------|------|----------|
 | Everything Claude Code | GitHub: affaan-m/everything-claude-code | 最新稳定版 |
 | Superpowers | Git: obra/superpowers | 最新稳定版 |
-| OpenSpec | npm: kld-sdd | 最新稳定版 |
+| OpenSpec | npm: @fission-ai/openspec | 最新稳定版 |
 | cc-discipline | GitHub: TechHU-GS/cc-discipline | 锁定 commit: `916da006` |
 
 ## 版本安全更新

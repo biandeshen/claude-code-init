@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  node-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+        with:
+          node-version: '18'
+      - run: node --check index.js
+      - run: node -e "const pkg = require('./package.json'); if (!pkg.name || !pkg.version) process.exit(1)"
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: sudo apt-get update -qq && sudo apt-get install -qq shellcheck
+      - run: |
+          echo "::group::init.sh"
+          shellcheck -x init.sh || true
+          echo "::endgroup::"
+          echo "::group::scripts/*.sh"
+          find scripts -name "*.sh" -exec shellcheck -x {} + || true
+          echo "::endgroup::"
+
+  bash-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: |
+          for f in init.sh scripts/*.sh; do
+            [ -f "$f" ] || continue
+            echo "Checking $f..."
+            bash -n "$f" || { echo "FAIL: $f"; exit 1; }
+          done
+          echo "All Bash scripts syntax OK"
+
+  markdown-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: DavidAnson/markdownlint-cli2-action@db43aefc7bc5c56b8068f99235cb088f36cfa269
+        with:
+          globs: 'templates/*.md,docs/*.md,*.md'
+        continue-on-error: true
+
+  python-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@3c2dbd4fe58be2262966472148d6609918a8e3ae
+        with:
+          python-version: '3.9'
+      - run: |
+          python -m py_compile scripts/check_secrets.py || true
+          python -m py_compile scripts/check_project_structure.py
+          python -m py_compile scripts/check_dependencies.py
+          python -m py_compile scripts/check_function_length.py
+          python -m py_compile scripts/check_import_order.py

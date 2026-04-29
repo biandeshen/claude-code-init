@@ -54,7 +54,7 @@ if echo "$command" | grep -q "git commit" 2>/dev/null; then
 fi
 
 # ─── 场景 5：执行 git push --force → 警告 ───
-if echo "$command" | grep -q "git push" 2>/dev/null; then
+if echo "$command" | grep -qE "git\s+push" 2>/dev/null; then
     if echo "$command" | grep -q "\-\-force-with-lease" 2>/dev/null; then
         # --force-with-lease 是相对安全的变体
         if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
@@ -82,19 +82,19 @@ EOF
 fi
 
 # ─── 场景 7：执行 rm -rf 等危险删除命令 → 警告 ───
-if echo "$command" | grep -qE "rm\s+-(rRf)" 2>/dev/null; then
-    if echo "$command" | grep -qE "rm\s+-(rRf).*\$|rm\s+-(rRf).*~" 2>/dev/null; then
+if echo "$command" | grep -qE "rm\s+-[rRf]" 2>/dev/null; then
+    if echo "$command" | grep -qE "rm\s+-[rRf].*\$|rm\s+-[rRf].*~" 2>/dev/null; then
         # 变量展开或 ~ 可能是危险模式
         if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
         suggestion="${suggestion}⚠️ 检测到包含变量或通配符的删除命令，可能误删重要文件。"
-    elif echo "$command" | grep -qE "rm\s+-(rRf)\s+/" 2>/dev/null; then
+    elif echo "$command" | grep -qE "rm\s+-[rRf]\s+/" 2>/dev/null; then
         # rm -rf / 是最危险的命令
         if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
         suggestion="${suggestion}⚠️ 危险！检测到 rm -rf / 命令，这会删除系统文件。"
     fi
 fi
 
-# ─── 场景 7：语义级安全检测（函数名检测）───
+# ─── 场景 8：语义级安全检测（函数名检测）───
 # 获取最近编辑的函数名
 edited_function=$(git diff HEAD 2>/dev/null | grep "^@@" -A5 | grep -oP "(def|function|class|fn)\s+\K\w+" | head -1)
 
@@ -104,14 +104,14 @@ if echo "$edited_function" | grep -qiE "(encrypt|decrypt|hash|token|auth|login|p
     suggestion="${suggestion}检测到你正在编辑安全敏感函数「$edited_function」，建议使用「code-review」技能重点审查安全性。"
 fi
 
-# ─── 场景 8：夜间无人值守推荐 ───
+# ─── 场景 9：夜间无人值守推荐 ───
 current_hour=$(date +%H 2>/dev/null || echo "12")
 if [ "$current_hour" -ge 18 ] && [ "$current_hour" -le 23 ]; then
     if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
     suggestion="${suggestion}已到夜间，是否设置云端 Routine 定时执行？输入 /routine 创建定时任务。"
 fi
 
-# ─── 场景 9：首次审查后推荐 Agent Teams ───
+# ─── 场景 10：首次审查后推荐 Agent Teams ───
 if echo "$command" | grep -q "/review" 2>/dev/null; then
     if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
     suggestion="${suggestion}首次使用代码审查？试试 /team 3 启动三人生审查，覆盖安全、性能和测试三个维度。"

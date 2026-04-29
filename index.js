@@ -8,9 +8,8 @@
  *   npx claude-code-init --project-path ./my-project
  */
 
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 const path = require('path');
-const fs = require('fs');
 
 // 解析命令行参数
 const args = process.argv.slice(2);
@@ -65,6 +64,9 @@ console.log(`目标目录: ${path.resolve(projectPath)}`);
 console.log(`操作系统: ${isWindows ? 'Windows' : isMac ? 'macOS' : 'Linux'}`);
 console.log('');
 
+// 预先检测 PowerShell 版本（避免重复 fork）
+const psCmd = detectPowerShell();
+
 // 检查系统依赖
 console.log('[检查] 验证系统依赖...');
 const deps = [
@@ -94,25 +96,42 @@ console.log('');
 try {
     if (isWindows) {
         // Windows: 使用 PowerShell（优先 pwsh，降级到 powershell）
-        const psCmd = detectPowerShell();
         if (!psCmd) {
             console.error('[错误] 未找到 PowerShell，请安装 PowerShell 7 或 Windows PowerShell。');
             process.exit(1);
         }
         console.log(`[执行] init.ps1 (${psCmd})`);
         const initScript = path.join(scriptDir, 'init.ps1');
-        execSync(`${psCmd} -File "${initScript}" -ProjectPath "${path.resolve(projectPath)}"`, {
+        const result = spawnSync(psCmd, [
+            '-File', initScript,
+            '-ProjectPath', path.resolve(projectPath)
+        ], {
             stdio: 'inherit',
             cwd: scriptDir
         });
+        if (result.error) throw result.error;
+        if (result.status !== 0) {
+            const err = new Error(`init.ps1 exited with code ${result.status}`);
+            err.status = result.status;
+            throw err;
+        }
     } else {
         // Unix/macOS: 使用 Bash
         console.log('[执行] init.sh');
         const initScript = path.join(scriptDir, 'init.sh');
-        execSync(`bash "${initScript}" "${path.resolve(projectPath)}"`, {
+        const result = spawnSync('bash', [
+            initScript,
+            path.resolve(projectPath)
+        ], {
             stdio: 'inherit',
             cwd: scriptDir
         });
+        if (result.error) throw result.error;
+        if (result.status !== 0) {
+            const err = new Error(`init.sh exited with code ${result.status}`);
+            err.status = result.status;
+            throw err;
+        }
     }
 
     console.log('');

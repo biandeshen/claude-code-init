@@ -163,6 +163,8 @@ AI 自动加载全部配置，**任务类型由 AI 自动评估**。
 | `CLAUDE.md` | 项目入口，引用双索引 |
 | `SOUL.md` | 元认知规则，决策树和复杂度评估 |
 | `PLAN_TEMPLATE.md` | 任务执行计划模板 |
+| `SPEC_Template.md` | 功能级设计规格模板 |
+| `ROUTINE_Template.md` | 日常开发规范模板 |
 
 ### 模板生命周期
 
@@ -174,6 +176,38 @@ claude-code-init/templates/
     ├── SOUL.md        # 复制后重命名
     └── PLAN_TEMPLATE.md
 ```
+
+---
+
+## 四层文档架构
+
+初始化后，项目具备四层递进的 AI 开发文档体系：
+
+```
+CLAUDE.md  ← 入口层：项目规范 + 文档索引
+    ↓
+SOUL.md    ← 决策层：复杂度评估 + 执行模式自动切换
+    ↓
+SPEC.md    ← 规格层：单一功能的目标/约束/契约/验收标准
+    ↓
+PLAN.md    ← 执行层：任务执行的实时日志
+```
+
+| 文档 | 定位 | 时机 | 示例 |
+|------|------|------|------|
+| **CLAUDE.md** | AI 启动时自动读取的入口规范 | 项目初始化时创建 | "本项目的代码风格是..." |
+| **SOUL.md** | 元认知规则，AI 自动评估任务复杂度 | 每次任务开始时评估 | "修改认证模块 → 4分 → Plan+TDD" |
+| **docs/specs/*.md** | 功能级设计蓝图，定义 API 契约和验收标准 | 复杂功能(≥5分)开发**前** | "用户认证系统 v1 — 支持 OAuth2 + JWT" |
+| **Plan.md** | 任务执行日志，记录每一步的实际操作 | 复杂功能开发**中** | "14:32 修改 auth.py → ✅ → 下一步..." |
+
+> **核心原则**：Spec 管"做什么"（事前设计），Plan 管"做了什么"（事后记录）。
+> 参考模板：[SPEC_Template.md](SPEC_Template.md) | [PLAN_Template.md](PLAN_Template.md)
+
+### Spec 与 OpenSpec 的关系
+
+- **Spec** (docs/specs/)：轻量级、项目内嵌的功能规格。适合单个功能的手写设计。
+- **OpenSpec** (openspec/changes/)：重量级 SDD 5步法工作流。适合大型变更的标准化管理。
+- **关系**：OpenSpec 的 "Spec" 步骤可产出 `docs/specs/` 中的 Spec 文件；手动创建的 Spec 也可作为 OpenSpec "Propose" 步骤的输入。
 
 ---
 
@@ -226,7 +260,7 @@ pre-commit run --all-files
 |------|------|----------|
 | **ECC** | Everything Claude Code - 38个Agent + 183个Skills | Claude Code 插件 |
 | **Superpowers** | TDD铁律 + 根因追踪 | Claude Code 插件 |
-| **OpenSpec** | SDD 5步法工作流 | npx kld-sdd |
+| **OpenSpec** | SDD 5步法工作流 | npm: @fission-ai/openspec |
 | **cc-discipline** | 物理防火墙 Hooks | git clone |
 
 ---

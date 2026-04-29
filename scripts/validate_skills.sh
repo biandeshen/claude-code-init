@@ -27,25 +27,28 @@ done
 # 2. 检查 name 字段唯一性
 echo ""
 echo "[2/3] 检查 name 字段唯一性..."
-declare -A NAME_COUNT
+
+# 使用临时文件代替关联数组（兼容 Bash 3.2+/macOS）
+TMPFILE=$(mktemp) || { echo "  [错误] 无法创建临时文件"; exit 1; }
+trap 'rm -f "$TMPFILE"' EXIT INT TERM
+
 for file in "$SKILLS_DIR"/*/SKILL.md; do
     if [ -f "$file" ]; then
         name=$(grep "^name:" "$file" | head -1 | sed 's/name: *//' | tr -d ' ')
         if [ -n "$name" ]; then
-            NAME_COUNT["$name"]=$((${NAME_COUNT["$name"]:-0} + 1))
+            echo "$name" >> "$TMPFILE"
         fi
     fi
 done
 
 HAS_DUPLICATE=0
-for name in "${!NAME_COUNT[@]}"; do
-    count=${NAME_COUNT[$name]}
+while read count name; do
     if [ "$count" -gt 1 ]; then
         echo "  [错误] name='$name' 出现 ${count} 次"
         ERRORS=$((ERRORS + 1))
         HAS_DUPLICATE=1
     fi
-done
+done < <(sort "$TMPFILE" | uniq -c)
 
 if [ $HAS_DUPLICATE -eq 0 ]; then
     echo "  [OK] 所有 name 字段唯一"
