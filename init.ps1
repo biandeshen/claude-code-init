@@ -132,7 +132,9 @@ if (-not $SkipCcDiscipline) {
 Write-Step "复制校验脚本到 .claude/scripts/"
 $ScriptsDir = Join-Path $ScriptDir "scripts"
 $TargetScriptsDir = "$ProjectPath\.claude\scripts"
-if (Test-Path $ScriptsDir) {
+if ($ScriptsDir -eq $TargetScriptsDir) {
+    Write-Info "源目录与目标目录相同，已跳过脚本复制"
+} elseif (Test-Path $ScriptsDir) {
     New-Item -ItemType Directory -Force -Path $TargetScriptsDir | Out-Null
     Copy-Item -Path "$ScriptsDir\*" -Destination $TargetScriptsDir -Force -Recurse
     Write-Success "已复制校验脚本到 .claude/scripts/"
@@ -144,7 +146,9 @@ if (Test-Path $ScriptsDir) {
 Write-Step "复制 Pre-commit 配置"
 $PrecommitConfig = Join-Path $ScriptDir "configs\.pre-commit-config.yaml"
 $TargetPrecommitConfig = "$ProjectPath\.pre-commit-config.yaml"
-if (Test-Path $PrecommitConfig) {
+if ($PrecommitConfig -eq $TargetPrecommitConfig) {
+    Write-Info "源文件与目标文件相同，已跳过 Pre-commit 配置复制"
+} elseif (Test-Path $PrecommitConfig) {
     Copy-Item -Path $PrecommitConfig -Destination $TargetPrecommitConfig -Force
     Write-Success "已复制 .pre-commit-config.yaml"
 } else {
@@ -209,7 +213,9 @@ if (Test-Path $TemplateDir) {
 Write-Step "复制自定义命令"
 $CommandsDir = Join-Path $ScriptDir "commands"
 $TargetCommandsDir = "$ProjectPath\.claude\commands"
-if (Test-Path $CommandsDir) {
+if ($CommandsDir -eq $TargetCommandsDir) {
+    Write-Info "源目录与目标目录相同，已跳过命令复制"
+} elseif (Test-Path $CommandsDir) {
     New-Item -ItemType Directory -Force -Path $TargetCommandsDir | Out-Null
     Copy-Item -Path "$CommandsDir\*" -Destination $TargetCommandsDir -Force -Recurse
     Write-Success "已复制自定义命令到 .claude/commands/"
@@ -221,7 +227,9 @@ if (Test-Path $CommandsDir) {
 Write-Step "复制 Skills"
 $SkillsDir = Join-Path $ScriptDir ".claude\skills"
 $TargetSkillsDir = "$ProjectPath\.claude\skills"
-if (Test-Path $SkillsDir) {
+if ($SkillsDir -eq $TargetSkillsDir) {
+    Write-Info "源目录与目标目录相同，已跳过 Skills 复制"
+} elseif (Test-Path $SkillsDir) {
     New-Item -ItemType Directory -Force -Path $TargetSkillsDir | Out-Null
     Copy-Item -Path "$SkillsDir\*" -Destination $TargetSkillsDir -Force -Recurse
     Write-Success "已复制 Skills 到 .claude/skills/"
@@ -235,10 +243,12 @@ $HooksSourceDir = Join-Path $ScriptDir ".claude\hooks"
 $HooksTargetDir = "$ProjectPath\.claude\hooks"
 $SettingsSource = Join-Path $ScriptDir ".claude\settings.json"
 $SettingsTarget = "$ProjectPath\.claude\settings.json"
-if (Test-Path $HooksSourceDir) {
+if ($HooksSourceDir -ne $HooksTargetDir -and (Test-Path $HooksSourceDir)) {
     New-Item -ItemType Directory -Force -Path $HooksTargetDir | Out-Null
     Copy-Item -Path "$HooksSourceDir\*" -Destination $HooksTargetDir -Force -Recurse
     Write-Success "已复制 Hooks 到 .claude/hooks/"
+} else {
+    Write-Info "源目录与目标目录相同或源目录不存在，已跳过 Hooks 复制"
 }
 if (Test-Path $SettingsSource) {
     if (Test-Path $SettingsTarget) {
