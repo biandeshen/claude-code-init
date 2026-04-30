@@ -304,6 +304,23 @@ Check-TemplateVersion (Join-Path $TemplateDir "SPEC_Template.md") "$ProjectPath\
 Check-TemplateVersion (Join-Path $TemplateDir "ROUTINE_Template.md") "$ProjectPath\.claude\ROUTINE_Template.md"
 Write-Success "模板版本检查完成"
 
+# 10.2 复制记忆系统模板
+Write-Step "复制记忆系统模板"
+$MemoryTemplateDir = Join-Path $TemplateDir "memory"
+if (Test-Path $MemoryTemplateDir) {
+    New-Item -ItemType Directory -Force -Path "$ProjectPath\.claude\memory\archive" | Out-Null
+    Get-ChildItem "$MemoryTemplateDir\*.md" | ForEach-Object {
+        Copy-Item $_.FullName "$ProjectPath\.claude\memory\$($_.Name)" -Force
+    }
+    $archiveGitkeep = Join-Path $MemoryTemplateDir "archive\.gitkeep"
+    if (Test-Path $archiveGitkeep) {
+        Copy-Item $archiveGitkeep "$ProjectPath\.claude\memory\archive\.gitkeep" -Force
+    }
+    Write-Success "已复制记忆系统模板到 .claude/memory/"
+} else {
+    Write-Info "记忆模板目录不存在，跳过"
+}
+
 # 11. 复制自定义命令
 Write-Step "复制自定义命令"
 $CommandsDir = Join-Path $ScriptDir "commands"
@@ -376,6 +393,21 @@ $localMd = @"
 "@
 $localMd | Out-File -FilePath "$ProjectPath\.claude\CLAUDE.local.md" -Encoding utf8
 Write-Success "已创建 CLAUDE.local.md (.claude/)"
+
+# 创建 MEMORY.local.md (个人私密记忆，不提交)
+$memoryLocalMd = @"
+# 个人私密记忆
+# 此文件会被 .gitignore 忽略，不会提交到仓库
+# 记录个人偏好、工作习惯等不适合团队共享的内容
+
+> 由 claude-code-init 自动生成
+> 模板版本: v1.0.0
+
+---
+<!-- 在此记录个人偏好设置、临时笔记等内容 -->
+"@
+$memoryLocalMd | Out-File -FilePath "$ProjectPath\MEMORY.local.md" -Encoding utf8
+Write-Success "已创建 MEMORY.local.md (gitignored)"
 
 # 13. 配置 .gitignore
 Write-Step "配置 .gitignore"

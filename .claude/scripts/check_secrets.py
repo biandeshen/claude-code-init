@@ -249,6 +249,33 @@ def check_python_files(file_paths: list) -> list:
     return errors
 
 
+def check_markdown_files(file_paths: list) -> list:
+    """检查 Markdown 文件中的敏感信息（重点扫描 MEMORY.md 等记忆文件）"""
+    errors = []
+
+    for file_path in file_paths:
+        if not file_path.endswith(".md"):
+            continue
+
+        try:
+            with open(file_path, encoding="utf-8") as f:
+                content = f.read()
+
+            for pattern in SECRET_PATTERNS:
+                for match in re.finditer(pattern, content):
+                    line_num = content[:match.start()].count("\n") + 1
+                    match_text = match.group()
+                    errors.append(
+                        f"[ERROR] {file_path}:{line_num} - Markdown 文件中疑似包含密钥\n"
+                        f"   匹配内容: {match_text[:30]}...\n"
+                        f"   建议: 从 {file_path} 中删除此内容\n"
+                    )
+        except Exception:
+            pass
+
+    return errors
+
+
 def main():
     """主函数"""
     errors = []
@@ -277,6 +304,17 @@ def main():
             errors.extend(check_python_files(staged_files))
     except Exception:
         pass
+
+    # 5. 检查 Markdown 文件（记忆文件等）
+    md_files = []
+    for md_path in [Path("MEMORY.md"), Path("MEMORY.local.md")]:
+        if md_path.exists():
+            md_files.append(str(md_path))
+    memory_dir = Path(".claude/memory")
+    if memory_dir.exists():
+        md_files.extend(str(p) for p in memory_dir.rglob("*.md"))
+    if md_files:
+        errors.extend(check_markdown_files(md_files))
 
     # 输出结果
     if errors:

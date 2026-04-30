@@ -10,12 +10,14 @@ description: >
   中文触发词：审查、检查、看看、review一下、提交、commit、修复、fix、
   重构、refactor、解释、explain、评审、架构、校验、validate、测试、
   开发新功能、帮我看看代码、帮我检查一下、代码质量、团队、并行、
-  过夜、夜间、无人值守、qa、需求审查、架构评审
+  过夜、夜间、无人值守、qa、需求审查、架构评审、
+  记忆、记住、回忆、备忘、之前怎么、偏好设置
 
   英文触发词：review, commit, fix, refactor, explain, validate, test,
   check, architecture, design, bug, error, debug, quality, security,
   audit, refactor, restructure, deploy, team, parallel, overnight,
-  unattended, qa, ceo-review, eng-review
+  unattended, qa, ceo-review, eng-review,
+  memory, remember, recall, preference
 ---
 
 # Development Workflow Router

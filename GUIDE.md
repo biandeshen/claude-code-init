@@ -160,6 +160,7 @@ AI 自动加载全部配置，**任务类型由 AI 自动评估**。
 | `/capabilities` | 按场景索引系统能力 |
 | `/messages` | 查看 Agent 团队消息 |
 | `/opsx:propose <名称>` | 复杂功能 SDD 流程（AI 可能自动触发） |
+| `/remember` | 浏览/搜索/管理项目记忆 |
 
 ---
 
@@ -266,6 +267,42 @@ pre-commit run --all-files
 
 ---
 
+## 记忆系统
+
+初始化后项目自动包含 `.claude/memory/` 记忆目录：
+
+```
+.claude/memory/
+├── INDEX.md          (摘要索引 — AI 启动时先读)
+├── decisions.md       (架构决策 — ADR 风格)
+├── bugs.md            (Bug 模式与根因)
+├── patterns.md        (编码模式/约定)
+├── context.md         (项目背景/领域知识)
+└── archive/           (过期记忆归档)
+```
+
+### 工作原理
+
+- **被动采集**：AI 在关键节点（`/commit`、`/fix`、`/review` 后）自动提议记录记忆，无需手动输入
+- **渐进式加载**：AI 先读 `INDEX.md`（~2KB），按需深入主题文件，避免一次性加载全部
+- **防膨胀**：每个主题文件控制在 500 条以内，90 天未引用自动归档
+
+### 安全管理
+
+| 文件 | 内容 | Git |
+|------|------|:---:|
+| `.claude/memory/*.md` | 技术决策、Bug根因、模式约定 | 提交 |
+| `MEMORY.local.md` | 个人偏好、临时笔记 | gitignored |
+
+### 命令
+
+| 命令 | 作用 |
+|------|------|
+| `/remember` | 浏览/搜索/管理记忆 |
+| `/remember gc` | 交互式清理过期记忆 |
+
+---
+
 ## 包含的工具
 
 | 工具 | 说明 | 安装方式 |
@@ -311,11 +348,18 @@ claude-code-init/
 │   ├── SOUL_Template.md
 │   ├── SPEC_Template.md
 │   ├── PLAN_Template.md
-│   └── ROUTINE_Template.md
-├── commands/              # 自定义斜杠命令 (17个)
+│   ├── ROUTINE_Template.md
+│   └── memory/              # 记忆系统模板
+│       ├── INDEX.md         # 摘要索引
+│       ├── decisions.md     # 架构决策
+│       ├── bugs.md          # Bug 模式
+│       ├── patterns.md      # 编码模式
+│       └── context.md       # 项目背景
+├── commands/              # 自定义斜杠命令 (18个)
 │   ├── review.md, commit.md, fix.md
 │   ├── refactor.md, explain.md, validate.md
 │   ├── team.md, qa.md, routine.md
+│   ├── remember.md
 │   └── help.md, status.md, capabilities.md...
 ├── scripts/               # Shell 脚本工具
 │   ├── tmux-session.sh    # 无人值守会话管理

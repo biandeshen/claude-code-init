@@ -52,6 +52,7 @@ switch ($choice) {
             "# === claude-code-init ===",
             "# Claude Code 个人本地文件（务必忽略）",
             ".claude/CLAUDE.local.md",
+            "MEMORY.local.md",
             "# === claude-code-init ==="
         )
         Write-Host "[OK] 已忽略个人偏好文件，其他配置可提交" -ForegroundColor Green
@@ -61,6 +62,7 @@ switch ($choice) {
             "# === claude-code-init ===",
             "# Claude Code 个人本地文件",
             ".claude/CLAUDE.local.md",
+            "MEMORY.local.md",
             "# === claude-code-init ==="
         )
         Write-Host "[OK] 所有 AI 配置文件提交就绪" -ForegroundColor Green

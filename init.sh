@@ -271,6 +271,23 @@ check_template_version "$TEMPLATE_DIR/SPEC_Template.md" "$PROJECT_PATH/.claude/S
 check_template_version "$TEMPLATE_DIR/ROUTINE_Template.md" "$PROJECT_PATH/.claude/ROUTINE_Template.md"
 echo_success "模板版本检查完成"
 
+# 10.2 复制记忆系统模板
+echo_step "复制记忆系统模板"
+MEMORY_TEMPLATE_DIR="$TEMPLATE_DIR/memory"
+if [ -d "$MEMORY_TEMPLATE_DIR" ]; then
+    mkdir -p "$PROJECT_PATH/.claude/memory/archive"
+    for _mf in "$MEMORY_TEMPLATE_DIR"/*.md; do
+        [ -f "$_mf" ] || continue
+        _mf_name=$(basename "$_mf")
+        cp "$_mf" "$PROJECT_PATH/.claude/memory/$_mf_name"
+    done
+    # 复制 archive 占位文件
+    [ -f "$MEMORY_TEMPLATE_DIR/archive/.gitkeep" ] && cp "$MEMORY_TEMPLATE_DIR/archive/.gitkeep" "$PROJECT_PATH/.claude/memory/archive/.gitkeep"
+    echo_success "已复制记忆系统模板到 .claude/memory/"
+else
+    echo_info "记忆模板目录不存在，跳过"
+fi
+
 # 11. 复制自定义命令
 echo_step "复制自定义命令"
 COMMANDS_DIR="$SCRIPT_DIR/commands"
@@ -336,6 +353,20 @@ cat > "$PROJECT_PATH/.claude/CLAUDE.local.md" << EOF
 ---
 EOF
 echo_success "已创建 CLAUDE.local.md (.claude/)"
+
+# 创建 MEMORY.local.md (个人私密记忆，不提交)
+cat > "$PROJECT_PATH/MEMORY.local.md" << 'LOCALEOF'
+# 个人私密记忆
+# 此文件会被 .gitignore 忽略，不会提交到仓库
+# 记录个人偏好、工作习惯等不适合团队共享的内容
+
+> 由 claude-code-init 自动生成
+> 模板版本: v1.0.0
+
+---
+<!-- 在此记录个人偏好设置、临时笔记等内容 -->
+LOCALEOF
+echo_success "已创建 MEMORY.local.md (gitignored)"
 
 # 13. 处理 .gitignore（调用独立脚本）
 echo ""
