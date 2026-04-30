@@ -258,6 +258,28 @@ if (Test-Path $TemplateDir) {
     Write-Warn "模板目录不存在，跳过模板复制"
 }
 
+# 10.1 模板版本检查
+Write-Step "检查模板版本"
+function Check-TemplateVersion {
+    param($SrcPath, $TargetPath)
+    if ((Test-Path $SrcPath) -and (Test-Path $TargetPath)) {
+        $srcContent = Get-Content $SrcPath -Raw -ErrorAction SilentlyContinue
+        $targetContent = Get-Content $TargetPath -Raw -ErrorAction SilentlyContinue
+        $srcMatch = [regex]::Match($srcContent, '模板版本：\s*(v[\d]+\.[\d]+\.[\d]+)')
+        $targetMatch = [regex]::Match($targetContent, '模板版本：\s*(v[\d]+\.[\d]+\.[\d]+)')
+        if ($srcMatch.Success -and $targetMatch.Success -and ($srcMatch.Groups[1].Value -ne $targetMatch.Groups[1].Value)) {
+            $name = Split-Path $TargetPath -Leaf
+            Write-Warn "   $name : 源版本 $($srcMatch.Groups[1].Value) / 目标版本 $($targetMatch.Groups[1].Value) — 建议手动合并更新"
+        }
+    }
+}
+Check-TemplateVersion (Join-Path $TemplateDir "CLAUDE_Template.md") "$ProjectPath\CLAUDE.md"
+Check-TemplateVersion (Join-Path $TemplateDir "SOUL_Template.md") "$ProjectPath\SOUL.md"
+Check-TemplateVersion (Join-Path $TemplateDir "PLAN_Template.md") "$ProjectPath\PLAN_TEMPLATE.md"
+Check-TemplateVersion (Join-Path $TemplateDir "SPEC_Template.md") "$ProjectPath\SPEC_Template.md"
+Check-TemplateVersion (Join-Path $TemplateDir "ROUTINE_Template.md") "$ProjectPath\ROUTINE_Template.md"
+Write-Success "模板版本检查完成"
+
 # 11. 复制自定义命令
 Write-Step "复制自定义命令"
 $CommandsDir = Join-Path $ScriptDir "commands"

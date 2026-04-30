@@ -150,6 +150,15 @@ AI 自动加载全部配置，**任务类型由 AI 自动评估**。
 | `/fix` | 自动错误修复（分析 → 根因 → 方案 → 执行 → 验证） |
 | `/refactor` | 安全重构（先测试保护，逐步重构，保持测试绿灯） |
 | `/explain <目标>` | 代码深度解释（架构/数据流/决策/风险） |
+| `/team <数量> <任务>` | 启动 Agent 团队并行工作 |
+| `/qa <目标>` | 质量保证测试 |
+| `/plan-ceo-review <需求>` | 产品需求审查 |
+| `/routine <描述>` | 云端定时任务管理 |
+| `/overnight` | 启动无人值守长任务 |
+| `/overnight-report` | 查看过夜任务汇总 |
+| `/status` | 项目状态仪表盘 |
+| `/capabilities` | 按场景索引系统能力 |
+| `/messages` | 查看 Agent 团队消息 |
 | `/opsx:propose <名称>` | 复杂功能 SDD 流程（AI 可能自动触发） |
 
 ---
@@ -201,7 +210,7 @@ PLAN.md    ← 执行层：任务执行的实时日志
 | **Plan.md** | 任务执行日志，记录每一步的实际操作 | 复杂功能开发**中** | "14:32 修改 auth.py → ✅ → 下一步..." |
 
 > **核心原则**：Spec 管"做什么"（事前设计），Plan 管"做了什么"（事后记录）。
-> 参考模板：[SPEC_Template.md](SPEC_Template.md) | [PLAN_Template.md](PLAN_Template.md)
+> 参考模板：[SPEC_Template.md](templates/SPEC_Template.md) | [PLAN_Template.md](templates/PLAN_Template.md)
 
 ### Spec 与 OpenSpec 的关系
 

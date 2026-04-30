@@ -3,10 +3,6 @@ name: CI
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.gitignore'
   pull_request:
     branches: [main]
 
@@ -72,3 +68,13 @@ jobs:
           python -m py_compile scripts/check_dependencies.py
           python -m py_compile scripts/check_function_length.py
           python -m py_compile scripts/check_import_order.py
+          python -m py_compile .claude/scripts/check_docs_consistency.py
+
+  docs-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@3c2dbd4fe58be2262966472148d6609918a8e3ae
+        with:
+          python-version: '3.9'
+      - run: python .claude/scripts/check_docs_consistency.py

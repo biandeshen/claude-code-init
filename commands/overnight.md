@@ -42,10 +42,10 @@
 tmux attach -t claude-overnight
 
 # 查看任务汇总
-cat reports/summary.md
+cat .claude/reports/summary.md
 
 # 查看具体任务报告
-ls reports/task-*.md
+ls .claude/reports/task-*.md
 ```
 
 ## 终止任务

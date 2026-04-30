@@ -213,6 +213,27 @@ else
     echo_warn "模板目录不存在，跳过模板复制"
 fi
 
+# 10.1 模板版本检查
+echo_step "检查模板版本"
+check_template_version() {
+    _src="$1"
+    _target="$2"
+    if [ -f "$_src" ] && [ -f "$_target" ]; then
+        _src_ver=$(grep -m1 "模板版本：" "$_src" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+        _target_ver=$(grep -m1 "模板版本：" "$_target" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+        if [ -n "$_src_ver" ] && [ -n "$_target_ver" ] && [ "$_src_ver" != "$_target_ver" ]; then
+            _name=$(basename "$_target")
+            echo_warn "   $_name: 源版本 $_src_ver / 目标版本 $_target_ver — 建议手动合并更新"
+        fi
+    fi
+}
+check_template_version "$TEMPLATE_DIR/CLAUDE_Template.md" "$PROJECT_PATH/CLAUDE.md"
+check_template_version "$TEMPLATE_DIR/SOUL_Template.md" "$PROJECT_PATH/SOUL.md"
+check_template_version "$TEMPLATE_DIR/PLAN_Template.md" "$PROJECT_PATH/PLAN_TEMPLATE.md"
+check_template_version "$TEMPLATE_DIR/SPEC_Template.md" "$PROJECT_PATH/SPEC_Template.md"
+check_template_version "$TEMPLATE_DIR/ROUTINE_Template.md" "$PROJECT_PATH/ROUTINE_Template.md"
+echo_success "模板版本检查完成"
+
 # 11. 复制自定义命令
 echo_step "复制自定义命令"
 COMMANDS_DIR="$SCRIPT_DIR/commands"

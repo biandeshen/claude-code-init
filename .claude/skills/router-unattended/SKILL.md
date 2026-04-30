@@ -15,11 +15,11 @@ description: >
 
 | 场景 | 普通模式 | 无人值守模式 |
 |------|----------|-------------|
-| 遇到 `rm -rf` / `git push --force` | 请求确认 | **自动拒绝**，记录到 `reports/blocked.md` |
+| 遇到 `rm -rf` / `git push --force` | 请求确认 | **自动拒绝**，记录到 `.claude/reports/blocked.md` |
 | 遇到需要多步编排的任务 | 依次执行 | 依次执行，任何一步失败自动跳到下一步并记录 |
 | 代码审查后发现问题 | 等待用户决定 | 自动分类为"可自动修复"和"需人工处理"，记录后者 |
 | 完成任务 | 等待用户确认 | 自动 `/commit`，然后继续下一个任务 |
-| 全部完成 | — | 自动生成 `reports/summary.md` |
+| 全部完成 | — | 自动生成 `.claude/reports/summary.md` |
 
 ## 无人值守决策规则
 
@@ -27,7 +27,7 @@ description: >
 
 1. **安全相关**（rm -rf、DROP TABLE、git push --force）：
    - 自动拒绝
-   - 记录到 `reports/blocked.md`
+   - 记录到 `.claude/reports/blocked.md`
    - 继续下一个任务
 
 2. **非安全相关**（如"是否重构此文件"）：
@@ -37,14 +37,14 @@ description: >
 ### 遇到错误时的处理
 
 1. 自动尝试 `/fix`
-2. 如果修复失败，记录到 `reports/blocked.md`
+2. 如果修复失败，记录到 `.claude/reports/blocked.md`
 3. 最多重试 3 次
 4. 跳过并继续下一个任务
 
 ### 完成任务时的处理
 
 1. 自动执行 git commit
-2. 更新 `reports/task-<N>.md`
+2. 更新 `.claude/reports/task-<N>.md`
 3. 继续下一个任务
 
 ## 输出格式
@@ -61,4 +61,4 @@ description: >
 
 - 禁止执行：`rm -rf`、`git push --force`、`DROP TABLE`
 - 超过硬限制（20文件/500行）立即停止
-- 违反任一限制记录到 `reports/overlimit.md`
+- 违反任一限制记录到 `.claude/reports/overlimit.md`

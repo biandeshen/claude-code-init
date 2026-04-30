@@ -21,7 +21,7 @@
 
 ## 约束条件
 
-- 最多重试 3 次，然后记录到 `reports/blocked.md` 继续下一个
+- 最多重试 3 次，然后记录到 `.claude/reports/blocked.md` 继续下一个
 - 不要修改 `core/` 下的核心代码
 - 不要执行 `git push --force`
 - 每次迭代最多消耗 $10 USD（由 --max-budget-usd 控制）
@@ -30,7 +30,7 @@
 
 ### 每个任务完成后的产出
 
-每完成一个任务，**必须**在 `reports/task-<N>.md` 中写一段总结：
+每完成一个任务，**必须**在 `.claude/reports/task-<N>.md` 中写一段总结：
 
 ```markdown
 # 任务 N：任务名称
@@ -51,7 +51,7 @@
 
 ### 所有任务完成后的汇总
 
-所有任务完成后，**必须**更新 `reports/summary.md`：
+所有任务完成后，**必须**更新 `.claude/reports/summary.md`：
 
 ```markdown
 ## 执行概览

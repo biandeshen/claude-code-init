@@ -30,7 +30,7 @@
 ✅ 更新 API 文档
 
 ## 失败任务
-❌ 重构 payment.ts（已记录到 reports/blocked.md）
+❌ 重构 payment.ts（已记录到 .claude/reports/blocked.md）
 ❌ 测试覆盖率提升（超出预算）
 
 ## Git 提交
@@ -74,12 +74,12 @@ ghi9012 refactor: 重构 database 层
 
 ### ❌ 任务5: 重构 payment.ts
 - 原因: 超出任务范围，涉及多个模块
-- 记录: reports/blocked.md#task-5
+- 记录: .claude/reports/blocked.md#task-5
 - 建议: 拆分为更小的任务
 
 ### ❌ 任务6: 测试覆盖率提升
 - 原因: 超出预算
-- 记录: reports/blocked.md#task-6
+- 记录: .claude/reports/blocked.md#task-6
 - 当前: 91% → 目标: 95%
 ```
 
@@ -89,9 +89,9 @@ ghi9012 refactor: 重构 database 层
 
 | 文件 | 用途 |
 |------|------|
-| `reports/summary.md` | 主汇总文件 |
-| `reports/task-*.md` | 各任务详情 |
-| `reports/blocked.md` | 被跳过的任务 |
+| `.claude/reports/summary.md` | 主汇总文件 |
+| `.claude/reports/task-*.md` | 各任务详情 |
+| `.claude/reports/blocked.md` | 被跳过的任务 |
 | `.git/logs/HEAD` | Git 提交历史 |
 
 ## 使用场景
