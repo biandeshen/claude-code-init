@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.5.1 | 2026-04-30
+# 版本: v1.5.2 | 2026-04-30
 
 set -euo pipefail
 
@@ -41,7 +41,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.0)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.2)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 
@@ -81,25 +81,29 @@ echo_info "请在 Claude Code 中执行以下命令:"
 echo -e "  ${YELLOW}/plugin marketplace add obra/superpowers-marketplace${NC}"
 echo -e "  ${YELLOW}/plugin install superpowers@superpowers-marketplace${NC}"
 
-# 4.1 阻断性确认
+# 4.1 插件确认 (--force 模式下跳过交互)
 echo ""
 echo -e "${YELLOW}==============================================${NC}"
 echo -e "${YELLOW} 重要：以上 ECC 和 Superpowers 插件需要在 Claude Code 中手动安装${NC}"
-echo -e "${YELLOW} 如果你已完成安装，请输入 y 继续；否则请输入 n 退出${NC}"
 echo -e "${YELLOW}==============================================${NC}"
-read -p "是否已完成插件安装？(y/n) " confirm
-if [ "$confirm" != "y" ]; then
-    echo -e "${RED}请先完成插件安装，再重新运行此脚本。${NC}"
-    exit 1
+if [ "$FORCE_OVERWRITE" = true ]; then
+    echo_info "跳过插件确认 (--force 模式)"
+else
+    echo -e "${YELLOW} 如果你已完成安装，请输入 y 继续；否则请输入 n 退出${NC}"
+    read -p "是否已完成插件安装？(y/n) " confirm
+    if [ "$confirm" != "y" ]; then
+        echo -e "${RED}请先完成插件安装，再重新运行此脚本。${NC}"
+        exit 1
+    fi
 fi
 echo_success "已确认插件安装"
 
 # 5. 安装 OpenSpec (SDD) - 自动执行
 echo_step "安装 OpenSpec (SDD 工作流)"
-if npm install -g @fission-ai/openspec@latest && openspec init; then
+if npm install -g @fission-ai/openspec@latest && openspec init --tools claude; then
     echo_success "OpenSpec 已初始化"
 else
-    echo_warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@latest && openspec init"
+    echo_warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@latest && openspec init --tools claude"
 fi
 
 # 6. 安装 cc-discipline (物理防火墙) - 自动执行
@@ -117,7 +121,12 @@ else
     echo_info "cc-discipline 已存在，如需更新请手动执行: git -C $CC_DISCIPLINE_PATH pull"
 fi
 echo_info "正在执行 cc-discipline 初始化..."
-if bash "$CC_DISCIPLINE_PATH/init.sh"; then
+# --force 模式下传递 --auto 给 cc-discipline，使其非交互运行
+CC_DISCIPLINE_FLAGS=""
+if [ "$FORCE_OVERWRITE" = true ]; then
+    CC_DISCIPLINE_FLAGS="--auto"
+fi
+if bash "$CC_DISCIPLINE_PATH/init.sh" $CC_DISCIPLINE_FLAGS; then
     echo_success "cc-discipline 已安装"
 else
     echo_warn "cc-discipline 初始化失败，请手动执行: bash $CC_DISCIPLINE_PATH/init.sh"
@@ -177,9 +186,9 @@ fi
 echo_step "复制覆盖层模板"
 TEMPLATE_DIR="$SCRIPT_DIR/templates"
 
-# 辅助: 获取模板版本号
+# 辅助: 获取模板版本号 (始终返回成功,未找到时返回空字符串)
 template_version() {
-    grep -m1 "模板版本：" "$1" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1
+    grep -m1 "模板版本：" "$1" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true
 }
 
 # 模板复制函数: 目标已存在时提供交互选择
@@ -256,8 +265,8 @@ check_template_version() {
     _src="$1"
     _target="$2"
     if [ -f "$_src" ] && [ -f "$_target" ]; then
-        _src_ver=$(grep -m1 "模板版本：" "$_src" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-        _target_ver=$(grep -m1 "模板版本：" "$_target" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+        _src_ver=$(grep -m1 "模板版本：" "$_src" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+        _target_ver=$(grep -m1 "模板版本：" "$_target" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
         if [ -n "$_src_ver" ] && [ -n "$_target_ver" ] && [ "$_src_ver" != "$_target_ver" ]; then
             _name=$(basename "$_target")
             echo_warn "   $_name: 源版本 $_src_ver / 目标版本 $_target_ver — 建议手动合并更新"

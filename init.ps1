@@ -1,6 +1,6 @@
 ﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.5.1 | 2026-04-30
+# 版本: v1.5.2 | 2026-04-30
 
 param(
     [Parameter(Mandatory=$true)]
@@ -37,7 +37,7 @@ function Write-Info { param($msg) Write-Host "[信息] $msg" -ForegroundColor Gr
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  Claude Code 开发环境一键初始化 (v1.5.0)" -ForegroundColor Cyan
+Write-Host "  Claude Code 开发环境一键初始化 (v1.5.2)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -89,8 +89,8 @@ if (-not $SkipSuperpowers) {
     Write-Info "跳过 Superpowers 安装"
 }
 
-# 4.1 阻断性确认
-if (-not $SkipECC -or -not $SkipSuperpowers) {
+# 4.1 插件确认 (-Force 模式下跳过交互)
+if ((-not $SkipECC -or -not $SkipSuperpowers) -and -not $Force) {
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Yellow
     Write-Host " 重要：以上 ECC 和 Superpowers 插件需要在 Claude Code 中手动安装" -ForegroundColor Yellow
@@ -111,10 +111,10 @@ if (-not $SkipOpenSpec) {
     Write-Step "安装 OpenSpec (SDD 工作流)"
     try {
         npm install -g @fission-ai/openspec@latest
-        openspec init
+        openspec init --tools claude
         Write-Success "OpenSpec 已初始化"
     } catch {
-        Write-Warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@latest && openspec init"
+        Write-Warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@latest && openspec init --tools claude"
     }
 } else {
     Write-Info "跳过 OpenSpec 安装"
@@ -138,7 +138,9 @@ if (-not $SkipCcDiscipline) {
     }
     Write-Info "正在执行 cc-discipline 初始化..."
     try {
-        bash "$CcDisciplinePath/init.sh"
+        $ccArgs = @()
+        if ($Force) { $ccArgs += "--auto" }
+        bash "$CcDisciplinePath/init.sh" @ccArgs
         Write-Success "cc-discipline 已安装"
     } catch {
         Write-Warn "cc-discipline 初始化失败，请手动执行: bash $CcDisciplinePath/init.sh"
