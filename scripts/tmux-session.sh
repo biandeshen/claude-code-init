@@ -10,7 +10,7 @@
 #   bash .claude/scripts/tmux-session.sh                    # 使用默认任务文件
 #   bash .claude/scripts/tmux-session.sh .claude/scripts/PROMPT.md # 指定任务文件
 
-set -e
+set -euo pipefail
 
 SESSION_NAME="${SESSION_NAME:-claude-overnight}"
 PROMPT_FILE="${1:-.claude/scripts/PROMPT.md}"
@@ -34,14 +34,15 @@ MAX_TURNS="${MAX_TURNS:-50}"
 MAX_BUDGET="${MAX_BUDGET:-10.00}"
 MAX_FILES="${MAX_FILES:-20}"
 MAX_LINES="${MAX_LINES:-500}"
+MAX_ITERATIONS="${MAX_ITERATIONS:-10}"   # 累计最大迭代次数(无人值守安全上限)
 
 # 检查依赖
 check_deps() {
-    if ! command -v tmux &> /dev/null; then
+    if ! command -v tmux >/dev/null 2>&1; then
         echo_fail "tmux 未安装。请运行: brew install tmux (macOS) 或 apt install tmux (Linux)"
         exit 1
     fi
-    if ! command -v claude &> /dev/null; then
+    if ! command -v claude >/dev/null 2>&1; then
         echo_fail "claude 未安装或不在 PATH 中"
         exit 1
     fi
@@ -49,10 +50,10 @@ check_deps() {
 
 # 创建 reports 目录
 setup_reports() {
-    mkdir -p "$PROJECT_DIR/reports"
+    mkdir -p "$PROJECT_DIR/.claude/reports"
     # 初始化 summary.md
-    if [ ! -f "$PROJECT_DIR/reports/summary.md" ]; then
-        cat > "$PROJECT_DIR/reports/summary.md" << EOF
+    if [ ! -f "$PROJECT_DIR/.claude/reports/summary.md" ]; then
+        cat > "$PROJECT_DIR/.claude/reports/summary.md" << EOF
 # 无人值守任务汇总
 
 > 生成时间: $(date '+%Y-%m-%d %H:%M:%S')
@@ -112,7 +113,7 @@ echo_step "初始化 Claude Code 无人值守循环..."
 if [ ! -f "$PROMPT_FILE" ]; then
     echo_warn "任务文件不存在: $PROMPT_FILE"
     echo "创建默认任务文件..."
-    cat > "$PROMPT_FILE" << 'EOF'
+    cat > "$PROMPT_FILE" << EOF
 # 过夜任务清单
 
 ## 项目背景
@@ -128,11 +129,11 @@ if [ ! -f "$PROMPT_FILE" ]; then
 - 每完成一个任务必须 git commit
 
 ## 硬限制
-- 最多修改 $MAX_FILES 个文件，超过则停止并记录到 `reports/overlimit.md`
+- 最多修改 $MAX_FILES 个文件，超过则停止并记录到 \`reports/overlimit.md\`
 - 最多修改 $MAX_LINES 行代码
-- 禁止执行 `rm -rf`、`git push --force`、`DROP TABLE`
+- 禁止执行 \`rm -rf\`、\`git push --force\`、\`DROP TABLE\`
 - 违反任一硬限制立即停止并记录
-- 最多重试 3 次，然后记录到 `reports/blocked.md` 继续下一个
+- 最多重试 3 次，然后记录到 \`reports/blocked.md\` 继续下一个
 EOF
 fi
 
@@ -171,7 +172,8 @@ sleep 1
 echo_info "启动 Claude Code..."
 echo_info "参数: --max-turns $MAX_TURNS --max-budget-usd \$$MAX_BUDGET --max-files $MAX_FILES --max-lines $MAX_LINES"
 
-tmux send-keys -t "$SESSION_NAME" "while true; do" Enter
+tmux send-keys -t "$SESSION_NAME" "ITER=0; while [ \$ITER -lt $MAX_ITERATIONS ]; do" Enter
+tmux send-keys -t "$SESSION_NAME" "  ITER=\$((ITER + 1))" Enter
 tmux send-keys -t "$SESSION_NAME" "  claude -p \"\$(cat $PROMPT_FILE)\" \\" Enter
 if [ -n "$SETTINGS_PARAM" ]; then
     tmux send-keys -t "$SESSION_NAME" "    $SETTINGS_PARAM \\" Enter

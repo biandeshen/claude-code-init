@@ -21,8 +21,10 @@ jobs:
       - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
         with:
           node-version: '18'
+          cache: 'npm'
       - run: node --check index.js
       - run: node -e "const pkg = require('./package.json'); if (!pkg.name || !pkg.version) process.exit(1)"
+      - run: npm audit --audit-level=moderate
 
   shellcheck:
     runs-on: ubuntu-latest
@@ -31,10 +33,10 @@ jobs:
       - run: sudo apt-get update -qq && sudo apt-get install -qq shellcheck
       - run: |
           echo "::group::init.sh"
-          shellcheck -x init.sh || true
+          shellcheck -x init.sh
           echo "::endgroup::"
           echo "::group::scripts/*.sh"
-          find scripts -name "*.sh" -exec shellcheck -x {} + || true
+          find scripts -name "*.sh" -exec shellcheck -x {} +
           echo "::endgroup::"
 
   bash-syntax:
@@ -56,7 +58,6 @@ jobs:
       - uses: DavidAnson/markdownlint-cli2-action@db43aefc7bc5c56b8068f99235cb088f36cfa269
         with:
           globs: 'templates/*.md,docs/*.md,*.md'
-        continue-on-error: true
 
   python-syntax:
     runs-on: ubuntu-latest
@@ -66,7 +67,7 @@ jobs:
         with:
           python-version: '3.9'
       - run: |
-          python -m py_compile scripts/check_secrets.py || true
+          python -m py_compile scripts/check_secrets.py
           python -m py_compile scripts/check_project_structure.py
           python -m py_compile scripts/check_dependencies.py
           python -m py_compile scripts/check_function_length.py

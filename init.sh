@@ -1,9 +1,9 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.5.0 | 2026-04-30
+# 版本: v1.5.1 | 2026-04-30
 
-set -e
+set -euo pipefail
 
 # 启用 nullglob，避免空通配符展开问题
 shopt -s nullglob
@@ -19,6 +19,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
+GRAY='\033[0;90m'
 NC='\033[0m' # No Color
 
 echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
@@ -45,6 +46,11 @@ cd "$PROJECT_PATH"
 PROJECT_PATH="$(pwd)"
 
 # 2. 初始化 Git
+if ! command -v git >/dev/null 2>&1; then
+    echo_fail "未找到 git 命令，请先安装 Git"
+    echo -e "  ${YELLOW}下载地址: https://git-scm.com/downloads${NC}"
+    exit 1
+fi
 if [ ! -d ".git" ]; then
     echo_step "初始化 Git 仓库"
     git init
@@ -118,6 +124,7 @@ if [ "$SCRIPTS_DIR" = "$TARGET_SCRIPTS_DIR" ]; then
 elif [ -d "$SCRIPTS_DIR" ] && [ "$(ls -A "$SCRIPTS_DIR" 2>/dev/null)" ]; then
     mkdir -p "$TARGET_SCRIPTS_DIR"
     cp -r "$SCRIPTS_DIR/"* "$TARGET_SCRIPTS_DIR/"
+    find "$TARGET_SCRIPTS_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
     echo_success "已复制校验脚本到 .claude/scripts/"
 else
     echo_info "scripts 目录为空或不存在，跳过"
@@ -138,14 +145,14 @@ fi
 echo_step "安装 Pre-commit Hooks"
 
 # 检查 Python 是否可用
-if command -v python3 &> /dev/null || command -v python &> /dev/null; then
+if command -v python3 >/dev/null 2>&1 || command -v python >/dev/null 2>&1; then
     PYTHON_CMD=$(command -v python3 || command -v python)
     # 检查 pre-commit 是否已安装
     $PYTHON_CMD -c "import pre_commit" 2>/dev/null || {
         echo_info "正在安装 pre-commit..."
         $PYTHON_CMD -m pip install --quiet pre-commit 2>/dev/null && echo_success "pre-commit 安装完成"
     }
-    if command -v pre-commit &> /dev/null; then
+    if command -v pre-commit >/dev/null 2>&1; then
         pre-commit install
         echo_success "Pre-commit Hooks 已安装"
     else
@@ -252,7 +259,8 @@ fi
 
 # 12. 创建本地偏好文件 (gitignored)
 echo_step "创建 CLAUDE.local.md (本地偏好)"
-cat > "$PROJECT_PATH/CLAUDE.local.md" << EOF
+mkdir -p "$PROJECT_PATH/.claude"
+cat > "$PROJECT_PATH/.claude/CLAUDE.local.md" << EOF
 # 本地个人偏好
 # 此文件会被 .gitignore 忽略，不会提交到仓库
 
@@ -276,10 +284,10 @@ echo ""
 echo_step "处理 AI 开发配置文件"
 
 # 优先使用 PowerShell 脚本
-if command -v pwsh &> /dev/null || command -v powershell &> /dev/null; then
+if command -v pwsh >/dev/null 2>&1 || command -v powershell >/dev/null 2>&1; then
     CONFIGURE_SCRIPT="$SCRIPT_DIR/scripts/configure-gitignore.ps1"
     if [ -f "$CONFIGURE_SCRIPT" ]; then
-        if command -v pwsh &> /dev/null; then
+        if command -v pwsh >/dev/null 2>&1; then
             pwsh -NoProfile -ExecutionPolicy Bypass -File "$CONFIGURE_SCRIPT" -ProjectPath "$PROJECT_PATH"
         else
             powershell -NoProfile -ExecutionPolicy Bypass -File "$CONFIGURE_SCRIPT" -ProjectPath "$PROJECT_PATH"
@@ -314,7 +322,7 @@ echo -e "  ${GRAY}- /qa: 质量保证测试${NC}"
 echo -e "  ${GRAY}- trigger-optimizer.sh: 分析 Skills 触发优化建议${NC}"
 echo -e "  ${GRAY}- weekly-report.sh: 生成本周使用报告${NC}"
 
-# 16. 运行环境检查
+# 15. 运行环境检查
 echo ""
 echo_step "运行环境完整性检查"
 if [ -f "$SCRIPT_DIR/scripts/check-env.sh" ]; then

@@ -6,7 +6,7 @@ description: >
   此技能会在先写保护测试的前提下安全执行重构。
 
   中文触发词：重构、refactor、清理、重写、整理代码、让代码更清晰、
-  代码优化、改善结构、提取方法、重命名
+  代码优化、改善结构、提取方法、重命名、整理、优化、代码整理
 
   英文触发词：refactor, restructure, clean up, improve code, reorganize
 ---

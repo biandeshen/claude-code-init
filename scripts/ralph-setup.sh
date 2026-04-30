@@ -28,7 +28,7 @@ INSTALL_MODE="${1:-ralph}"
 
 # 检查 Claude Code 是否安装
 check_claude() {
-    if ! command -v claude &> /dev/null; then
+    if ! command -v claude >/dev/null 2>&1; then
         echo_fail "Claude Code 未安装。请先安装 Claude Code。"
         exit 1
     fi
@@ -37,17 +37,17 @@ check_claude() {
 
 # 安装 jq（Ralph 依赖）
 install_jq() {
-    if command -v jq &> /dev/null; then
+    if command -v jq >/dev/null 2>&1; then
         echo_success "jq 已安装"
         return
     fi
 
     echo_step "安装 jq..."
-    if command -v brew &> /dev/null; then
+    if command -v brew >/dev/null 2>&1; then
         brew install jq
-    elif command -v apt &> /dev/null; then
+    elif command -v apt >/dev/null 2>&1; then
         sudo apt install jq -y
-    elif command -v yum &> /dev/null; then
+    elif command -v yum >/dev/null 2>&1; then
         sudo yum install jq -y
     else
         echo_warn "无法自动安装 jq，请手动安装: https://stedolan.github.io/jq/download/"
@@ -85,7 +85,7 @@ install_ralph() {
 install_tmux_orche() {
     echo_step "安装 tmux-orche（备选方案）..."
 
-    if command -v pip &> /dev/null || command -v pip3 &> /dev/null; then
+    if command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1; then
         pip install tmux-orche 2>/dev/null || pip3 install tmux-orche 2>/dev/null
         echo_success "tmux-orche 安装完成"
     else
@@ -98,7 +98,7 @@ install_tmux_orche() {
 verify_installation() {
     echo_step "验证安装..."
 
-    if command -v claude &> /dev/null; then
+    if command -v claude >/dev/null 2>&1; then
         # 检查 /ralph-loop 是否可用
         if claude --help 2>&1 | grep -qi "ralph"; then
             echo_success "Ralph Wiggum 插件可用"
@@ -108,7 +108,7 @@ verify_installation() {
         fi
     fi
 
-    if command -v jq &> /dev/null; then
+    if command -v jq >/dev/null 2>&1; then
         echo_success "jq 验证: $(jq --version)"
     fi
 }

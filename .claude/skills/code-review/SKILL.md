@@ -6,7 +6,7 @@ description: >
   也适用于提交前的最终检查。
 
   中文触发词：审查、检查、review、看看代码、检查质量、代码审计、
-  代码分析、帮我review、帮我检查
+  代码分析、帮我review、帮我检查、安全、漏洞、加密、安全审查
 
   英文触发词：review, check, examine, inspect, audit, quality, analyze code
 ---

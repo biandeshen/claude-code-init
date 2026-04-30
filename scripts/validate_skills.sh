@@ -29,7 +29,7 @@ echo ""
 echo "[2/3] 检查 name 字段唯一性..."
 
 # 使用临时文件代替关联数组（兼容 Bash 3.2+/macOS）
-TMPFILE=$(mktemp) || { echo "  [错误] 无法创建临时文件"; exit 1; }
+TMPFILE=$(mktemp /tmp/cci_validate_XXXXXX) || { echo "  [错误] 无法创建临时文件"; exit 1; }
 trap 'rm -f "$TMPFILE"' EXIT INT TERM
 
 for file in "$SKILLS_DIR"/*/SKILL.md; do

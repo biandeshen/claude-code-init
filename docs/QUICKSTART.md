@@ -9,7 +9,7 @@
 ### 1. 初始化项目
 
 ```bash
-npx claude-code-init --project-path ./my-project
+npx @biandeshen/claude-code-init --project-path ./my-project
 cd my-project
 ```
 
@@ -44,7 +44,7 @@ AI 自动加载 code-review 技能，输出分级审查报告。
 ### 6. 进阶：过夜任务
 
 ```bash
-bash scripts/tmux-session.sh scripts/PROMPT.md
+bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 ```
 
 ### 7. 进阶：云端定时任务（Routines）

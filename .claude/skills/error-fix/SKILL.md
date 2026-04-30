@@ -6,7 +6,7 @@ description: >
   遵循分析→根因→方案→验证→提交的完整闭环。
 
   中文触发词：修复、fix、调试、bug、报错、错误、出了问题、哪里有bug、
-  修复这个、帮我看看、找出原因
+  修复这个、帮我看看、找出原因、排查、定位、排查问题
 
   英文触发词：fix, bug, error, debug, repair, troubleshoot, issue, problem
 ---

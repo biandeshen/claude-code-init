@@ -22,7 +22,7 @@ echo -e "${CYAN}========================================${NC}"
 echo ""
 
 # 获取本周起始日期（本周一）
-if command -v date &> /dev/null; then
+if command -v date >/dev/null 2>&1; then
     # 尝试获取本周一日期（兼容 Linux/macOS）
     THIS_WEEK=$(date -d "last Monday" +%Y-%m-%d 2>/dev/null || date -v-mon +%Y-%m-%d 2>/dev/null || echo "$(date +%Y-%m-01)")
 else
@@ -34,8 +34,10 @@ echo ""
 
 # 平台检测：为 macOS BSD find 准备兼容的时间过滤器
 if [ "$(uname)" = "Darwin" ]; then
-    FIND_TIME_FILTER="-newer /tmp/_cci_week_ref_$$"
-    touch -t "$(echo "$THIS_WEEK" | tr -d '-')0000" /tmp/_cci_week_ref_$$
+    WEEK_REF=$(mktemp /tmp/cci_week_ref_XXXXXX) || { echo "无法创建临时文件"; exit 1; }
+    trap 'rm -f "$WEEK_REF"' EXIT
+    FIND_TIME_FILTER="-newer $WEEK_REF"
+    touch -t "$(echo "$THIS_WEEK" | tr -d '-')0000" "$WEEK_REF"
 else
     FIND_TIME_FILTER="-newermt $THIS_WEEK"
 fi
@@ -168,6 +170,3 @@ echo -e "${CYAN}========================================${NC}"
 echo ""
 echo "详细日志：$LOG_FILE"
 echo ""
-
-# 清理临时时间戳文件
-rm -f /tmp/_cci_week_ref_$$

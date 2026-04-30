@@ -1,6 +1,6 @@
 ﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.5.0 | 2026-04-30
+# 版本: v1.5.1 | 2026-04-30
 
 param(
     [Parameter(Mandatory=$true)]
@@ -89,17 +89,21 @@ if (-not $SkipSuperpowers) {
 }
 
 # 4.1 阻断性确认
-Write-Host ""
-Write-Host "==============================================" -ForegroundColor Yellow
-Write-Host " 重要：以上 ECC 和 Superpowers 插件需要在 Claude Code 中手动安装" -ForegroundColor Yellow
-Write-Host " 如果你已完成安装，请输入 y 继续；否则请输入 n 退出" -ForegroundColor Yellow
-Write-Host "==============================================" -ForegroundColor Yellow
-$confirm = Read-Host "是否已完成插件安装？(y/n)"
-if ($confirm -ne "y") {
-    Write-Host "请先完成插件安装，再重新运行此脚本。" -ForegroundColor Red
-    exit 1
+if (-not $SkipECC -or -not $SkipSuperpowers) {
+    Write-Host ""
+    Write-Host "==============================================" -ForegroundColor Yellow
+    Write-Host " 重要：以上 ECC 和 Superpowers 插件需要在 Claude Code 中手动安装" -ForegroundColor Yellow
+    Write-Host " 如果你已完成安装，请输入 y 继续；否则请输入 n 退出" -ForegroundColor Yellow
+    Write-Host "==============================================" -ForegroundColor Yellow
+    $confirm = Read-Host "是否已完成插件安装？(y/n)"
+    if ($confirm -ne "y") {
+        Write-Host "请先完成插件安装，再重新运行此脚本。" -ForegroundColor Red
+        exit 1
+    }
+    Write-Success "已确认插件安装"
+} else {
+    Write-Info "已跳过插件安装确认"
 }
-Write-Success "已确认插件安装"
 
 # 5. 安装 OpenSpec (SDD) - 自动执行
 if (-not $SkipOpenSpec) {
@@ -173,7 +177,8 @@ if ($PrecommitConfig -eq $TargetPrecommitConfig) {
 Write-Step "安装 Pre-commit Hooks"
 
 # 检查 Python 是否可用
-$pythonCmd = Get-Command python -ErrorAction SilentlyContinue
+$pythonCmd = Get-Command python3 -ErrorAction SilentlyContinue
+if (-not $pythonCmd) { $pythonCmd = Get-Command python -ErrorAction SilentlyContinue }
 if ($pythonCmd) {
     # 检查 pre-commit 是否已安装
     try {
@@ -399,7 +404,7 @@ Write-Host "  5. 输入 /status 查看项目状态仪表盘" -ForegroundColor Wh
 Write-Host "  6. 输入 /capabilities 按场景查看全部能力" -ForegroundColor White
 Write-Host ""
 
-# 17. 全局偏好设置引导（跨所有项目生效）
+# 16. 全局偏好设置引导（跨所有项目生效）
 Write-Host "[建议] 设置全局偏好（跨所有项目生效）：" -ForegroundColor Yellow
 $globalClaude = "$env:USERPROFILE\.claude\CLAUDE.md"
 Write-Host "  将你的通用编码偏好写入 $globalClaude" -ForegroundColor Gray

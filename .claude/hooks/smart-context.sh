@@ -3,6 +3,11 @@
 # 场景感知自动推荐 Skill，基于当前操作上下文提供智能建议
 # 不依赖 jq，使用纯 shell 实现
 
+# JSON 字符串转义函数（处理双引号和反斜杠）
+json_escape() {
+    printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
 event_data=$(cat 2>/dev/null)
 if [ -z "$event_data" ]; then
     exit 0
@@ -29,12 +34,13 @@ if echo "$file_path" | grep -qiE "(auth|login|password|token|secret|session|encr
     if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
     suggestion="${suggestion}检测到你正在修改安全相关代码。「code-review」技能已自动加载。"
     # 确定性 Skill 激活（不依赖语义匹配）
+    escaped=$(json_escape "$suggestion")
     cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
     "skillToActivate": "code-review",
-    "suggestion": "$suggestion"
+    "suggestion": "$escaped"
   }
 }
 EOF
@@ -96,7 +102,7 @@ fi
 
 # ─── 场景 8：语义级安全检测（函数名检测）───
 # 获取最近编辑的函数名
-edited_function=$(git diff HEAD 2>/dev/null | grep "^@@" -A5 | grep -oP "(def|function|class|fn)\s+\K\w+" | head -1)
+edited_function=$(git diff HEAD 2>/dev/null | grep "^@@" -A5 | sed -n 's/.*(def\|function\|class\|fn)\s\+\([a-zA-Z_][a-zA-Z0-9_]*\).*/\1/p' | head -1)
 
 # 语义级安全检测
 if echo "$edited_function" | grep -qiE "(encrypt|decrypt|hash|token|auth|login|password|secret|sanitize|validate)" 2>/dev/null; then
@@ -129,13 +135,14 @@ fi
 if [ -n "$suggestion" ]; then
     # 记录触发日志
     LOG_FILE="$HOME/.claude-skill-usage.log"
-    echo "$(date -Iseconds 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S') | smart-context | $suggestion" >> "$LOG_FILE" 2>/dev/null || true
+    echo "$(date '+%Y-%m-%dT%H:%M:%S' 2>/dev/null) | smart-context | $suggestion" >> "$LOG_FILE" 2>/dev/null || true
 
+    escaped=$(json_escape "$suggestion")
     cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
-    "suggestion": "$suggestion"
+    "suggestion": "$escaped"
   }
 }
 EOF

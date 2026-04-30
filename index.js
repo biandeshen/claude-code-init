@@ -73,7 +73,7 @@ const deps = [
     ['git', 'Git'],
     ['python', 'Python'],
 ];
-if (isWindows) deps.push([detectPowerShell() || 'pwsh', 'PowerShell']);
+if (isWindows) deps.push([psCmd || 'pwsh', 'PowerShell']);
 else deps.push(['bash', 'Bash']);
 
 const missingDeps = [];

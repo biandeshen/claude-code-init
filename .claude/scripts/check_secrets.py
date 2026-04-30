@@ -29,21 +29,21 @@ SENSITIVE_KEYWORDS = [
 
 # 真实密钥的特征（非示例值）
 SECRET_PATTERNS = [
-    r"sk-[a-zA-Z0-9]{20,}",           # OpenAI 格式
-    r"sk-ant-[a-zA-Z0-9]{20,}",        # Anthropic 格式
-    r"[a-f0-9]{32,}",                   # 32位+ hex
-    r"[a-zA-Z0-9]{40,}",                # 40位+ 字符串
+    r"sk-[a-zA-Z0-9]{20,}",              # OpenAI API Key
+    r"sk-ant-[a-zA-Z0-9]{20,}",           # Anthropic API Key
+    r"ghp_[a-zA-Z0-9]{36}",               # GitHub Personal Access Token
+    r"github_pat_[a-zA-Z0-9]{22,}",       # GitHub Fine-grained Token
+    r"glpat-[a-zA-Z0-9]{20,}",            # GitLab Personal Access Token
+    r"AKIA[0-9A-Z]{16}",                  # AWS Access Key ID
+    r"eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}",  # JWT Token
+    r"-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",  # Private Key Block
 ]
 
 # 白名单（允许的值）
 # 这些是明确的占位符示例值，不是真实密钥
 
-# 前缀匹配的白名单项（允许以这些前缀开头的值）
-WHITELIST_PREFIX = ["test_"]
-
 # 精确匹配的白名单项
 WHITELIST_EXACT = [
-    "${",              # 环境变量引用
     "your_secret",     # 完整占位符
     "your_api_key",
     "your_password",
@@ -58,6 +58,9 @@ WHITELIST_EXACT = [
     "127.0.0.1",       # 本地地址
     "::1",             # IPv6 本地地址
 ]
+
+# 前缀匹配的白名单项（允许以这些前缀开头的值）
+WHITELIST_PREFIX = ["test_", "${", "$env:"]
 
 
 def is_whitelisted(value: str) -> bool:

@@ -30,7 +30,7 @@
 
 ```bash
 # 初始化项目
-npx claude-code-init --project-path ./my-project
+npx @biandeshen/claude-code-init --project-path ./my-project
 
 # 安装核心插件（在 Claude Code 中执行）
 /plugin marketplace add affaan-m/everything-claude-code
@@ -79,11 +79,11 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 让 AI 在你离开后继续工作：
 ```bash
 # macOS/Linux
-bash scripts/tmux-session.sh scripts/PROMPT.md
+bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 # Windows
 tmux new-session -d -s claude-overnight
-tmux send-keys -t claude-overnight "claude -p \$(cat scripts/PROMPT.md) --max-turns 50 --max-budget-usd 10.00" Enter
+tmux send-keys -t claude-overnight "claude -p \$(cat .claude/scripts/PROMPT.md) --max-turns 50 --max-budget-usd 10.00" Enter
 tmux attach -t claude-overnight
 ```
 
