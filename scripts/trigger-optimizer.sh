@@ -9,12 +9,8 @@ LOG_FILE="$HOME/.claude-skill-usage.log"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_DIR="$SCRIPT_DIR/../../.claude/skills"
 
-# 颜色输出
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+# 加载公共库（颜色输出 + 工具函数）
+[ -f "$SCRIPT_DIR/lib/common.sh" ] && source "$SCRIPT_DIR/lib/common.sh"
 
 echo -e "${CYAN}=== Skills 触发优化分析 ===${NC}"
 echo ""

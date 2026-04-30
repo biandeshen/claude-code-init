@@ -16,6 +16,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - 6 overlapping Commands (commit/fix/review/refactor/explain/validate) reduced to Skill reference entries.
 - `scripts/check_secrets.py` synced with full version from `.claude/scripts/` (GitHub/AWS/JWT patterns + Markdown scanning).
 - Version bumped to v1.5.2 across `init.sh` and `init.ps1`.
+- `engines.node` raised to `>=18.0.0` (Node 16 EOL, `node --test` requires Node 18+).
+- CI matrix drops Node 16; added `version-check` job for cross-file version consistency.
+- Eliminated duplicate color/output-function definitions in 5 scripts; centralized via `scripts/lib/common.sh`.
+- Cleaned up 3 dead-code blocks in `scripts/tmux-session.sh` (ROUTER_SKILL, CLAUDE_CMD, notify_completion).
+- Fixed 3 incorrect step-number comments in `init.sh` (#7→#8, #13→#14, #16→#15).
 
 ## [1.5.1] - 2026-04-30
 

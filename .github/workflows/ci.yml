@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: ['16', '18', '20', '22']
+        node-version: ['18', '20', '22']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -94,3 +94,22 @@ jobs:
       - uses: gitleaks/gitleaks-action@44bdecdef787b7ab0441bf2d8a9e4cd3ea8052f3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Check version consistency
+        run: |
+          PKG_VER=$(node -e "console.log(require('./package.json').version)")
+          echo "package.json:  v$PKG_VER"
+          INIT_SH_VER=$(grep -oP '版本:\s*v\K[\d.]+' init.sh | head -1)
+          echo "init.sh:       v$INIT_SH_VER"
+          INIT_PS1_VER=$(grep -oP '版本:\s*v\K[\d.]+' init.ps1 | head -1)
+          echo "init.ps1:      v$INIT_PS1_VER"
+          CLAUDE_VER=$(grep -oP '> 版本：v\K[\d.]+' CLAUDE.md)
+          echo "CLAUDE.md:     v$CLAUDE_VER"
+          [ "$PKG_VER" = "$INIT_SH_VER" ] || { echo "MISMATCH: init.sh ($INIT_SH_VER) != package.json ($PKG_VER)"; exit 1; }
+          [ "$PKG_VER" = "$INIT_PS1_VER" ] || { echo "MISMATCH: init.ps1 ($INIT_PS1_VER) != package.json ($PKG_VER)"; exit 1; }
+          [ "$PKG_VER" = "$CLAUDE_VER" ] || { echo "MISMATCH: CLAUDE.md ($CLAUDE_VER) != package.json ($PKG_VER)"; exit 1; }
+          echo "✅ All version references consistent: v$PKG_VER"

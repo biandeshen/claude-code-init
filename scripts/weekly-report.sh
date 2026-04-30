@@ -8,12 +8,11 @@ set -e
 LOG_FILE="$HOME/.claude-skill-usage.log"
 REPORTS_DIR=".claude/reports"
 
-# 颜色输出
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+# 加载公共库（颜色输出 + 工具函数）
+_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$_SCRIPT_DIR/lib/common.sh" ]; then
+    source "$_SCRIPT_DIR/lib/common.sh"
+fi
 
 echo ""
 echo -e "${CYAN}========================================${NC}"

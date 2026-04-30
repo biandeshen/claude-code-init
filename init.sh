@@ -191,7 +191,7 @@ else
     echo_info "scripts 目录为空或不存在，跳过"
 fi
 
-# 7. 复制 Pre-commit 配置
+# 8. 复制 Pre-commit 配置
 echo_step "复制 Pre-commit 配置"
 PRECOMMIT_CONFIG="$SCRIPT_DIR/configs/.pre-commit-config.yaml"
 TARGET_PRECOMMIT_CONFIG="$PROJECT_PATH/.pre-commit-config.yaml"
@@ -436,7 +436,7 @@ else
     echo_warn "未找到配置脚本，跳过 .gitignore 配置"
 fi
 
-# 13. 运行环境检查
+# 14. 运行环境检查
 echo ""
 echo_step "运行环境完整性检查"
 if [ -f "$SCRIPT_DIR/scripts/check-env.sh" ]; then
@@ -470,7 +470,7 @@ echo "  5. 输入 /status 查看项目状态仪表盘"
 echo "  6. 输入 /capabilities 按场景查看全部能力"
 echo ""
 
-# 16. 全局偏好设置引导（跨所有项目生效）
+# 15. 全局偏好设置引导（跨所有项目生效）
 echo -e "${YELLOW}[建议] 设置全局偏好（跨所有项目生效）：${NC}"
 GLOBAL_CLAUDE="$HOME/.claude/CLAUDE.md"
 echo -e "  ${GRAY}将你的通用编码偏好写入 $GLOBAL_CLAUDE${NC}"

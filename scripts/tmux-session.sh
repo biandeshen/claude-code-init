@@ -16,18 +16,11 @@ SESSION_NAME="${SESSION_NAME:-claude-overnight}"
 PROMPT_FILE="${1:-.claude/scripts/PROMPT.md}"
 PROJECT_DIR="${2:-.}"
 
-# 颜色输出
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
-echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
-echo_success() { echo -e "${GREEN}[成功]${NC} $1"; }
-echo_warn() { echo -e "${YELLOW}[警告]${NC} $1"; }
-echo_fail() { echo -e "${RED}[失败]${NC} $1"; }
-echo_info() { echo -e "[信息] $1"; }
+# 加载公共库（颜色输出 + 工具函数）
+_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$_SCRIPT_DIR/lib/common.sh" ]; then
+    source "$_SCRIPT_DIR/lib/common.sh"
+fi
 
 # 默认安全参数
 MAX_TURNS="${MAX_TURNS:-50}"
@@ -139,7 +132,6 @@ fi
 
 # 构建 Claude Code 命令（关键：加载项目配置 + 安全限制）
 CLAUDE_SETTINGS="$PROJECT_DIR/.claude/settings.json"
-ROUTER_SKILL="$PROJECT_DIR/.claude/skills/router/SKILL.md"
 
 # 基础参数（含安全限制）
 BASE_PARAMS="--max-turns $MAX_TURNS --max-budget-usd $MAX_BUDGET --max-files-changed $MAX_FILES --max-lines-changed $MAX_LINES --max-input-rate 5000 --max-output-rate 10000"
@@ -152,9 +144,6 @@ else
     SETTINGS_PARAM=""
     echo_warn "未找到项目配置，使用受限模式"
 fi
-
-# 构建完整命令
-CLAUDE_CMD="claude -p \"\$(cat $PROMPT_FILE)\" $SETTINGS_PARAM $BASE_PARAMS --permission-mode acceptEdits"
 
 # 发送初始化命令
 tmux send-keys -t "$SESSION_NAME" "cd \"$PROJECT_DIR\"" Enter
@@ -175,14 +164,7 @@ tmux send-keys -t "$SESSION_NAME" "    --permission-mode acceptEdits" Enter
 tmux send-keys -t "$SESSION_NAME" "  sleep 2" Enter
 tmux send-keys -t "$SESSION_NAME" "done" Enter
 
-# 无人值守任务完成后自动通知
-notify_completion() {
-    if [ "$(uname)" = "Darwin" ]; then
-        osascript -e "display notification \"Claude Code 过夜任务已完成\" with title \"claude-code-init\""
-    elif [ "$(uname)" = "Linux" ] && command -v notify-send >/dev/null 2>&1; then
-        notify-send "claude-code-init" "过夜任务已完成"
-    fi
-}
+
 
 echo ""
 echo_success "无人值守会话已启动"

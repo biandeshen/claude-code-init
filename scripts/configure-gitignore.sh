@@ -6,16 +6,11 @@
 
 PROJECT_PATH="${1:-.}"
 
-# 颜色输出
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
-echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
-echo_success() { echo -e "${GREEN}[成功]${NC} $1"; }
-echo_warn() { echo -e "${YELLOW}[警告]${NC} $1"; }
+# 加载公共库（颜色输出 + 工具函数）
+_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$_SCRIPT_DIR/lib/common.sh" ]; then
+    source "$_SCRIPT_DIR/lib/common.sh"
+fi
 
 cd "$PROJECT_PATH"
 
