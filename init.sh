@@ -76,32 +76,29 @@ else
     echo_info "Git 仓库已存在，跳过"
 fi
 
-# 3. 安装 ECC (Everything Claude Code)
-if [ "$SKIP_ECC" = true ]; then
-    echo_info "跳过 ECC 安装 (--skip-ecc)"
+# 3. 安装核心 Claude Code 插件 (ECC + Superpowers)
+if [ "$SKIP_ECC" = true ] && [ "$SKIP_SUPERPOWERS" = true ]; then
+    echo_info "跳过插件安装 (--skip-ecc --skip-superpowers)"
 else
-    echo_step "安装 Everything Claude Code (ECC)"
-    echo_info "请在 Claude Code 中执行以下命令:"
-    echo -e "  ${YELLOW}/plugin marketplace add affaan-m/everything-claude-code${NC}"
-    echo -e "  ${YELLOW}/plugin install everything-claude-code@everything-claude-code${NC}"
-    echo_info "选择 'Install for you (user scope)'"
+    echo_step "安装核心 Claude Code 插件"
+    if [ "$SKIP_ECC" != true ]; then
+        echo_info "  ECC — 请在 Claude Code 中执行:"
+        echo -e "    ${YELLOW}/plugin marketplace add affaan-m/everything-claude-code${NC}"
+        echo -e "    ${YELLOW}/plugin install everything-claude-code@everything-claude-code${NC}"
+        echo_info "  选择 'Install for you (user scope)'"
+    fi
+    if [ "$SKIP_SUPERPOWERS" != true ]; then
+        echo_info "  Superpowers — 请在 Claude Code 中执行:"
+        echo -e "    ${YELLOW}/plugin marketplace add obra/superpowers-marketplace${NC}"
+        echo -e "    ${YELLOW}/plugin install superpowers@superpowers-marketplace${NC}"
+    fi
 fi
 
-# 4. 安装 Superpowers
-if [ "$SKIP_SUPERPOWERS" = true ]; then
-    echo_info "跳过 Superpowers 安装 (--skip-superpowers)"
-else
-    echo_step "安装 Superpowers"
-    echo_info "请在 Claude Code 中执行以下命令:"
-    echo -e "  ${YELLOW}/plugin marketplace add obra/superpowers-marketplace${NC}"
-    echo -e "  ${YELLOW}/plugin install superpowers@superpowers-marketplace${NC}"
-fi
-
-# 4.1 插件确认 (--force 模式下跳过交互)
+# 3.1 插件确认 (--force 模式下跳过交互)
 if [ "$SKIP_ECC" != true ] || [ "$SKIP_SUPERPOWERS" != true ]; then
     echo ""
     echo -e "${YELLOW}==============================================${NC}"
-    echo -e "${YELLOW} 重要：以上 ECC 和 Superpowers 插件需要在 Claude Code 中手动安装${NC}"
+    echo -e "${YELLOW} 重要：以上插件需要在 Claude Code 中手动安装${NC}"
     echo -e "${YELLOW}==============================================${NC}"
     if [ "$FORCE_OVERWRITE" = true ]; then
         echo_info "跳过插件确认 (--force 模式)"
@@ -115,10 +112,10 @@ if [ "$SKIP_ECC" != true ] || [ "$SKIP_SUPERPOWERS" != true ]; then
     fi
     echo_success "已确认插件安装"
 else
-    echo_info "ECC 和 Superpowers 均已跳过，无需确认"
+    echo_info "所有插件均已跳过，无需确认"
 fi
 
-# 5. 安装 OpenSpec (SDD) - 自动执行
+# 4. 安装 OpenSpec (SDD) - 自动执行
 if [ "$SKIP_OPENSPEC" = true ]; then
     echo_info "跳过 OpenSpec 安装 (--skip-openspec)"
 else
@@ -130,7 +127,7 @@ else
     fi
 fi
 
-# 6. 安装 cc-discipline (物理防火墙) - 自动执行
+# 5. 安装 cc-discipline (物理防火墙) - 自动执行
 if [ "$SKIP_CCDISCIPLINE" = true ]; then
     echo_info "跳过 cc-discipline 安装 (--skip-ccdiscipline)"
 else
@@ -194,7 +191,7 @@ else
     echo_info "scripts 目录为空或不存在，跳过"
 fi
 
-# 8. 复制 Pre-commit 配置
+# 7. 复制 Pre-commit 配置
 echo_step "复制 Pre-commit 配置"
 PRECOMMIT_CONFIG="$SCRIPT_DIR/configs/.pre-commit-config.yaml"
 TARGET_PRECOMMIT_CONFIG="$PROJECT_PATH/.pre-commit-config.yaml"
@@ -439,29 +436,7 @@ else
     echo_warn "未找到配置脚本，跳过 .gitignore 配置"
 fi
 
-# 14. 配置 gstack 命令
-echo_step "配置 gstack 角色命令"
-GSTACK_COMMANDS="team.md messages.md qa.md plan-ceo-review.md overnight.md overnight-report.md capabilities.md status.md"
-TARGET_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
-for cmd in $GSTACK_COMMANDS; do
-    src="$SCRIPT_DIR/commands/$cmd"
-    if [ -f "$src" ]; then
-        mkdir -p "$TARGET_COMMANDS_DIR"
-        cp "$src" "$TARGET_COMMANDS_DIR/" 2>/dev/null || true
-        echo_info "已复制 $cmd"
-    fi
-done
-
-echo ""
-echo -e "${YELLOW}无人值守功能已配置。${NC}"
-echo -e "  ${GRAY}- tmux-session.sh: 启动无人值守会话${NC}"
-echo -e "  ${GRAY}- ralph-setup.sh: 安装 Ralph Wiggum 插件${NC}"
-echo -e "  ${GRAY}- /team: 启动 Agent 团队${NC}"
-echo -e "  ${GRAY}- /qa: 质量保证测试${NC}"
-echo -e "  ${GRAY}- trigger-optimizer.sh: 分析 Skills 触发优化建议${NC}"
-echo -e "  ${GRAY}- weekly-report.sh: 生成本周使用报告${NC}"
-
-# 15. 运行环境检查
+# 13. 运行环境检查
 echo ""
 echo_step "运行环境完整性检查"
 if [ -f "$SCRIPT_DIR/scripts/check-env.sh" ]; then

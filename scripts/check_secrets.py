@@ -281,6 +281,73 @@ def check_markdown_files(file_paths: list) -> list:
     return errors
 
 
+def check_shell_files(file_paths: list) -> list:
+    """检查 Shell 脚本中的硬编码密钥"""
+    errors = []
+
+    for file_path in file_paths:
+        if not file_path.endswith((".sh", ".bash")):
+            continue
+
+        try:
+            with open(file_path, encoding="utf-8") as f:
+                content = f.read()
+                lines = content.split("\n")
+
+            in_heredoc = False
+            heredoc_delim = ""
+            for i, line in enumerate(lines, 1):
+                # 跳过注释
+                stripped = line.strip()
+                if stripped.startswith("#"):
+                    continue
+                # 跳过 heredoc 内容
+                if in_heredoc:
+                    if stripped == heredoc_delim:
+                        in_heredoc = False
+                        heredoc_delim = ""
+                    continue
+                if "<<" in stripped and not stripped.startswith("#"):
+                    # 检测 heredoc 开始
+                    match = re.search(r"<<[-]?'?(\w+)'?", stripped)
+                    if match:
+                        in_heredoc = True
+                        heredoc_delim = match.group(1)
+                    continue
+
+                # 检查变量赋值中的硬编码密钥
+                if "=" in line and not line.strip().startswith("#"):
+                    parts = line.split("=", 1)
+                    if len(parts) == 2:
+                        key, value = parts[0].strip(), parts[1].strip()
+                        value = value.strip('"').strip("'")
+                        key_lower = key.lower()
+
+                        is_sensitive = any(kw in key_lower for kw in SENSITIVE_KEYWORDS)
+                        if not is_sensitive:
+                            continue
+
+                        # 跳过白名单、空值、环境变量引用
+                        if not value or is_whitelisted(value):
+                            continue
+                        if value.startswith("$"):
+                            continue
+
+                        for pattern in SECRET_PATTERNS:
+                            if re.search(pattern, value):
+                                errors.append(
+                                    f"[ERROR] {file_path}:{i} - Shell 脚本中检测到硬编码密钥\n"
+                                    f"   行内容: {line.strip()}\n"
+                                    f"   建议: 改用环境变量 ${key} 或从 .env 读取\n"
+                                )
+                                break
+
+        except Exception:
+            pass
+
+    return errors
+
+
 def main():
     """主函数"""
     errors = []
@@ -307,6 +374,7 @@ def main():
         staged_files = result.stdout.strip().split("\n")
         if staged_files and staged_files[0]:
             errors.extend(check_python_files(staged_files))
+            errors.extend(check_shell_files(staged_files))
     except Exception:
         pass
 

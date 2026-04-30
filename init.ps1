@@ -68,32 +68,29 @@ if (-not (Test-Path ".git")) {
     Write-Info "Git 仓库已存在，跳过"
 }
 
-# 3. 安装 ECC (Everything Claude Code)
-if (-not $SkipECC) {
-    Write-Step "安装 Everything Claude Code (ECC)"
-    Write-Info "请在 Claude Code 中执行以下命令:"
-    Write-Host "  /plugin marketplace add affaan-m/everything-claude-code" -ForegroundColor Yellow
-    Write-Host "  /plugin install everything-claude-code@everything-claude-code" -ForegroundColor Yellow
-    Write-Info "选择 'Install for you (user scope)'"
+# 3. 安装核心 Claude Code 插件 (ECC + Superpowers)
+if ($SkipECC -and $SkipSuperpowers) {
+    Write-Info "跳过插件安装 (SkipECC, SkipSuperpowers)"
 } else {
-    Write-Info "跳过 ECC 安装"
+    Write-Step "安装核心 Claude Code 插件"
+    if (-not $SkipECC) {
+        Write-Info "  ECC — 请在 Claude Code 中执行:"
+        Write-Host "    /plugin marketplace add affaan-m/everything-claude-code" -ForegroundColor Yellow
+        Write-Host "    /plugin install everything-claude-code@everything-claude-code" -ForegroundColor Yellow
+        Write-Info "  选择 'Install for you (user scope)'"
+    }
+    if (-not $SkipSuperpowers) {
+        Write-Info "  Superpowers — 请在 Claude Code 中执行:"
+        Write-Host "    /plugin marketplace add obra/superpowers-marketplace" -ForegroundColor Yellow
+        Write-Host "    /plugin install superpowers@superpowers-marketplace" -ForegroundColor Yellow
+    }
 }
 
-# 4. 安装 Superpowers
-if (-not $SkipSuperpowers) {
-    Write-Step "安装 Superpowers"
-    Write-Info "请在 Claude Code 中执行以下命令:"
-    Write-Host "  /plugin marketplace add obra/superpowers-marketplace" -ForegroundColor Yellow
-    Write-Host "  /plugin install superpowers@superpowers-marketplace" -ForegroundColor Yellow
-} else {
-    Write-Info "跳过 Superpowers 安装"
-}
-
-# 4.1 插件确认 (-Force 模式下跳过交互)
+# 3.1 插件确认 (-Force 模式下跳过交互)
 if ((-not $SkipECC -or -not $SkipSuperpowers) -and -not $Force) {
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Yellow
-    Write-Host " 重要：以上 ECC 和 Superpowers 插件需要在 Claude Code 中手动安装" -ForegroundColor Yellow
+    Write-Host " 重要：以上插件需要在 Claude Code 中手动安装" -ForegroundColor Yellow
     Write-Host " 如果你已完成安装，请输入 y 继续；否则请输入 n 退出" -ForegroundColor Yellow
     Write-Host "==============================================" -ForegroundColor Yellow
     $confirm = Read-Host "是否已完成插件安装？(y/n)"
@@ -106,7 +103,7 @@ if ((-not $SkipECC -or -not $SkipSuperpowers) -and -not $Force) {
     Write-Info "已跳过插件安装确认"
 }
 
-# 5. 安装 OpenSpec (SDD) - 自动执行
+# 4. 安装 OpenSpec (SDD) - 自动执行
 if (-not $SkipOpenSpec) {
     Write-Step "安装 OpenSpec (SDD 工作流)"
     try {

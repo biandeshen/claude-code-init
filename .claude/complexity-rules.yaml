@@ -1,0 +1,119 @@
+# Complexity Rules
+# 从 SOUL.md 抽取的结构化复杂度评估规则
+# Router 在决策时读取此文件，结合用户意图进行路由选择
+# 版本: v1.0.0 | 2026-04-30
+
+# ============================================================
+# 规则一：只读操作快速通道（0分）
+# ============================================================
+readonly_rules:
+  - pattern: "git (status|log|diff)$"
+    description: Git 查看类（仅查看，不提交）
+    score: 0
+  - pattern: "(ls|dir|cat|head|tail|find|grep|search)"
+    description: 文件浏览/搜索类
+    score: 0
+  - pattern: "读取|查看|显示|列出"
+    description: 中文只读语义
+    score: 0
+
+  # 例外：敏感搜索自动升级
+  readonly_escalation:
+    triggers:
+      - "搜索敏感字段（password|secret|token|key|credential）"
+      - "扫描 .env 文件"
+      - "以 -S/-G 搜索二进制模式"
+    escalation_score: 3
+    action: "立即停止 → 输出安全审计报告 → 等待用户确认"
+
+# ============================================================
+# 规则二：风险因子评分（叠加计算）
+# ============================================================
+risk_factors:
+  - condition: "影响模块超过 1 个"
+    score: 1
+    type: count
+  - condition: "涉及 API、数据库 schema 或数据结构变更"
+    score: 1
+    type: flag
+  - condition: "涉及加密、鉴权、支付、文件删除等敏感操作"
+    score: 1
+    type: flag
+  - condition: "修改核心业务逻辑（业务规则、计算逻辑）"
+    score: 2
+    type: flag
+  - condition: "修改安全相关代码（认证、授权、加密实现）"
+    score: 2
+    type: flag
+  - condition: "修改数据库查询或 schema"
+    score: 2
+    type: flag
+  - condition: "修改 API 接口契约（参数、返回值、行为）"
+    score: 2
+    type: flag
+
+# ============================================================
+# 规则三：动态阈值（按项目规模调整）
+# ============================================================
+dynamic_thresholds:
+  - max_files: 30
+    module_weight: 2
+    description: "≤30 文件，每个受影响模块 +2 分"
+  - max_files: 100
+    module_weight: 1
+    description: "31-100 文件，默认权重"
+  - max_files: 300
+    module_weight: 0.7
+    description: "101-300 文件，每个受影响模块 +0.7 分"
+  - max_files: 999999
+    module_weight: 0.5
+    description: ">300 文件，每个受影响模块 +0.5 分"
+
+# ============================================================
+# 规则四：分值 → 执行模式
+# ============================================================
+execution_modes:
+  - range: [0, 0]
+    mode: "direct"
+    description: "直接执行"
+  - range: [1, 2]
+    mode: "plan"
+    description: "Plan + 执行"
+  - range: [3, 4]
+    mode: "tdd"
+    description: "Plan + TDD"
+  - range: [5, 999]
+    mode: "full_sdd"
+    description: "完整 SDD 流程（先 Spec 后执行）"
+
+# ============================================================
+# 规则五：无人值守模式降级
+# ============================================================
+unattended_downgrade:
+  - source_mode: "tdd"
+    downgrade_to: "plan"
+    reason: "跳过 TDD 红灯确认"
+  - source_mode: "full_sdd"
+    downgrade_to: "plan"
+    reason: "完整 SDD 需人工决策，无人值守不启动"
+
+# ============================================================
+# 规则六：强制中断
+# ============================================================
+circuit_breaker:
+  - trigger: "单文件编辑超过 5 次"
+    action: "停止 → 重新评估复杂度 → 根因分析 → 汇报状态"
+  - trigger: "同一操作失败 2 次"
+    action: "立即停止所有修改 → 请求人工介入"
+  - trigger: "累计编辑文件数 ≥ 50（无人值守）"
+    action: "停止并报告"
+  - trigger: "同一任务连续失败 3 次（无人值守）"
+    action: "跳过并标记"
+
+# ============================================================
+# 规则七：不确定性处理
+# ============================================================
+fallback:
+  default_score: 3
+  default_mode: "tdd"
+  description: "无法判断时默认 3 分，强制走 Plan + TDD"

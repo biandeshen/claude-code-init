@@ -84,3 +84,13 @@ jobs:
         with:
           python-version: '3.9'
       - run: python .claude/scripts/check_docs_consistency.py
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@44bdecdef787b7ab0441bf2d8a9e4cd3ea8052f3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
