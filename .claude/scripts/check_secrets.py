@@ -48,6 +48,7 @@ SECRET_PATTERNS = [
 
 # 白名单（允许的值）
 # 这些是明确的占位符示例值，不是真实密钥
+# SECRET_PATTERNS 设计时已避免匹配 Git SHA (hex 40-char 模式) 和 UUID
 
 # 精确匹配的白名单项
 WHITELIST_EXACT = [
@@ -255,6 +256,10 @@ def check_markdown_files(file_paths: list) -> list:
 
     for file_path in file_paths:
         if not file_path.endswith(".md"):
+            continue
+        # 跳过 .git/ 目录下的文件（Git 对象 SHA 并非密钥）
+        fp_str = str(file_path)
+        if "/.git/" in fp_str or "\\.git\\" in fp_str:
             continue
 
         try:

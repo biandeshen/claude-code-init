@@ -20,6 +20,7 @@ __pycache__/
 
 # 本地文件
 CLAUDE.local.md
+MEMORY.local.md
 
 # 文档（可选发布）
 docs/

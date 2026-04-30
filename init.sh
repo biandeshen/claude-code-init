@@ -14,12 +14,20 @@ shopt -s nullglob
 PROJECT_PATH="${1:-.}"
 ORIGINAL_PATH="$PROJECT_PATH"  # 保存原始输入用于显示
 FORCE_OVERWRITE=false
+SKIP_ECC=false
+SKIP_SUPERPOWERS=false
+SKIP_OPENSPEC=false
+SKIP_CCDISCIPLINE=false
 
 # 解析参数
 shift 2>/dev/null || true
 for arg in "$@"; do
     case "$arg" in
         --force) FORCE_OVERWRITE=true ;;
+        --skip-ecc) SKIP_ECC=true ;;
+        --skip-superpowers) SKIP_SUPERPOWERS=true ;;
+        --skip-openspec) SKIP_OPENSPEC=true ;;
+        --skip-ccdiscipline) SKIP_CCDISCIPLINE=true ;;
     esac
 done
 
@@ -69,67 +77,87 @@ else
 fi
 
 # 3. 安装 ECC (Everything Claude Code)
-echo_step "安装 Everything Claude Code (ECC)"
-echo_info "请在 Claude Code 中执行以下命令:"
-echo -e "  ${YELLOW}/plugin marketplace add affaan-m/everything-claude-code${NC}"
-echo -e "  ${YELLOW}/plugin install everything-claude-code@everything-claude-code${NC}"
-echo_info "选择 'Install for you (user scope)'"
+if [ "$SKIP_ECC" = true ]; then
+    echo_info "跳过 ECC 安装 (--skip-ecc)"
+else
+    echo_step "安装 Everything Claude Code (ECC)"
+    echo_info "请在 Claude Code 中执行以下命令:"
+    echo -e "  ${YELLOW}/plugin marketplace add affaan-m/everything-claude-code${NC}"
+    echo -e "  ${YELLOW}/plugin install everything-claude-code@everything-claude-code${NC}"
+    echo_info "选择 'Install for you (user scope)'"
+fi
 
 # 4. 安装 Superpowers
-echo_step "安装 Superpowers"
-echo_info "请在 Claude Code 中执行以下命令:"
-echo -e "  ${YELLOW}/plugin marketplace add obra/superpowers-marketplace${NC}"
-echo -e "  ${YELLOW}/plugin install superpowers@superpowers-marketplace${NC}"
+if [ "$SKIP_SUPERPOWERS" = true ]; then
+    echo_info "跳过 Superpowers 安装 (--skip-superpowers)"
+else
+    echo_step "安装 Superpowers"
+    echo_info "请在 Claude Code 中执行以下命令:"
+    echo -e "  ${YELLOW}/plugin marketplace add obra/superpowers-marketplace${NC}"
+    echo -e "  ${YELLOW}/plugin install superpowers@superpowers-marketplace${NC}"
+fi
 
 # 4.1 插件确认 (--force 模式下跳过交互)
-echo ""
-echo -e "${YELLOW}==============================================${NC}"
-echo -e "${YELLOW} 重要：以上 ECC 和 Superpowers 插件需要在 Claude Code 中手动安装${NC}"
-echo -e "${YELLOW}==============================================${NC}"
-if [ "$FORCE_OVERWRITE" = true ]; then
-    echo_info "跳过插件确认 (--force 模式)"
-else
-    echo -e "${YELLOW} 如果你已完成安装，请输入 y 继续；否则请输入 n 退出${NC}"
-    read -p "是否已完成插件安装？(y/n) " confirm
-    if [ "$confirm" != "y" ]; then
-        echo -e "${RED}请先完成插件安装，再重新运行此脚本。${NC}"
-        exit 1
+if [ "$SKIP_ECC" != true ] || [ "$SKIP_SUPERPOWERS" != true ]; then
+    echo ""
+    echo -e "${YELLOW}==============================================${NC}"
+    echo -e "${YELLOW} 重要：以上 ECC 和 Superpowers 插件需要在 Claude Code 中手动安装${NC}"
+    echo -e "${YELLOW}==============================================${NC}"
+    if [ "$FORCE_OVERWRITE" = true ]; then
+        echo_info "跳过插件确认 (--force 模式)"
+    else
+        echo -e "${YELLOW} 如果你已完成安装，请输入 y 继续；否则请输入 n 退出${NC}"
+        read -p "是否已完成插件安装？(y/n) " confirm
+        if [ "$confirm" != "y" ]; then
+            echo -e "${RED}请先完成插件安装，再重新运行此脚本。${NC}"
+            exit 1
+        fi
     fi
+    echo_success "已确认插件安装"
+else
+    echo_info "ECC 和 Superpowers 均已跳过，无需确认"
 fi
-echo_success "已确认插件安装"
 
 # 5. 安装 OpenSpec (SDD) - 自动执行
-echo_step "安装 OpenSpec (SDD 工作流)"
-if npm install -g @fission-ai/openspec@latest && openspec init --tools claude; then
-    echo_success "OpenSpec 已初始化"
+if [ "$SKIP_OPENSPEC" = true ]; then
+    echo_info "跳过 OpenSpec 安装 (--skip-openspec)"
 else
-    echo_warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@latest && openspec init --tools claude"
+    echo_step "安装 OpenSpec (SDD 工作流)"
+    if npm install -g @fission-ai/openspec@1.3.1 && openspec init --tools claude; then
+        echo_success "OpenSpec 已初始化"
+    else
+        echo_warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@1.3.1 && openspec init --tools claude"
+    fi
 fi
 
 # 6. 安装 cc-discipline (物理防火墙) - 自动执行
-echo_step "安装 cc-discipline (物理防火墙 Hooks)"
-CC_DISCIPLINE_PATH="$HOME/.cc-discipline"
-CC_DISCIPLINE_COMMIT="916da00691128fde44599928d76c129f3d08b8f1"  # 锁定版本 2026-04-26
-if [ ! -d "$CC_DISCIPLINE_PATH" ]; then
-    echo_info "克隆 cc-discipline 仓库..."
-    git clone -b main https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
-    cd "$CC_DISCIPLINE_PATH"
-    git checkout "$CC_DISCIPLINE_COMMIT"
-    cd "$PROJECT_PATH"
-    echo_success "已克隆 cc-discipline (commit: ${CC_DISCIPLINE_COMMIT:0:7})"
+if [ "$SKIP_CCDISCIPLINE" = true ]; then
+    echo_info "跳过 cc-discipline 安装 (--skip-ccdiscipline)"
 else
-    echo_info "cc-discipline 已存在，如需更新请手动执行: git -C $CC_DISCIPLINE_PATH pull"
-fi
-echo_info "正在执行 cc-discipline 初始化..."
-# --force 模式下传递 --auto 给 cc-discipline，使其非交互运行
-CC_DISCIPLINE_FLAGS=""
-if [ "$FORCE_OVERWRITE" = true ]; then
-    CC_DISCIPLINE_FLAGS="--auto"
-fi
-if bash "$CC_DISCIPLINE_PATH/init.sh" $CC_DISCIPLINE_FLAGS; then
-    echo_success "cc-discipline 已安装"
-else
-    echo_warn "cc-discipline 初始化失败，请手动执行: bash $CC_DISCIPLINE_PATH/init.sh"
+    echo_step "安装 cc-discipline (物理防火墙 Hooks)"
+    CC_DISCIPLINE_PATH="$HOME/.cc-discipline"
+    CC_DISCIPLINE_COMMIT="916da00691128fde44599928d76c129f3d08b8f1"  # 锁定版本 2026-04-26
+    if [ ! -d "$CC_DISCIPLINE_PATH" ]; then
+        echo_info "克隆 cc-discipline 仓库..."
+        git clone -b main https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
+        cd "$CC_DISCIPLINE_PATH"
+        git checkout "$CC_DISCIPLINE_COMMIT"
+        cd "$PROJECT_PATH"
+        echo_success "已克隆 cc-discipline (commit: ${CC_DISCIPLINE_COMMIT:0:7})"
+    else
+        echo_info "cc-discipline 已存在，如需更新请手动执行: git -C $CC_DISCIPLINE_PATH pull"
+    fi
+    echo_info "正在执行 cc-discipline 初始化..."
+    # --force 模式下传递 --auto 给 cc-discipline，使其非交互运行
+    CC_DISCIPLINE_FLAGS=""
+    if [ "$FORCE_OVERWRITE" = true ]; then
+        CC_DISCIPLINE_FLAGS="--auto"
+    fi
+    if bash "$CC_DISCIPLINE_PATH/init.sh" $CC_DISCIPLINE_FLAGS; then
+        echo_success "cc-discipline 已安装"
+    else
+        echo_warn "cc-discipline 初始化失败，请手动执行: bash $CC_DISCIPLINE_PATH/init.sh"
+    fi
 fi
 
 # 7. 复制 Python 校验脚本
@@ -434,8 +462,8 @@ echo -e "${GREEN}  Claude Code 开发环境初始化完成！${NC}"
 echo -e "${GREEN}==============================================${NC}"
 echo ""
 echo -e "${CYAN}你现在拥有：${NC}"
-echo -e "  ${GREEN}✅${NC} 11 个可自动触发的 Skills（审查/提交/TDD/调试/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）"
-echo -e "  ${GREEN}✅${NC} 10+ 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status）"
+echo -e "  ${GREEN}✅${NC} 10 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）"
+echo -e "  ${GREEN}✅${NC} 18 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /plan-ceo-review /routine /messages /overnight-report）"
 echo -e "  ${GREEN}✅${NC} 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）"
 echo -e "  ${GREEN}✅${NC} 6 个项目完整性校验脚本"
 echo -e "  ${GREEN}✅${NC} Pre-commit 自动检查（9 个检查项）"

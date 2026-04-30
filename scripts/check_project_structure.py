@@ -55,23 +55,22 @@ def check_gitignore() -> list:
 
     # 检查常见应该被忽略的目录/文件
     recommended_ignores = {
-        "__pycache__": ("Python 字节码缓存", False),
-        "*.pyc": ("Python 编译文件", True),
-        ".venv": ("Python 虚拟环境", False),
-        "venv": ("Python 虚拟环境", False),
-        ".env": ("环境变量文件", False),
-        "node_modules": ("Node.js 依赖", False),
+        "__pycache__": "Python 字节码缓存",
+        "*.pyc": "Python 编译文件",
+        ".venv": "Python 虚拟环境",
+        "venv": "Python 虚拟环境",
+        ".env": "环境变量文件",
+        "node_modules": "Node.js 依赖",
     }
 
     missing = []
-    for item, (desc, is_wildcard) in recommended_ignores.items():
-        if is_wildcard:
-            # 通配符条目：仅检查 gitignore 内容中是否已包含
-            if item not in gitignore_content:
+    for item, desc in recommended_ignores.items():
+        if item not in gitignore_content:
+            # 通配符条目（如 *.pyc）：直接建议加入 gitignore
+            if "*" in item:
                 missing.append(f"{item} ({desc})")
-        else:
-            # 非通配符条目：检查是否存在于文件系统且未被忽略
-            if item not in gitignore_content and Path(item).exists():
+            # 字面路径条目：仅在文件系统实际存在时提醒
+            elif Path(item).exists():
                 missing.append(f"{item} ({desc})")
 
     if missing:

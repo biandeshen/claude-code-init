@@ -36,21 +36,22 @@ SENSITIVE_KEYWORDS = [
 
 # 真实密钥的特征（非示例值）
 SECRET_PATTERNS = [
-    r"sk-[a-zA-Z0-9]{20,}",           # OpenAI 格式
-    r"sk-ant-[a-zA-Z0-9]{20,}",        # Anthropic 格式
-    r"[a-f0-9]{32,}",                   # 32位+ hex
-    r"[a-zA-Z0-9]{40,}",                # 40位+ 字符串
+    r"sk-[a-zA-Z0-9]{20,}",              # OpenAI API Key
+    r"sk-ant-[a-zA-Z0-9]{20,}",           # Anthropic API Key
+    r"ghp_[a-zA-Z0-9]{36}",               # GitHub Personal Access Token
+    r"github_pat_[a-zA-Z0-9]{22,}",       # GitHub Fine-grained Token
+    r"glpat-[a-zA-Z0-9]{20,}",            # GitLab Personal Access Token
+    r"AKIA[0-9A-Z]{16}",                  # AWS Access Key ID
+    r"eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}",  # JWT Token
+    r"-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",  # Private Key Block
 ]
 
 # 白名单（允许的值）
 # 这些是明确的占位符示例值，不是真实密钥
-
-# 前缀匹配的白名单项（允许以这些前缀开头的值）
-WHITELIST_PREFIX = ["test_"]
+# SECRET_PATTERNS 设计时已避免匹配 Git SHA (hex 40-char 模式) 和 UUID
 
 # 精确匹配的白名单项
 WHITELIST_EXACT = [
-    "${",              # 环境变量引用
     "your_secret",     # 完整占位符
     "your_api_key",
     "your_password",
@@ -65,6 +66,9 @@ WHITELIST_EXACT = [
     "127.0.0.1",       # 本地地址
     "::1",             # IPv6 本地地址
 ]
+
+# 前缀匹配的白名单项（允许以这些前缀开头的值）
+WHITELIST_PREFIX = ["test_", "${", "$env:"]
 
 
 def is_whitelisted(value: str) -> bool:
@@ -137,23 +141,29 @@ def check_config_file(file_path: str) -> list:
             lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
+            # 跳过注释
             if line.strip().startswith("#"):
                 continue
 
+            # 检查是否包含敏感字段
             line_lower = line.lower()
             is_sensitive = any(keyword in line_lower for keyword in SENSITIVE_KEYWORDS)
 
             if is_sensitive:
+                # 检查值部分
                 if ":" in line:
                     key, value = line.split(":", 1)
                     value = value.strip().strip('"').strip("'")
 
+                    # 跳过白名单
                     if is_whitelisted(value):
                         continue
 
+                    # 跳过空值
                     if not value:
                         continue
 
+                    # 检查是否是真实密钥
                     for pattern in SECRET_PATTERNS:
                         if re.search(pattern, value):
                             errors.append(
@@ -240,6 +250,37 @@ def check_python_files(file_paths: list) -> list:
     return errors
 
 
+def check_markdown_files(file_paths: list) -> list:
+    """检查 Markdown 文件中的敏感信息（重点扫描 MEMORY.md 等记忆文件）"""
+    errors = []
+
+    for file_path in file_paths:
+        if not file_path.endswith(".md"):
+            continue
+        # 跳过 .git/ 目录下的文件（Git 对象 SHA 并非密钥）
+        fp_str = str(file_path)
+        if "/.git/" in fp_str or "\\.git\\" in fp_str:
+            continue
+
+        try:
+            with open(file_path, encoding="utf-8") as f:
+                content = f.read()
+
+            for pattern in SECRET_PATTERNS:
+                for match in re.finditer(pattern, content):
+                    line_num = content[:match.start()].count("\n") + 1
+                    match_text = match.group()
+                    errors.append(
+                        f"[ERROR] {file_path}:{line_num} - Markdown 文件中疑似包含密钥\n"
+                        f"   匹配内容: {match_text[:30]}...\n"
+                        f"   建议: 从 {file_path} 中删除此内容\n"
+                    )
+        except Exception:
+            pass
+
+    return errors
+
+
 def main():
     """主函数"""
     errors = []
@@ -268,6 +309,17 @@ def main():
             errors.extend(check_python_files(staged_files))
     except Exception:
         pass
+
+    # 5. 检查 Markdown 文件（记忆文件等）
+    md_files = []
+    for md_path in [Path("MEMORY.md"), Path("MEMORY.local.md")]:
+        if md_path.exists():
+            md_files.append(str(md_path))
+    memory_dir = Path(".claude/memory")
+    if memory_dir.exists():
+        md_files.extend(str(p) for p in memory_dir.rglob("*.md"))
+    if md_files:
+        errors.extend(check_markdown_files(md_files))
 
     # 输出结果
     if errors:

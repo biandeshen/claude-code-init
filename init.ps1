@@ -110,11 +110,11 @@ if ((-not $SkipECC -or -not $SkipSuperpowers) -and -not $Force) {
 if (-not $SkipOpenSpec) {
     Write-Step "安装 OpenSpec (SDD 工作流)"
     try {
-        npm install -g @fission-ai/openspec@latest
+        npm install -g @fission-ai/openspec@1.3.1
         openspec init --tools claude
         Write-Success "OpenSpec 已初始化"
     } catch {
-        Write-Warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@latest && openspec init --tools claude"
+        Write-Warn "OpenSpec 自动安装失败，请手动执行: npm install -g @fission-ai/openspec@1.3.1 && openspec init --tools claude"
     }
 } else {
     Write-Info "跳过 OpenSpec 安装"
@@ -464,8 +464,8 @@ Write-Host "  Claude Code 开发环境初始化完成！" -ForegroundColor Green
 Write-Host "==============================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "你现在拥有：" -ForegroundColor Cyan
-Write-Host "  ✅ 11 个可自动触发的 Skills（审查/提交/TDD/调试/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）" -ForegroundColor White
-Write-Host "  ✅ 10+ 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status）" -ForegroundColor White
+Write-Host "  ✅ 10 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）" -ForegroundColor White
+Write-Host "  ✅ 18 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /plan-ceo-review /routine /messages /overnight-report）" -ForegroundColor White
 Write-Host "  ✅ 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）" -ForegroundColor White
 Write-Host "  ✅ 6 个项目完整性校验脚本" -ForegroundColor White
 Write-Host "  ✅ Pre-commit 自动检查（9 个检查项）" -ForegroundColor White

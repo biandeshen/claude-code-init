@@ -156,6 +156,15 @@
 
 格式：`[决策] 评分 X 分（理由），走 XXX 流程`
 
+### 与 Router 的评分联通
+
+> 复杂度评估完成后，Router (`.claude/skills/router/SKILL.md`) 结合评分和用户意图进一步选择执行路径。
+> **联动逻辑**：
+> 1. SOUL.md 计算复杂度评分（0-5+分）
+> 2. Router 根据用户意图关键词匹配工作流
+> 3. Router 综合评分 + 意图 → 确定执行深度（直接执行 / Plan / TDD / 完整 SDD）
+> 4. Router 输出 `[决策] 评分 X 分 + 意图 Y → Z 流程`
+
 ---
 
 ### 规则二：风险因子评分（叠加计算）
@@ -325,7 +334,7 @@
 
 ### 模板参考
 
-> 详细模板见：[PLAN_Template.md](.claude/PLAN_Template.md) | [SPEC_Template.md](.claude/SPEC_Template.md)
+> 详细模板见：[PLAN_Template.md](.claude/PLAN_Template.md) | [SPEC_Template.md](.claude/SPEC_Template.md) | [Router Skill](.claude/skills/router/SKILL.md)
 
 ---
 

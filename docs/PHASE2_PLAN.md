@@ -1,6 +1,6 @@
 # 阶段二落地计划：从小队流程化到自治开发者
 
-> **状态：已完成** (v1.5.0 已交付全部 4 个步骤：tmux-session.sh、post-commit-review 能力、Router 升级、docs 更新)
+> **状态：已完成** (v1.5.0 已交付全部 4 个步骤：tmux-session.sh、Router 升级、docs 更新。注：post-commit-review 通过 git-commit Skill 实现，非独立脚本)
 > **归档日期：2026-04-30**
 
 让 AI 从"人在环内"的被动助手，升级为"人在环上"的自治开发者。

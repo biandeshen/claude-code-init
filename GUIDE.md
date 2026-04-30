@@ -307,7 +307,7 @@ pre-commit run --all-files
 
 | 工具 | 说明 | 安装方式 |
 |------|------|----------|
-| **ECC** | Everything Claude Code - 38个Agent + 183个Skills | Claude Code 插件 |
+| **ECC** | Everything Claude Code - 38个Agent + 156个Skills | Claude Code 插件 |
 | **Superpowers** | TDD铁律 + 根因追踪 | Claude Code 插件 |
 | **OpenSpec** | SDD 5步法工作流 | npm: @fission-ai/openspec |
 | **cc-discipline** | 物理防火墙 Hooks | git clone |

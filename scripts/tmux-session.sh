@@ -190,7 +190,7 @@ tmux send-keys -t "$SESSION_NAME" "done" Enter
 notify_completion() {
     if [ "$(uname)" = "Darwin" ]; then
         osascript -e "display notification \"Claude Code 过夜任务已完成\" with title \"claude-code-init\""
-    elif [ "$(uname)" = "Linux" ] && command -v notify-send &>/dev/null; then
+    elif [ "$(uname)" = "Linux" ] && command -v notify-send >/dev/null 2>&1; then
         notify-send "claude-code-init" "过夜任务已完成"
     fi
 }

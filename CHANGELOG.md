@@ -4,7 +4,20 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.5.2] - 2026-04-30
+
+### Fixed
+- `template_version()` grep non-zero exit code crashing `init.sh` at step 10 when target CLAUDE.md lacks version marker.
+- `--force` mode now skips plugin installation confirmation prompt for non-interactive execution.
+- `--force` mode passes `--auto` to cc-discipline to prevent interaction in pipelines.
+- OpenSpec install locked to `@1.3.1` and uses `--tools claude` flag.
+
+### Changed
+- 6 overlapping Commands (commit/fix/review/refactor/explain/validate) reduced to Skill reference entries.
+- `scripts/check_secrets.py` synced with full version from `.claude/scripts/` (GitHub/AWS/JWT patterns + Markdown scanning).
+- Version bumped to v1.5.2 across `init.sh` and `init.ps1`.
+
+## [1.5.1] - 2026-04-30
 
 ### Added
 - SPEC_Template.md for feature-level spec generation.
@@ -81,6 +94,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Initial release with basic scaffolding functionality.
 
 [Unreleased]: https://github.com/biandeshen/claude-code-init/compare/v1.5.0...HEAD
+[1.5.2]: https://github.com/biandeshen/claude-code-init/compare/v1.5.1...v1.5.2
+[1.5.1]: https://github.com/biandeshen/claude-code-init/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/biandeshen/claude-code-init/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/biandeshen/claude-code-init/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/biandeshen/claude-code-init/compare/v1.3.0...v1.4.0
