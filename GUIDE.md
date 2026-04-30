@@ -367,15 +367,15 @@ claude-code-init/
 │   ├── weekly-report.sh   # 周报生成
 │   ├── validate_skills.sh # Skills 健康检查
 │   ├── check-env.sh       # 环境检查
-│   └── configure-gitignore.* # .gitignore 配置
-├── .claude/scripts/         # Claude Code 专用脚本
-│   ├── check_secrets.py     # 密钥安全检查
+│   ├── configure-gitignore.* # .gitignore 配置
+│   ├── check_secrets.py      # 密钥安全检查
 │   ├── check_function_length.py
 │   ├── check_dependencies.py
 │   ├── check_import_order.py
-│   ├── check_project_structure.py
-│   └── PROMPT.md            # 过夜任务清单
-└── configs/               # 配置文件
+│   └── check_project_structure.py
+├── .claude/scripts/          # Claude Code 专用
+│   └── PROMPT.md             # 过夜任务清单
+└── configs/                  # 配置文件
     └── .pre-commit-config.yaml
 ```
 

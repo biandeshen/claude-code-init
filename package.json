@@ -15,7 +15,10 @@
     "scripts/",
     "configs/",
     ".claude/skills/",
-    ".claude/hooks/"
+    ".claude/hooks/",
+    ".claude/scripts/",
+    ".claude/settings.json",
+    ".claude/complexity-rules.yaml"
   ],
   "scripts": {
     "start": "node index.js",

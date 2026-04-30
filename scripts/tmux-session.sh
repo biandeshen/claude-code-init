@@ -153,16 +153,8 @@ else
     echo_warn "未找到项目配置，使用受限模式"
 fi
 
-# 如果有无人值守专用路由，加载它
-if [ -f "$ROUTER_UNATTENDED" ]; then
-    ROUTER_PARAM="--skill router-unattended"
-    echo_info "加载无人值守专用路由"
-else
-    echo_info "使用默认路由"
-fi
-
 # 构建完整命令
-CLAUDE_CMD="claude -p \"\$(cat $PROMPT_FILE)\" $SETTINGS_PARAM $ROUTER_PARAM $BASE_PARAMS --permission-mode acceptEdits"
+CLAUDE_CMD="claude -p \"\$(cat $PROMPT_FILE)\" $SETTINGS_PARAM $BASE_PARAMS --permission-mode acceptEdits"
 
 # 发送初始化命令
 tmux send-keys -t "$SESSION_NAME" "cd \"$PROJECT_DIR\"" Enter
@@ -177,9 +169,6 @@ tmux send-keys -t "$SESSION_NAME" "  ITER=\$((ITER + 1))" Enter
 tmux send-keys -t "$SESSION_NAME" "  CLAUDE_MODE=unattended claude -p \"\$(cat $PROMPT_FILE)\" \\" Enter
 if [ -n "$SETTINGS_PARAM" ]; then
     tmux send-keys -t "$SESSION_NAME" "    $SETTINGS_PARAM \\" Enter
-fi
-if [ -n "$ROUTER_PARAM" ]; then
-    tmux send-keys -t "$SESSION_NAME" "    $ROUTER_PARAM \\" Enter
 fi
 tmux send-keys -t "$SESSION_NAME" "    $BASE_PARAMS \\" Enter
 tmux send-keys -t "$SESSION_NAME" "    --permission-mode acceptEdits" Enter

@@ -431,37 +431,7 @@ if (Test-Path $gitignoreScript) {
     Write-Warn "configure-gitignore.ps1 未找到，跳过 .gitignore 配置"
 }
 
-# 14. 配置 gstack 命令（可选）
-Write-Step "配置 gstack 角色命令"
-$gstackCommands = @(
-    "team.md",
-    "messages.md",
-    "qa.md",
-    "plan-ceo-review.md",
-    "overnight.md",
-    "overnight-report.md",
-    "capabilities.md",
-    "status.md"
-)
-$targetCommandsDir = Join-Path $ProjectPath ".claude\commands"
-foreach ($cmd in $gstackCommands) {
-    $src = Join-Path $ScriptDir "commands\$cmd"
-    if (Test-Path $src) {
-        Copy-Item -Path $src -Destination $targetCommandsDir -Force -ErrorAction SilentlyContinue
-        Write-Info "已复制 $cmd"
-    }
-}
-
-Write-Host ""
-Write-Host "无人值守功能可通过 .claude/scripts/ 使用。" -ForegroundColor Yellow
-Write-Host "  - tmux-session.sh: 启动无人值守会话 (.claude/scripts/)" -ForegroundColor Gray
-Write-Host "  - ralph-setup.sh: 安装 Ralph Wiggum 插件 (.claude/scripts/)" -ForegroundColor Gray
-Write-Host "  - /team: 启动 Agent 团队" -ForegroundColor Gray
-Write-Host "  - /qa: 质量保证测试" -ForegroundColor Gray
-Write-Host "  - trigger-optimizer.sh: 分析 Skills 触发优化建议" -ForegroundColor Gray
-Write-Host "  - weekly-report.sh: 生成本周使用报告" -ForegroundColor Gray
-
-# 15. 运行环境检查
+# 14. 运行环境检查
 Write-Step "运行环境完整性检查"
 $checkEnvScript = Join-Path $ScriptDir "scripts\check-env.sh"
 if (Test-Path $checkEnvScript) {
@@ -495,7 +465,7 @@ Write-Host "  5. 输入 /status 查看项目状态仪表盘" -ForegroundColor Wh
 Write-Host "  6. 输入 /capabilities 按场景查看全部能力" -ForegroundColor White
 Write-Host ""
 
-# 16. 全局偏好设置引导（跨所有项目生效）
+# 15. 全局偏好设置引导（跨所有项目生效）
 Write-Host "[建议] 设置全局偏好（跨所有项目生效）：" -ForegroundColor Yellow
 $globalClaude = "$env:USERPROFILE\.claude\CLAUDE.md"
 Write-Host "  将你的通用编码偏好写入 $globalClaude" -ForegroundColor Gray

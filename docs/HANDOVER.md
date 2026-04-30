@@ -92,8 +92,7 @@ claude-code-init/
 │   │   ├── git-commit/
 │   │   ├── project-validate/
 │   │   ├── code-explain/
-│   │   ├── project-init/
-│   │   └── router-unattended/  # 无人值守专用
+│   │   └── project-init/
 │   ├── hooks/
 │   │   └── smart-context.sh   # 场景感知 Hook
 │   └── scripts/             # ⚠️ Python 校验脚本（不是 scripts/）
@@ -522,7 +521,6 @@ Lead 汇总结果
 | project-validate | 项目校验 | 校验、validate |
 | code-explain | 代码解释 | 解释、explain |
 | project-init | 项目初始化 | 初始化、新项目 |
-| router-unattended | 无人值守路由 | tmux 模式 |
 
 ### 8.2 自定义命令
 
@@ -622,7 +620,7 @@ PowerShell 5.x 不支持无 BOM 的 UTF-8，会导致中文乱码。PS 7+ 已修
 bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 ```
 
-会在 tmux 会话中循环运行 Claude Code，支持安全限制和 router-unattended 路由。
+会在 tmux 会话中循环运行 Claude Code，支持安全限制。
 
 ### Q: init 后在目标项目找不到 Python 校验脚本？
 
