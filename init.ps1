@@ -1,6 +1,6 @@
 ﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.5.2 | 2026-04-30
+# 版本: v1.5.3 | 2026-04-30
 
 param(
     [Parameter(Mandatory=$true)]
@@ -37,7 +37,7 @@ function Write-Info { param($msg) Write-Host "[信息] $msg" -ForegroundColor Gr
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  Claude Code 开发环境一键初始化 (v1.5.2)" -ForegroundColor Cyan
+Write-Host "  Claude Code 开发环境一键初始化 (v1.5.3)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -387,7 +387,11 @@ if (Test-Path $SettingsSource) {
 # 12. 创建本地偏好文件 (gitignored)
 Write-Step "创建 CLAUDE.local.md (本地偏好)"
 New-Item -ItemType Directory -Force -Path "$ProjectPath\.claude" | Out-Null
-$localMd = @"
+$claudeLocalPath = "$ProjectPath\.claude\CLAUDE.local.md"
+if (Test-Path $claudeLocalPath) {
+    if ($Force) {
+        Write-Warn "CLAUDE.local.md 已存在，-Force 模式：覆盖"
+        $localMd = @"
 # 本地个人偏好
 # 此文件会被 .gitignore 忽略，不会提交到仓库
 
@@ -404,11 +408,39 @@ $localMd = @"
 
 ---
 "@
-$localMd | Out-File -FilePath "$ProjectPath\.claude\CLAUDE.local.md" -Encoding utf8
-Write-Success "已创建 CLAUDE.local.md (.claude/)"
+        $localMd | Out-File -FilePath $claudeLocalPath -Encoding utf8
+        Write-Success "已覆盖 CLAUDE.local.md"
+    } else {
+        Write-Warn "CLAUDE.local.md 已存在，跳过创建（使用 -Force 可覆盖）"
+    }
+} else {
+    $localMd = @"
+# 本地个人偏好
+# 此文件会被 .gitignore 忽略，不会提交到仓库
+
+> 由 claude-code-init 自动生成
+> 版本: v1.0.0 | $(Get-Date -Format 'yyyy-MM-dd')
+
+---
+
+## 个人偏好设置
+
+- 开始编码前先解释 Plan
+- 所有异步函数必须有 timeout
+- 复杂任务先创建 Plan.md
+
+---
+"@
+    $localMd | Out-File -FilePath $claudeLocalPath -Encoding utf8
+    Write-Success "已创建 CLAUDE.local.md (.claude/)"
+}
 
 # 创建 MEMORY.local.md (个人私密记忆，不提交)
-$memoryLocalMd = @"
+$memoryLocalPath = "$ProjectPath\MEMORY.local.md"
+if (Test-Path $memoryLocalPath) {
+    if ($Force) {
+        Write-Warn "MEMORY.local.md 已存在，-Force 模式：覆盖"
+        $memoryLocalMd = @"
 # 个人私密记忆
 # 此文件会被 .gitignore 忽略，不会提交到仓库
 # 记录个人偏好、工作习惯等不适合团队共享的内容
@@ -419,8 +451,26 @@ $memoryLocalMd = @"
 ---
 <!-- 在此记录个人偏好设置、临时笔记等内容 -->
 "@
-$memoryLocalMd | Out-File -FilePath "$ProjectPath\MEMORY.local.md" -Encoding utf8
-Write-Success "已创建 MEMORY.local.md (gitignored)"
+        $memoryLocalMd | Out-File -FilePath $memoryLocalPath -Encoding utf8
+        Write-Success "已覆盖 MEMORY.local.md"
+    } else {
+        Write-Warn "MEMORY.local.md 已存在，跳过创建（使用 -Force 可覆盖）"
+    }
+} else {
+    $memoryLocalMd = @"
+# 个人私密记忆
+# 此文件会被 .gitignore 忽略，不会提交到仓库
+# 记录个人偏好、工作习惯等不适合团队共享的内容
+
+> 由 claude-code-init 自动生成
+> 模板版本: v1.0.0
+
+---
+<!-- 在此记录个人偏好设置、临时笔记等内容 -->
+"@
+    $memoryLocalMd | Out-File -FilePath $memoryLocalPath -Encoding utf8
+    Write-Success "已创建 MEMORY.local.md (gitignored)"
+}
 
 # 13. 配置 .gitignore
 Write-Step "配置 .gitignore"

@@ -4,6 +4,28 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.3] - 2026-05-01
+
+### Fixed
+- **Memory 系统路径骨折 (P0)**: 模板和文档统一描述单文件 MEMORY.md 记忆结构，替换废弃的多文件引用 (INDEX.md/decisions.md/bugs.md/patterns.md/context.md)。
+- **静默覆盖用户数据 (P0)**: `init.sh` 和 `init.ps1` 中 CLAUDE.local.md 和 MEMORY.local.md 写入前添加存在性检查，`--force`/`-Force` 可跳过保护。
+- **project-validate 幽灵脚本 (P0)**: 5 个缺失的 Python 校验脚本从 `scripts/` 复制到 `.claude/scripts/`。
+- **Router 缺失条目 (P0)**: 决策表新增 code-explain 和 project-init 两个 Skills 的触发规则。
+- **幽灵命令引用 (P1)**: 删除 `/ship`、`/clean`、`/canary`、`/benchmark`、`/cso`、`/office-hours` 6 个不存在命令的残留引用。
+- **路径错误 (P1)**: `help.md` 修正 SOUL_Template.md 路径；`status.md` 修正 reports/ 路径为 `.claude/reports/`。
+- **版本号升级**: package.json、CLAUDE.md、init.sh、init.ps1 统一升至 v1.5.3。
+
+### Added
+- 新增 `commands/plan-eng-review.md`：技术架构评审命令，支持可扩展性/安全性/可维护性/成本四维度评审。
+- 新增 `commands/tdd.md`：TDD 工作流快捷命令（Red→Green→Refactor 循环）。
+
+### Changed
+- 6 个骨架命令 (commit/explain/fix/refactor/review/validate) 添加「快速参考」节，提供功能摘要和适用场景。
+
+### Known Limitations
+- **ROUTINE_Template.md** 定义了 YAML 例行任务结构但尚无执行引擎实现，规划于 v1.6.0。
+- **complexity-rules.yaml** 与 **SOUL.md** 存在重叠的复杂度评分规则，规划于 v1.6.0 统一。
+
 ## [1.5.2] - 2026-04-30
 
 ### Fixed
@@ -98,7 +120,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - Initial release with basic scaffolding functionality.
 
-[Unreleased]: https://github.com/biandeshen/claude-code-init/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/biandeshen/claude-code-init/compare/v1.5.3...HEAD
+[1.5.3]: https://github.com/biandeshen/claude-code-init/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/biandeshen/claude-code-init/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/biandeshen/claude-code-init/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/biandeshen/claude-code-init/compare/v1.4.1...v1.5.0

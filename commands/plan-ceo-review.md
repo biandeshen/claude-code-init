@@ -78,5 +78,4 @@
 ## 相关命令
 
 - `/plan-eng-review` - 技术架构审查
-- `/office-hours` - 完整产品审视
 - `/autoplan` - 自动串联多个评审

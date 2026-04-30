@@ -76,23 +76,26 @@ ECC 已提供丰富的内置 Skills 和 Agents，无需额外配置：
 
 ### 记忆系统
 
-本项目使用 `.claude/memory/` 目录管理项目记忆，文件结构：
-- `INDEX.md` — 摘要索引（AI 启动时先读此文件）
-- `decisions.md` — 架构决策 (ADR 风格)
-- `bugs.md` — Bug 模式与根因
-- `patterns.md` — 编码模式/约定
-- `context.md` — 项目背景/领域知识
+本项目使用 `.claude/memory/MEMORY.md` 管理项目记忆（单文件，内部分章节）：
+
+| 章节 | 内容 |
+|------|------|
+| 索引表（文件顶部） | AI 启动时先读索引获取记忆概览 |
+| 架构决策 (ADR) | 项目架构决策及原因 |
+| Bug 模式 | Bug 模式与根因 |
+| 编码模式 | 编码模式/约定 |
+| 领域知识 | 项目背景/领域知识 |
 
 **AI 行为规则：**
-- 每次会话启动时先读 `.claude/memory/INDEX.md`
-- 修复复杂 Bug（排查 > 30 分钟）后，在对话末尾提议记录到 `bugs.md`
-- 做出架构决策后，提议记录到 `decisions.md`（必须包含决策原因）
+- 每次会话启动时先读 `.claude/memory/MEMORY.md` 顶部的索引表
+- 修复复杂 Bug（排查 > 30 分钟）后，在对话末尾提议记录到 MEMORY.md 的「Bug 模式」章节
+- 做出架构决策后，提议记录到 MEMORY.md 的「架构决策 (ADR)」章节（必须包含决策原因）
 - `/commit`、`/fix`、`/review` 关键操作后，检查是否需要记录记忆
 - 用户说"之前怎么修的/上次/我记得"时，自动搜索记忆库
 - **禁止**在记忆中记录：密钥/Token/密码、内网IP、对人评价、未公开商业策略
 
 **安全管理：**
-- 共享记忆写入 `.claude/memory/*.md`（提交到 Git）
+- 共享记忆写入 `.claude/memory/MEMORY.md`（提交到 Git）
 - 个人私密内容写入 `MEMORY.local.md`（gitignored，不提交）
 - 记忆提交到 Git 前，pre-commit hook 会自动扫描密钥
 

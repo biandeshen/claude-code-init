@@ -269,23 +269,24 @@ pre-commit run --all-files
 
 ## 记忆系统
 
-初始化后项目自动包含 `.claude/memory/` 记忆目录：
+初始化后项目自动包含 `.claude/memory/` 记忆目录，所有记忆存储在单个文件 `MEMORY.md` 中：
 
 ```
 .claude/memory/
-├── INDEX.md          (摘要索引 — AI 启动时先读)
-├── decisions.md       (架构决策 — ADR 风格)
-├── bugs.md            (Bug 模式与根因)
-├── patterns.md        (编码模式/约定)
-├── context.md         (项目背景/领域知识)
+├── MEMORY.md          ← 唯一记忆文件（内部分章节）
+│   ├── 索引表（文件顶部）
+│   ├── 架构决策 (ADR)
+│   ├── Bug 模式
+│   ├── 编码模式
+│   └── 领域知识
 └── archive/           (过期记忆归档)
 ```
 
 ### 工作原理
 
 - **被动采集**：AI 在关键节点（`/commit`、`/fix`、`/review` 后）自动提议记录记忆，无需手动输入
-- **渐进式加载**：AI 先读 `INDEX.md`（~2KB），按需深入主题文件，避免一次性加载全部
-- **防膨胀**：每个主题文件控制在 500 条以内，90 天未引用自动归档
+- **渐进式加载**：AI 先读 `MEMORY.md` 顶部的索引表，按需深入对应章节，避免一次性加载全部
+- **防膨胀**：每个章节控制在 500 条以内，90 天未引用自动归档
 
 ### 安全管理
 
@@ -350,11 +351,7 @@ claude-code-init/
 │   ├── PLAN_Template.md
 │   ├── ROUTINE_Template.md
 │   └── memory/              # 记忆系统模板
-│       ├── INDEX.md         # 摘要索引
-│       ├── decisions.md     # 架构决策
-│       ├── bugs.md          # Bug 模式
-│       ├── patterns.md      # 编码模式
-│       └── context.md       # 项目背景
+│       └── MEMORY.md         # 单文件记忆（含索引+A...）
 ├── commands/              # 自定义斜杠命令 (18个)
 │   ├── review.md, commit.md, fix.md
 │   ├── refactor.md, explain.md, validate.md

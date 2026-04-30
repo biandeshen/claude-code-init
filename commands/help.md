@@ -47,7 +47,7 @@
 
 > 💡 输入 `/help commands` 查看所有可用命令的完整清单
 > 💡 输入 `/help <命令>` 查看某个命令的详细说明
-> 💡 关于项目整体规范，可查阅 README.md、GUIDE.md、SOUL_Template.md
+> 💡 关于项目整体规范，可查阅 README.md、GUIDE.md、templates/SOUL_Template.md
 
 ## 二、完整命令清单（`/help commands` 触发）
 

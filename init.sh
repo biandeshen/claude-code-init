@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.5.2 | 2026-04-30
+# 版本: v1.5.3 | 2026-04-30
 
 set -euo pipefail
 
@@ -382,7 +382,10 @@ fi
 # 12. 创建本地偏好文件 (gitignored)
 echo_step "创建 CLAUDE.local.md (本地偏好)"
 mkdir -p "$PROJECT_PATH/.claude"
-cat > "$PROJECT_PATH/.claude/CLAUDE.local.md" << EOF
+if [ -f "$PROJECT_PATH/.claude/CLAUDE.local.md" ]; then
+    if [ "$FORCE_OVERWRITE" = true ]; then
+        echo_warn "CLAUDE.local.md 已存在，--force 模式：覆盖"
+        cat > "$PROJECT_PATH/.claude/CLAUDE.local.md" << EOF
 # 本地个人偏好
 # 此文件会被 .gitignore 忽略，不会提交到仓库
 
@@ -399,10 +402,36 @@ cat > "$PROJECT_PATH/.claude/CLAUDE.local.md" << EOF
 
 ---
 EOF
-echo_success "已创建 CLAUDE.local.md (.claude/)"
+        echo_success "已覆盖 CLAUDE.local.md"
+    else
+        echo_warn "CLAUDE.local.md 已存在，跳过创建（使用 --force 可覆盖）"
+    fi
+else
+    cat > "$PROJECT_PATH/.claude/CLAUDE.local.md" << EOF
+# 本地个人偏好
+# 此文件会被 .gitignore 忽略，不会提交到仓库
+
+> 由 claude-code-init 自动生成
+> 版本: v1.0.0 | $(date +%Y-%m-%d)
+
+---
+
+## 个人偏好设置
+
+- 开始编码前先解释 Plan
+- 所有异步函数必须有 timeout
+- 复杂任务先创建 Plan.md
+
+---
+EOF
+    echo_success "已创建 CLAUDE.local.md (.claude/)"
+fi
 
 # 创建 MEMORY.local.md (个人私密记忆，不提交)
-cat > "$PROJECT_PATH/MEMORY.local.md" << 'LOCALEOF'
+if [ -f "$PROJECT_PATH/MEMORY.local.md" ]; then
+    if [ "$FORCE_OVERWRITE" = true ]; then
+        echo_warn "MEMORY.local.md 已存在，--force 模式：覆盖"
+        cat > "$PROJECT_PATH/MEMORY.local.md" << 'LOCALEOF'
 # 个人私密记忆
 # 此文件会被 .gitignore 忽略，不会提交到仓库
 # 记录个人偏好、工作习惯等不适合团队共享的内容
@@ -413,7 +442,24 @@ cat > "$PROJECT_PATH/MEMORY.local.md" << 'LOCALEOF'
 ---
 <!-- 在此记录个人偏好设置、临时笔记等内容 -->
 LOCALEOF
-echo_success "已创建 MEMORY.local.md (gitignored)"
+        echo_success "已覆盖 MEMORY.local.md"
+    else
+        echo_warn "MEMORY.local.md 已存在，跳过创建（使用 --force 可覆盖）"
+    fi
+else
+    cat > "$PROJECT_PATH/MEMORY.local.md" << 'LOCALEOF'
+# 个人私密记忆
+# 此文件会被 .gitignore 忽略，不会提交到仓库
+# 记录个人偏好、工作习惯等不适合团队共享的内容
+
+> 由 claude-code-init 自动生成
+> 模板版本: v1.0.0
+
+---
+<!-- 在此记录个人偏好设置、临时笔记等内容 -->
+LOCALEOF
+    echo_success "已创建 MEMORY.local.md (gitignored)"
+fi
 
 # 13. 处理 .gitignore（调用独立脚本）
 echo ""

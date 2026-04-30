@@ -8,7 +8,7 @@
 1. `git status --short` - Git 状态
 2. `git log --oneline -5` - 最近提交
 3. `git diff --stat` - 未提交的改动
-4. 检查 `reports/` 目录
+4. 检查 `.claude/reports/` 目录
 
 ## 输出格式
 

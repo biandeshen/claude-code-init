@@ -11,3 +11,9 @@
 4. 预览确认后执行 `git commit`
 
 > 提交规范详情、pre-commit 检查清单、push 确认流程见 git-commit Skill。
+
+## 快速参考
+
+- **功能**：生成符合 Conventional Commits 规范的提交信息（feat/fix/docs/...）
+- **适用场景**：代码提交时、需要统一团队提交规范时
+- **完整指令**：见 `.claude/skills/git-commit/SKILL.md`
