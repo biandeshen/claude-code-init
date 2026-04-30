@@ -1,6 +1,6 @@
 # claude-code-init 项目交接文档
 
-> 版本：v1.5.1 | 最后更新：2026-04-30
+> 版本：v1.5.2 | 最后更新：2026-04-30
 
 ---
 
@@ -55,7 +55,7 @@ claude-code-init/
 ├── CHANGELOG.md              # 版本变更日志
 ├── package.json              # npm 分发配置
 ├── index.js                  # npx 入口
-├── init.ps1 / init.sh        # 初始化脚本（16步，两者保持同步）
+├── init.ps1 / init.sh        # 初始化脚本（步号已简化至 14-15 步，两者步号略有差异需同步）
 │
 ├── templates/                # 覆盖层模板（初始化时复制到项目）
 │   ├── CLAUDE_Template.md    # AI 入口配置（含 spec 索引）
@@ -95,20 +95,22 @@ claude-code-init/
 │   │   └── project-init/
 │   ├── hooks/
 │   │   └── smart-context.sh   # 场景感知 Hook
-│   └── scripts/             # ⚠️ Python 校验脚本（不是 scripts/）
-│       ├── check_secrets.py
-│       ├── check_function_length.py
-│       ├── check_dependencies.py
-│       ├── check_import_order.py
-│       └── check_project_structure.py
+│   └── scripts/             # Claude Code 运行时数据（由 init 脚本复制填充）
+│       ├── PROMPT.md          # 过夜任务清单（源码随包发布）
+│       └── check_docs_consistency.py
 │
-├── scripts/                 # Bash 脚本（独立工具）
+├── scripts/                 # Shell + Python 工具脚本
 │   ├── tmux-session.sh      # 无人值守
 │   ├── check-env.sh         # 环境检查
-│   ├── trigger-optimizer.sh # Skills 触发分析
-│   ├── weekly-report.sh     # 周报
+│   ├── check_secrets.py     # 密钥安全检查
+│   ├── check_function_length.py
+│   ├── check_dependencies.py
+│   ├── check_import_order.py
+│   ├── check_project_structure.py
 │   ├── configure-gitignore.sh / .ps1
 │   ├── validate_skills.sh   # Skills 命名校验
+│   ├── trigger-optimizer.sh # Skills 触发分析
+│   ├── weekly-report.sh     # 周报
 │   ├── lib/
 │   │   └── common.sh        # 公共函数库
 │   └── ...
@@ -136,7 +138,7 @@ claude-code-init/
 |--------|--------|--------|------|
 | 本地配置 | `/CLAUDE.local.md` | `/.claude/CLAUDE.local.md` | 隐藏目录合规 |
 | 周报输出 | `reports/` | `.claude/reports/` | 避免污染项目根目录 |
-| tmux PROMPT | `scripts/PROMPT.md` | `.claude/scripts/PROMPT.md` | 与校验脚本同目录 |
+| tmux PROMPT | `scripts/PROMPT.md` | `.claude/scripts/PROMPT.md` | 统一到运行时目录 |
 | 功能规格模板 | 无 | `templates/SPEC_Template.md` | Spec Generation |
 | 定时任务模板 | 无 | `templates/ROUTINE_Template.md` | Routines 集成 |
 | CI/CD | 无 | `.github/workflows/ci.yml` | 自动化质量门禁 |
@@ -158,12 +160,12 @@ claude-code-init/
 | 项目中引用 scripts | `bash .claude/scripts/tmux-session.sh` | `bash scripts/tmux-session.sh`（在本项目中） |
 
 **原理**：
-- `.claude/scripts/` 是 **目标项目的 Claude Code 专用目录**，init 时 Python 校验脚本复制到此处
-- `scripts/` 是 **脚手架项目自己的独立 Bash 工具**，在项目根目录运行
-- init.ps1/init.sh 的 Step 7 把整个 `scripts/` 目录复制到目标项目（保持原目录名）
-- **旧 Step 14 曾错误地再创建 `scripts/` 目录**（已于 v1.5.1 删除），因为 Step 7 已完成复制
+- `.claude/scripts/` 在**目标项目**中存放所有运行时脚本（init 后）：Python 校验脚本 + PROMPT.md + tmux-session.sh 等
+- `scripts/` 在**源码包**中存放工具脚本：init 脚本把其中部分文件复制到目标项目的 `.claude/scripts/`
+- **路径规则**：Skills/pre-commit/CLI 引用一律用目标项目路径 `.claude/scripts/`；源码内脚本自身用 `scripts/`
+- **陷阱**：标记哪个目录是"源"、哪个是"目标"很重要，混淆会导致路径错误
 
-> **教训**：修改 init 流程时，必须同时检查 init.ps1 和 init.sh，两者步号必须保持一致。
+> **教训**：修改路径引用时，必须区分"这个路径是在源码包中生效还是在目标项目中生效"。
 
 ### 3.2 PowerShell Linter 文件干扰
 
@@ -267,11 +269,11 @@ init.ps1 和 init.sh 必须保持步号同步：
 | 11 | 复制 commands/ | |
 | 12 | 复制 configs/ | |
 | 13 | 配置 .gitignore | |
-| 14 | 安装 gstack | （原 Step 15） |
-| 15 | 环境检查 | （原 Step 16） |
-| 16 | 全局偏好设置 | （原 Step 17） |
+| 14 | gstack 命令 (PS1) | init.sh 已删除，init.ps1 中仍存在（Step 11 已全量复制） |
+| 15 | 环境检查 | |
+| 16 | 全局偏好设置 | |
 
-> Step 14（创建 scripts/ 目录）已在 v1.5.1 删除，因为 Step 7 已完成此工作。步号 15→14, 16→15, 17→16。
+> **注意**：init.sh 和 init.ps1 步号已出现差异。多次优化中 init.sh 修改更彻底（合并 3-4、删除 gstack），而 init.ps1 因编码问题未能完全同步。当前 init.sh ~14 步，init.ps1 ~15 步。
 
 ---
 
@@ -599,10 +601,10 @@ SHELLCHECK_OPTS: "-e SC1091 -e SC2034 -e SC2154"
 
 ### Q: 为什么有 scripts/ 和 .claude/scripts/ 两个目录？
 
-- `scripts/`：独立的 Bash 工具，在项目根目录运行（如 tmux-session.sh）
-- `.claude/scripts/`：Python 校验脚本，Claude Code 自动识别并运行
+- `scripts/`：Shell + Python 工具脚本存放处（源码）。init 脚本会把 Python 校验脚本从这里复制到目标项目的 `.claude/scripts/`
+- `.claude/scripts/`：Claude Code 运行时数据目录。init 后目标项目会包含全部校验脚本 + PROMPT.md。源码中仅含 PROMPT.md 和 check_docs_consistency.py
 
-**不要在 Skills 中引用 `scripts/` 下的 Python 文件，它们实际在 `.claude/scripts/`。**
+**关键规则：Skills/pre-commit 引用目标项目路径 `.claude/scripts/`；源码中脚本实际在 `scripts/`。两者不直接相等，靠 init 脚本桥接。**
 
 ### Q: 为什么 .ps1 文件需要 UTF-8 BOM？
 
@@ -648,11 +650,32 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| v1.5.2 | 2026-04-30 | 死代码清理 + 文档修正 + 配置补全（多agent审查修复） |
 | v1.5.1 | 2026-04-30 | 隐藏目录合规 + 架构安全 + Spec Generation 集成（26 文件变更） |
 | v1.5.0 | 2026-04-30 | Agent Teams 自动建议、Routines 集成、Plugin 市场 |
 | v1.4.1 | 2026-04-28 | 智能化提升、无人值守优化 |
 | v1.4.0 | 2026-04-28 | SOUL.md 五级复杂度评估 |
 | v1.3.0 | 2026-04-28 | 文档清理、安全增强 |
+
+### v1.5.2 详细变更
+
+**死代码清理（1 修复）**：
+- tmux-session.sh 删除 `$ROUTER_UNATTENDED` 死代码块（变量从未赋值，路径永不执行）
+  - 无人值守功能实际通过 `CLAUDE_MODE=unattended` 环境变量生效，不受影响
+
+**文档修正（2 修复）**：
+- HANDOVER.md 清除 3 处已删除的 `router-unattended/` 过期引用
+- GUIDE.md + HANDOVER.md 修正目录结构图：Python 校验脚本路径从 `.claude/scripts/` 移至 `scripts/`
+- HANDOVER.md FAQ 重写双目录说明（scripts/ vs .claude/scripts/）
+
+**重复代码移除（1 修复）**：
+- init.ps1 删除 Step 14 gstack 命令复制（Step 11 已全量复制 `commands/` 目录）
+
+**配置补全（4 修复）**：
+- package.json "files" 补全 3 项缺失条目
+- publish.yml CI 矩阵补齐 Node 16
+- .npmignore 增加 `venv/` 防御性条目
+- 删除 Windows 残留文件 + Python 缓存
 
 ### v1.5.1 详细变更
 
