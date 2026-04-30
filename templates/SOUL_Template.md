@@ -294,7 +294,7 @@
 
 ### 模板参考
 
-> 详细模板见：[PLAN_Template.md](PLAN_Template.md) | [SPEC_Template.md](SPEC_Template.md)
+> 详细模板见：[PLAN_Template.md](.claude/PLAN_Template.md) | [SPEC_Template.md](.claude/SPEC_Template.md)
 
 ---
 

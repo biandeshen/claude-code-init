@@ -171,9 +171,9 @@ AI 自动加载全部配置，**任务类型由 AI 自动评估**。
 |------|------|
 | `CLAUDE.md` | 项目入口，引用双索引 |
 | `SOUL.md` | 元认知规则，决策树和复杂度评估 |
-| `PLAN_TEMPLATE.md` | 任务执行计划模板 |
-| `SPEC_Template.md` | 功能级设计规格模板 |
-| `ROUTINE_Template.md` | 日常开发规范模板 |
+| `.claude/PLAN_Template.md` | 任务执行计划模板 |
+| `.claude/SPEC_Template.md` | 功能级设计规格模板 |
+| `.claude/ROUTINE_Template.md` | 日常开发规范模板 |
 
 ### 模板生命周期
 
@@ -181,9 +181,12 @@ AI 自动加载全部配置，**任务类型由 AI 自动评估**。
 claude-code-init/templates/
         ↓  init.ps1/init.sh 复制
 项目根目录/
-    ├── CLAUDE.md      # 复制后重命名
-    ├── SOUL.md        # 复制后重命名
-    └── PLAN_TEMPLATE.md
+    ├── CLAUDE.md                    # 复制后重命名
+    ├── SOUL.md                      # 复制后重命名
+    └── .claude/
+        ├── PLAN_Template.md         # 任务执行计划模板
+        ├── SPEC_Template.md         # 功能级设计规格模板
+        └── ROUTINE_Template.md      # 日常开发规范模板
 ```
 
 ---
@@ -210,7 +213,7 @@ PLAN.md    ← 执行层：任务执行的实时日志
 | **Plan.md** | 任务执行日志，记录每一步的实际操作 | 复杂功能开发**中** | "14:32 修改 auth.py → ✅ → 下一步..." |
 
 > **核心原则**：Spec 管"做什么"（事前设计），Plan 管"做了什么"（事后记录）。
-> 参考模板：[SPEC_Template.md](templates/SPEC_Template.md) | [PLAN_Template.md](templates/PLAN_Template.md)
+> 参考模板：[SPEC_Template.md](.claude/SPEC_Template.md) | [PLAN_Template.md](.claude/PLAN_Template.md)
 
 ### Spec 与 OpenSpec 的关系
 

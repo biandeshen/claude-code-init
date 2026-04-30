@@ -9,7 +9,8 @@ param(
     [switch]$SkipECC,
     [switch]$SkipSuperpowers,
     [switch]$SkipOpenSpec,
-    [switch]$SkipCcDiscipline
+    [switch]$SkipCcDiscipline,
+    [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
@@ -203,57 +204,80 @@ if ($pythonCmd) {
 # 10. 复制覆盖层模板
 Write-Step "复制覆盖层模板"
 $TemplateDir = Join-Path $ScriptDir "templates"
+
+# 辅助: 获取模板版本号
+function Get-TemplateVersion {
+    param($Path)
+    if (Test-Path $Path) {
+        $content = Get-Content $Path -Raw -ErrorAction SilentlyContinue
+        $match = [regex]::Match($content, '模板版本：\s*(v[\d]+\.[\d]+\.[\d]+)')
+        if ($match.Success) { return $match.Groups[1].Value }
+    }
+    return $null
+}
+
+# 模板复制函数: 目标已存在时提供交互选择
+function Copy-Template {
+    param($Source, $Target, $DisplayName)
+
+    if (-not (Test-Path $Target)) {
+        Copy-Item -Path $Source -Destination $Target -Force
+        Write-Success "已复制 $DisplayName"
+        return
+    }
+
+    $srcVer = Get-TemplateVersion $Source
+    $tgtVer = Get-TemplateVersion $Target
+
+    if ($Force) {
+        Copy-Item -Path $Target -Destination "$Target.bak" -Force
+        Copy-Item -Path $Source -Destination $Target -Force
+        Write-Success "已强制覆盖 $DisplayName (原文件备份为 .bak)"
+        return
+    }
+
+    Write-Host ""
+    Write-Host "━━━ $DisplayName 已存在 ━━━" -ForegroundColor Yellow
+    if ($tgtVer) { Write-Host "  目标版本: $tgtVer" -ForegroundColor Gray }
+    if ($srcVer) { Write-Host "  源版本:   $srcVer" -ForegroundColor Green }
+    Write-Host ""
+    Write-Host "  [s] 跳过(默认)  [o] 覆盖(备份原文件)  [d] 查看差异" -ForegroundColor Cyan
+    $choice = Read-Host "  请选择"
+    switch ($choice) {
+        'o' {
+            Copy-Item -Path $Target -Destination "$Target.bak" -Force
+            Copy-Item -Path $Source -Destination $Target -Force
+            Write-Success "已覆盖 $DisplayName (原文件备份为 .bak)"
+        }
+        'd' {
+            if (Get-Command git -ErrorAction SilentlyContinue) {
+                git diff --no-index $Target $Source 2>$null
+                if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { Write-Warn "git diff 不可用" }
+            } elseif (Get-Command fc.exe -ErrorAction SilentlyContinue) {
+                fc.exe /N $Target $Source
+            } else {
+                Write-Warn "无法显示差异 (git/fc 不可用)"
+            }
+            Write-Host ""
+            Write-Host "  [s] 跳过  [o] 覆盖(备份原文件)" -ForegroundColor Cyan
+            $choice2 = Read-Host "  现在选择"
+            if ($choice2 -eq 'o') {
+                Copy-Item -Path $Target -Destination "$Target.bak" -Force
+                Copy-Item -Path $Source -Destination $Target -Force
+                Write-Success "已覆盖 $DisplayName (原文件备份为 .bak)"
+            }
+        }
+        default { Write-Info "已跳过 $DisplayName" }
+    }
+}
+
 if (Test-Path $TemplateDir) {
-    # 复制 CLAUDE.md
-    $templateCLAUDE = Join-Path $TemplateDir "CLAUDE_Template.md"
-    if (Test-Path $templateCLAUDE) {
-        if (Test-Path "$ProjectPath\CLAUDE.md") {
-            Write-Warn "CLAUDE.md 已存在，跳过以避免覆盖已有配置"
-        } else {
-            Copy-Item -Path $templateCLAUDE -Destination "$ProjectPath\CLAUDE.md" -Force
-            Write-Success "已复制 CLAUDE.md"
-        }
-    }
-
-    # 复制 SOUL.md
-    $templateSOUL = Join-Path $TemplateDir "SOUL_Template.md"
-    if (Test-Path $templateSOUL) {
-        if (Test-Path "$ProjectPath\SOUL.md") {
-            Write-Warn "SOUL.md 已存在，跳过以避免覆盖已有配置"
-        } else {
-            Copy-Item -Path $templateSOUL -Destination "$ProjectPath\SOUL.md" -Force
-            Write-Success "已复制 SOUL.md"
-        }
-    }
-
-    # 复制 PLAN_TEMPLATE.md
-    $templatePLAN = Join-Path $TemplateDir "PLAN_Template.md"
-    if (Test-Path $templatePLAN) {
-        if (Test-Path "$ProjectPath\PLAN_TEMPLATE.md") {
-            Write-Warn "PLAN_TEMPLATE.md 已存在，跳过以避免覆盖已有配置"
-        } else {
-            Copy-Item -Path $templatePLAN -Destination "$ProjectPath\PLAN_TEMPLATE.md" -Force
-            Write-Success "已复制 PLAN_TEMPLATE.md"
-        }
-    }
-
-    # 复制 SPEC_Template.md
-    $templateSPEC = Join-Path $TemplateDir "SPEC_Template.md"
-    if (Test-Path $templateSPEC) {
-        if (-not (Test-Path "$ProjectPath\SPEC_Template.md")) {
-            Copy-Item -Path $templateSPEC -Destination "$ProjectPath\SPEC_Template.md" -Force
-            Write-Success "已复制 SPEC_Template.md"
-        }
-    }
-
-    # 复制 ROUTINE_Template.md
-    $templateROUTINE = Join-Path $TemplateDir "ROUTINE_Template.md"
-    if (Test-Path $templateROUTINE) {
-        if (-not (Test-Path "$ProjectPath\ROUTINE_Template.md")) {
-            Copy-Item -Path $templateROUTINE -Destination "$ProjectPath\ROUTINE_Template.md" -Force
-            Write-Success "已复制 ROUTINE_Template.md"
-        }
-    }
+    Copy-Template (Join-Path $TemplateDir "CLAUDE_Template.md") "$ProjectPath\CLAUDE.md" "CLAUDE.md"
+    Copy-Template (Join-Path $TemplateDir "SOUL_Template.md") "$ProjectPath\SOUL.md" "SOUL.md"
+    New-Item -ItemType Directory -Force -Path "$ProjectPath\.claude" | Out-Null
+    Copy-Template (Join-Path $TemplateDir "PLAN_Template.md") "$ProjectPath\.claude\PLAN_Template.md" "PLAN_Template.md"
+    Copy-Template (Join-Path $TemplateDir "SPEC_Template.md") "$ProjectPath\.claude\SPEC_Template.md" "SPEC_Template.md"
+    Copy-Template (Join-Path $TemplateDir "ROUTINE_Template.md") "$ProjectPath\.claude\ROUTINE_Template.md" "ROUTINE_Template.md"
 } else {
     Write-Warn "模板目录不存在，跳过模板复制"
 }
@@ -275,9 +299,9 @@ function Check-TemplateVersion {
 }
 Check-TemplateVersion (Join-Path $TemplateDir "CLAUDE_Template.md") "$ProjectPath\CLAUDE.md"
 Check-TemplateVersion (Join-Path $TemplateDir "SOUL_Template.md") "$ProjectPath\SOUL.md"
-Check-TemplateVersion (Join-Path $TemplateDir "PLAN_Template.md") "$ProjectPath\PLAN_TEMPLATE.md"
-Check-TemplateVersion (Join-Path $TemplateDir "SPEC_Template.md") "$ProjectPath\SPEC_Template.md"
-Check-TemplateVersion (Join-Path $TemplateDir "ROUTINE_Template.md") "$ProjectPath\ROUTINE_Template.md"
+Check-TemplateVersion (Join-Path $TemplateDir "PLAN_Template.md") "$ProjectPath\.claude\PLAN_Template.md"
+Check-TemplateVersion (Join-Path $TemplateDir "SPEC_Template.md") "$ProjectPath\.claude\SPEC_Template.md"
+Check-TemplateVersion (Join-Path $TemplateDir "ROUTINE_Template.md") "$ProjectPath\.claude\ROUTINE_Template.md"
 Write-Success "模板版本检查完成"
 
 # 11. 复制自定义命令

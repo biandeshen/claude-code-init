@@ -13,6 +13,15 @@ shopt -s nullglob
 
 PROJECT_PATH="${1:-.}"
 ORIGINAL_PATH="$PROJECT_PATH"  # 保存原始输入用于显示
+FORCE_OVERWRITE=false
+
+# 解析参数
+shift 2>/dev/null || true
+for arg in "$@"; do
+    case "$arg" in
+        --force) FORCE_OVERWRITE=true ;;
+    esac
+done
 
 # 颜色输出
 RED='\033[0;31m'
@@ -167,48 +176,76 @@ fi
 # 10. 复制覆盖层模板
 echo_step "复制覆盖层模板"
 TEMPLATE_DIR="$SCRIPT_DIR/templates"
+
+# 辅助: 获取模板版本号
+template_version() {
+    grep -m1 "模板版本：" "$1" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1
+}
+
+# 模板复制函数: 目标已存在时提供交互选择
+# 用法: copy_template <源> <目标> <显示名>
+copy_template() {
+    _src="$1"; _target="$2"; _display="$3"
+
+    if [ ! -f "$_target" ]; then
+        cp "$_src" "$_target"
+        echo_success "已复制 $_display"
+        return
+    fi
+
+    _src_ver=$(template_version "$_src")
+    _tgt_ver=$(template_version "$_target")
+
+    if [ "$FORCE_OVERWRITE" = true ]; then
+        cp "$_target" "$_target.bak"
+        cp "$_src" "$_target"
+        echo_success "已强制覆盖 $_display (原文件备份为 .bak)"
+        return
+    fi
+
+    echo ""
+    echo -e "${YELLOW}━━━ $_display 已存在 ━━━${NC}"
+    [ -n "$_tgt_ver" ] && echo -e "  目标版本: ${GRAY}$_tgt_ver${NC}"
+    [ -n "$_src_ver" ] && echo -e "  源版本:   ${GREEN}$_src_ver${NC}"
+    echo ""
+    echo -e "  ${CYAN}[s]${NC} 跳过(默认)  ${CYAN}[o]${NC} 覆盖(备份原文件)  ${CYAN}[d]${NC} 查看差异"
+    printf "  请选择: "
+    read -r _choice </dev/tty 2>/dev/null || _choice="s"
+    case "$_choice" in
+        o|O)
+            cp "$_target" "$_target.bak"
+            cp "$_src" "$_target"
+            echo_success "已覆盖 $_display (原文件备份为 .bak)"
+            ;;
+        d|D)
+            if command -v diff >/dev/null 2>&1; then
+                diff -u "$_target" "$_src" || true
+            elif command -v git >/dev/null 2>&1; then
+                git diff --no-index "$_target" "$_src" || true
+            else
+                echo_warn "无法显示差异 (diff/git 不可用)"
+            fi
+            echo ""
+            echo -e "  ${CYAN}[s]${NC} 跳过  ${CYAN}[o]${NC} 覆盖(备份原文件)"
+            printf "  现在选择: "
+            read -r _choice2 </dev/tty 2>/dev/null || _choice2="s"
+            [ "$_choice2" = "o" ] || [ "$_choice2" = "O" ] && {
+                cp "$_target" "$_target.bak"
+                cp "$_src" "$_target"
+                echo_success "已覆盖 $_display (原文件备份为 .bak)"
+            }
+            ;;
+        *) echo_info "已跳过 $_display" ;;
+    esac
+}
+
 if [ -d "$TEMPLATE_DIR" ]; then
-    # 复制 CLAUDE.md
-    if [ -f "$TEMPLATE_DIR/CLAUDE_Template.md" ]; then
-        if [ -f "$PROJECT_PATH/CLAUDE.md" ]; then
-            echo_warn "CLAUDE.md 已存在，跳过以避免覆盖已有配置"
-        else
-            cp "$TEMPLATE_DIR/CLAUDE_Template.md" "$PROJECT_PATH/CLAUDE.md"
-            echo_success "已复制 CLAUDE.md"
-        fi
-    fi
-
-    # 复制 SOUL.md
-    if [ -f "$TEMPLATE_DIR/SOUL_Template.md" ]; then
-        if [ -f "$PROJECT_PATH/SOUL.md" ]; then
-            echo_warn "SOUL.md 已存在，跳过以避免覆盖已有配置"
-        else
-            cp "$TEMPLATE_DIR/SOUL_Template.md" "$PROJECT_PATH/SOUL.md"
-            echo_success "已复制 SOUL.md"
-        fi
-    fi
-
-    # 复制 PLAN_TEMPLATE.md
-    if [ -f "$TEMPLATE_DIR/PLAN_Template.md" ]; then
-        if [ -f "$PROJECT_PATH/PLAN_TEMPLATE.md" ]; then
-            echo_warn "PLAN_TEMPLATE.md 已存在，跳过以避免覆盖已有配置"
-        else
-            cp "$TEMPLATE_DIR/PLAN_Template.md" "$PROJECT_PATH/PLAN_TEMPLATE.md"
-            echo_success "已复制 PLAN_TEMPLATE.md"
-        fi
-    fi
-
-    # 复制 SPEC_Template.md
-    if [ -f "$TEMPLATE_DIR/SPEC_Template.md" ] && [ ! -f "$PROJECT_PATH/SPEC_Template.md" ]; then
-        cp "$TEMPLATE_DIR/SPEC_Template.md" "$PROJECT_PATH/SPEC_Template.md"
-        echo_success "已复制 SPEC_Template.md"
-    fi
-
-    # 复制 ROUTINE_Template.md
-    if [ -f "$TEMPLATE_DIR/ROUTINE_Template.md" ] && [ ! -f "$PROJECT_PATH/ROUTINE_Template.md" ]; then
-        cp "$TEMPLATE_DIR/ROUTINE_Template.md" "$PROJECT_PATH/ROUTINE_Template.md"
-        echo_success "已复制 ROUTINE_Template.md"
-    fi
+    copy_template "$TEMPLATE_DIR/CLAUDE_Template.md" "$PROJECT_PATH/CLAUDE.md" "CLAUDE.md"
+    copy_template "$TEMPLATE_DIR/SOUL_Template.md" "$PROJECT_PATH/SOUL.md" "SOUL.md"
+    mkdir -p "$PROJECT_PATH/.claude"
+    copy_template "$TEMPLATE_DIR/PLAN_Template.md" "$PROJECT_PATH/.claude/PLAN_Template.md" "PLAN_Template.md"
+    copy_template "$TEMPLATE_DIR/SPEC_Template.md" "$PROJECT_PATH/.claude/SPEC_Template.md" "SPEC_Template.md"
+    copy_template "$TEMPLATE_DIR/ROUTINE_Template.md" "$PROJECT_PATH/.claude/ROUTINE_Template.md" "ROUTINE_Template.md"
 else
     echo_warn "模板目录不存在，跳过模板复制"
 fi
@@ -229,9 +266,9 @@ check_template_version() {
 }
 check_template_version "$TEMPLATE_DIR/CLAUDE_Template.md" "$PROJECT_PATH/CLAUDE.md"
 check_template_version "$TEMPLATE_DIR/SOUL_Template.md" "$PROJECT_PATH/SOUL.md"
-check_template_version "$TEMPLATE_DIR/PLAN_Template.md" "$PROJECT_PATH/PLAN_TEMPLATE.md"
-check_template_version "$TEMPLATE_DIR/SPEC_Template.md" "$PROJECT_PATH/SPEC_Template.md"
-check_template_version "$TEMPLATE_DIR/ROUTINE_Template.md" "$PROJECT_PATH/ROUTINE_Template.md"
+check_template_version "$TEMPLATE_DIR/PLAN_Template.md" "$PROJECT_PATH/.claude/PLAN_Template.md"
+check_template_version "$TEMPLATE_DIR/SPEC_Template.md" "$PROJECT_PATH/.claude/SPEC_Template.md"
+check_template_version "$TEMPLATE_DIR/ROUTINE_Template.md" "$PROJECT_PATH/.claude/ROUTINE_Template.md"
 echo_success "模板版本检查完成"
 
 # 11. 复制自定义命令

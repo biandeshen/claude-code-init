@@ -62,7 +62,7 @@ ECC 已提供丰富的内置 Skills 和 Agents，无需额外配置：
 | **元认知规则** | [SOUL.md](SOUL.md) |
 | **复杂度评估** | [SOUL.md → 复杂度自动评估规则](SOUL.md) |
 | **功能规格** | `docs/specs/` 目录 |
-| **规格模板** | [SPEC_Template.md](SPEC_Template.md) — 功能级设计蓝图模板 |
+| **规格模板** | [SPEC_Template.md](.claude/SPEC_Template.md) — 功能级设计蓝图模板 |
 | **项目文档** | `docs/` 目录 |
 
 ---
@@ -71,7 +71,7 @@ ECC 已提供丰富的内置 Skills 和 Agents，无需额外配置：
 
 > 复杂功能开发前，AI 必须遵循：
 > 1. 先检查 `docs/specs/` 是否有相关 Spec
-> 2. 若无 → 参考 [SPEC_Template.md](SPEC_Template.md) 创建
+> 2. 若无 → 参考 [SPEC_Template.md](.claude/SPEC_Template.md) 创建
 > 3. Spec 定稿后再进入 SOUL.md 决策树执行
 
 ---
