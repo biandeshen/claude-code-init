@@ -8,7 +8,7 @@
 - **Claude Code ≥ 2.0**（确认方法：在终端输入 `claude --version`，版本号应 ≥ 2.0。如低于此版本，请先升级 Claude Code）
 - Git
 - Python 3.8+
-- Node.js 18+
+- Node.js 16+
 - Windows PowerShell 7+（推荐）或 Git Bash
 
 ## 它能帮你做什么？

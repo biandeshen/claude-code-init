@@ -45,7 +45,7 @@ $env:Path += ";~/tools/claude-code-init"
 ### 方式一：npx 一键初始化（推荐）
 
 ```bash
-npx claude-code-init --project-path ./my-project
+npx @biandeshen/claude-code-init --project-path ./my-project
 ```
 
 ### 方式二：手动克隆后运行
@@ -285,23 +285,40 @@ claude-code-init/
 ├── README.md              # 快速开始入口
 ├── GUIDE.md               # 完整使用文档
 ├── SECURITY.md            # 安全策略
+├── LICENSE                # MIT 许可证
+├── CHANGELOG.md           # 版本变更记录
 ├── package.json           # npm 包配置（支持 npx）
 ├── index.js               # npx 入口脚本
 ├── init.ps1 / init.sh      # 初始化脚本
+├── docs/                  # 文档
+│   ├── QUICKSTART.md      # 快速上手
+│   ├── TROUBLESHOOTING.md # 故障排查
+│   └── HANDOVER.md        # 项目交接文档
 ├── templates/              # 覆盖层模板
 │   ├── CLAUDE_Template.md
 │   ├── SOUL_Template.md
-│   └── PLAN_Template.md
-├── commands/              # 自定义斜杠命令
-│   ├── review.md
-│   ├── commit.md
-│   └── architect.md
-├── .claude/scripts/         # Python 校验脚本（Claude Code 专用目录）
-│   ├── check_secrets.py
+│   ├── SPEC_Template.md
+│   ├── PLAN_Template.md
+│   └── ROUTINE_Template.md
+├── commands/              # 自定义斜杠命令 (17个)
+│   ├── review.md, commit.md, fix.md
+│   ├── refactor.md, explain.md, validate.md
+│   ├── team.md, qa.md, routine.md
+│   └── help.md, status.md, capabilities.md...
+├── scripts/               # Shell 脚本工具
+│   ├── tmux-session.sh    # 无人值守会话管理
+│   ├── ralph-setup.sh     # Ralph 插件安装
+│   ├── weekly-report.sh   # 周报生成
+│   ├── validate_skills.sh # Skills 健康检查
+│   ├── check-env.sh       # 环境检查
+│   └── configure-gitignore.* # .gitignore 配置
+├── .claude/scripts/         # Claude Code 专用脚本
+│   ├── check_secrets.py     # 密钥安全检查
 │   ├── check_function_length.py
 │   ├── check_dependencies.py
 │   ├── check_import_order.py
-│   └── check_project_structure.py
+│   ├── check_project_structure.py
+│   └── PROMPT.md            # 过夜任务清单
 └── configs/               # 配置文件
     └── .pre-commit-config.yaml
 ```
@@ -332,6 +349,8 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| v1.5.1 | 2026-04-30 | 全线跨平台兼容修复(38项)、安全加固、CI门禁强化、MIT License |
+| v1.5.0 | 2026-04-30 | Agent Teams 并行开发、无人值守长任务、Skills 触发词优化、文档交接 |
 | v1.4.1 | 2026-04-28 | 移除误导性 Skip 参数文档、添加系统依赖检查、修复静默失败 |
 | v1.4.0 | 2026-04-28 | 移除 _archived/、SECURITY.md 重写、SOUL.md 五级制复杂度评估 |
 | v1.3.0 | 2026-04-28 | 删除 _archived/、增强 README 警告、修复硬化路径 |

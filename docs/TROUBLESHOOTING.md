@@ -16,7 +16,7 @@
 
 ## 1. 安装问题
 
-### 1.1 `npx claude-code-init` 报错找不到包
+### 1.1 `npx @biandeshen/claude-code-init` 报错找不到包
 
 **症状**：
 ```
