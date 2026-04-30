@@ -15,8 +15,7 @@
     { "path": ".claude/skills/git-commit/SKILL.md", "name": "git-commit", "description": "规范提交（自动分析→Conventional Commits）" },
     { "path": ".claude/skills/project-validate/SKILL.md", "name": "project-validate", "description": "项目完整性校验（结构、密钥、函数长度等）" },
     { "path": ".claude/skills/code-explain/SKILL.md", "name": "code-explain", "description": "代码深度解释（架构、数据流、关键决策）" },
-    { "path": ".claude/skills/project-init/SKILL.md", "name": "project-init", "description": "新项目初始化辅助" },
-    { "path": ".claude/skills/router-unattended/SKILL.md", "name": "router-unattended", "description": "无人值守模式专用路由（跳过确认）" }
+    { "path": ".claude/skills/project-init/SKILL.md", "name": "project-init", "description": "新项目初始化辅助" }
   ],
   "commands": [
     { "path": "commands/help.md", "name": "help", "description": "智能帮助系统（场景导航→命令清单→命令详情）" },

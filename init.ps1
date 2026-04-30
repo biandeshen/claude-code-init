@@ -327,19 +327,14 @@ Write-Success "模板版本检查完成"
 
 # 10.2 复制记忆系统模板
 Write-Step "复制记忆系统模板"
-$MemoryTemplateDir = Join-Path $TemplateDir "memory"
-if (Test-Path $MemoryTemplateDir) {
+$MemoryTemplate = Join-Path $TemplateDir "memory\MEMORY.md"
+if (Test-Path $MemoryTemplate) {
     New-Item -ItemType Directory -Force -Path "$ProjectPath\.claude\memory\archive" | Out-Null
-    Get-ChildItem "$MemoryTemplateDir\*.md" | ForEach-Object {
-        Copy-Item $_.FullName "$ProjectPath\.claude\memory\$($_.Name)" -Force
-    }
-    $archiveGitkeep = Join-Path $MemoryTemplateDir "archive\.gitkeep"
-    if (Test-Path $archiveGitkeep) {
-        Copy-Item $archiveGitkeep "$ProjectPath\.claude\memory\archive\.gitkeep" -Force
-    }
+    New-Item -ItemType File -Force -Path "$ProjectPath\.claude\memory\archive\.gitkeep" | Out-Null
+    Copy-Template $MemoryTemplate (Join-Path $ProjectPath ".claude\memory\MEMORY.md") "MEMORY.md"
     Write-Success "已复制记忆系统模板到 .claude/memory/"
 } else {
-    Write-Info "记忆模板目录不存在，跳过"
+    Write-Info "记忆模板不存在，跳过"
 }
 
 # 11. 复制自定义命令

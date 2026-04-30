@@ -73,7 +73,7 @@ repos:
 
   # 6. ruff 代码格式检查
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.4
+    rev: v0.12.1
     hooks:
       - id: ruff
         args: [--fix]
@@ -96,7 +96,7 @@ repos:
 
   # 8. 通用 Git hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer

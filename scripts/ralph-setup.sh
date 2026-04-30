@@ -24,6 +24,7 @@ echo_fail() { echo -e "${RED}[失败]${NC} $1"; }
 
 RALPH_REPO="https://github.com/snarktank/ralph.git"
 RALPH_DIR="$HOME/.claude/skills/ralph"
+RALPH_COMMIT="main"  # 锁定版本（改为具体 commit hash 可固定版本）
 INSTALL_MODE="${1:-ralph}"
 
 # 检查 Claude Code 是否安装
@@ -71,6 +72,11 @@ install_ralph() {
         fi
     else
         git clone "$RALPH_REPO" "$RALPH_DIR"
+        if [ "$RALPH_COMMIT" != "main" ]; then
+            cd "$RALPH_DIR"
+            git checkout "$RALPH_COMMIT"
+            cd - > /dev/null
+        fi
         echo_success "Ralph 已克隆到 $RALPH_DIR"
     fi
 

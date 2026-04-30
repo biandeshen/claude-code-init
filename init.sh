@@ -328,19 +328,14 @@ echo_success "模板版本检查完成"
 
 # 10.2 复制记忆系统模板
 echo_step "复制记忆系统模板"
-MEMORY_TEMPLATE_DIR="$TEMPLATE_DIR/memory"
-if [ -d "$MEMORY_TEMPLATE_DIR" ]; then
+MEMORY_TEMPLATE="$TEMPLATE_DIR/memory/MEMORY.md"
+if [ -f "$MEMORY_TEMPLATE" ]; then
     mkdir -p "$PROJECT_PATH/.claude/memory/archive"
-    for _mf in "$MEMORY_TEMPLATE_DIR"/*.md; do
-        [ -f "$_mf" ] || continue
-        _mf_name=$(basename "$_mf")
-        cp "$_mf" "$PROJECT_PATH/.claude/memory/$_mf_name"
-    done
-    # 复制 archive 占位文件
-    [ -f "$MEMORY_TEMPLATE_DIR/archive/.gitkeep" ] && cp "$MEMORY_TEMPLATE_DIR/archive/.gitkeep" "$PROJECT_PATH/.claude/memory/archive/.gitkeep"
+    touch "$PROJECT_PATH/.claude/memory/archive/.gitkeep"
+    copy_template "$MEMORY_TEMPLATE" "$PROJECT_PATH/.claude/memory/MEMORY.md" "MEMORY.md"
     echo_success "已复制记忆系统模板到 .claude/memory/"
 else
-    echo_info "记忆模板目录不存在，跳过"
+    echo_info "记忆模板不存在，跳过"
 fi
 
 # 11. 复制自定义命令

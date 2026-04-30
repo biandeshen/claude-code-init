@@ -5,7 +5,7 @@
 #   - 创建/重连 tmux 会话
 #   - 自动加载项目 .claude/settings.json
 #   - 安全限制：--max-turns, --max-budget-usd, --max-files-changed, --max-lines-changed
-#   - 无人值守专用路由 router-unattended
+#   - 路由模式：无人值守（通过 CLAUDE_MODE=unattended 标记触发）
 # 用法：
 #   bash .claude/scripts/tmux-session.sh                    # 使用默认任务文件
 #   bash .claude/scripts/tmux-session.sh .claude/scripts/PROMPT.md # 指定任务文件
@@ -139,10 +139,10 @@ fi
 
 # 构建 Claude Code 命令（关键：加载项目配置 + 安全限制）
 CLAUDE_SETTINGS="$PROJECT_DIR/.claude/settings.json"
-ROUTER_UNATTENDED="$PROJECT_DIR/.claude/skills/router-unattended/SKILL.md"
+ROUTER_SKILL="$PROJECT_DIR/.claude/skills/router/SKILL.md"
 
-# 基础参数
-BASE_PARAMS="--max-turns $MAX_TURNS --max-budget-usd $MAX_BUDGET --max-input-rate 5000 --max-output-rate 10000"
+# 基础参数（含安全限制）
+BASE_PARAMS="--max-turns $MAX_TURNS --max-budget-usd $MAX_BUDGET --max-files-changed $MAX_FILES --max-lines-changed $MAX_LINES --max-input-rate 5000 --max-output-rate 10000"
 
 # 如果有项目配置，加载它
 if [ -f "$CLAUDE_SETTINGS" ]; then
@@ -174,7 +174,7 @@ echo_info "参数: --max-turns $MAX_TURNS --max-budget-usd \$$MAX_BUDGET --max-f
 
 tmux send-keys -t "$SESSION_NAME" "ITER=0; while [ \$ITER -lt $MAX_ITERATIONS ]; do" Enter
 tmux send-keys -t "$SESSION_NAME" "  ITER=\$((ITER + 1))" Enter
-tmux send-keys -t "$SESSION_NAME" "  claude -p \"\$(cat $PROMPT_FILE)\" \\" Enter
+tmux send-keys -t "$SESSION_NAME" "  CLAUDE_MODE=unattended claude -p \"\$(cat $PROMPT_FILE)\" \\" Enter
 if [ -n "$SETTINGS_PARAM" ]; then
     tmux send-keys -t "$SESSION_NAME" "    $SETTINGS_PARAM \\" Enter
 fi
