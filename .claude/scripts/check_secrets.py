@@ -19,6 +19,13 @@ import re
 import sys
 from pathlib import Path
 
+# 尝试导入 yaml（如果不可用则回退到逐行解析）
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
+
 # 敏感字段关键词
 SENSITIVE_KEYWORDS = [
     "api_key", "apikey", "api-key",
@@ -79,10 +86,54 @@ def is_whitelisted(value: str) -> bool:
     return False
 
 
+def _walk_yaml(obj, path="", errors=None, file_path=""):
+    """递归遍历 YAML 结构查找敏感字段"""
+    if errors is None:
+        errors = []
+
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            key_str = str(key).lower()
+            new_path = f"{path}.{key}" if path else str(key)
+            if isinstance(value, (dict, list)):
+                _walk_yaml(value, new_path, errors, file_path)
+            else:
+                is_sensitive = any(kw in key_str for kw in SENSITIVE_KEYWORDS)
+                if is_sensitive and isinstance(value, str) and value:
+                    if not is_whitelisted(value):
+                        for pattern in SECRET_PATTERNS:
+                            if re.search(pattern, value):
+                                errors.append(
+                                    f"[ERROR] {file_path}:{new_path} - 检测到硬编码密钥\n"
+                                    f"   字段: {key}\n"
+                                    f"   建议: 改为环境变量引用\n"
+                                )
+                                break
+    elif isinstance(obj, list):
+        for idx, item in enumerate(obj):
+            if isinstance(item, dict):
+                _walk_yaml(item, f"{path}[{idx}]", errors, file_path)
+
+    return errors
+
+
 def check_config_file(file_path: str) -> list:
-    """检查配置文件中的硬编码密钥"""
+    """检查配置文件中的硬编码密钥（支持 YAML 递归解析）"""
     errors = []
 
+    if HAS_YAML:
+        try:
+            with open(file_path, encoding="utf-8") as f:
+                config = yaml.safe_load(f)
+
+            if isinstance(config, (dict, list)):
+                errors = _walk_yaml(config, file_path=file_path)
+                return errors
+        except (yaml.YAMLError, Exception):
+            # YAML 解析失败，回退到逐行检查
+            pass
+
+    # 回退：逐行检查（原有逻辑，兼容非 YAML 文件）
     try:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()

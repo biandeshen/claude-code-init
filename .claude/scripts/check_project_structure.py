@@ -65,8 +65,13 @@ def check_gitignore() -> list:
 
     missing = []
     for item, desc in recommended_ignores.items():
-        if item not in gitignore_content and Path(item.replace("*", "test")).exists():
-            missing.append(f"{item} ({desc})")
+        if item not in gitignore_content:
+            # 通配符条目（如 *.pyc）：直接建议加入 gitignore
+            if "*" in item:
+                missing.append(f"{item} ({desc})")
+            # 字面路径条目：仅在文件系统实际存在时提醒
+            elif Path(item).exists():
+                missing.append(f"{item} ({desc})")
 
     if missing:
         errors.append(f"[WARN] .gitignore 缺少建议的条目: {', '.join(missing)}")
