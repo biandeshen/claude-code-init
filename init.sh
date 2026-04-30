@@ -142,10 +142,28 @@ else
         git clone -b main https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
         cd "$CC_DISCIPLINE_PATH"
         git checkout "$CC_DISCIPLINE_COMMIT"
+        # 验证 commit 是否匹配锁定版本
+        ACTUAL_COMMIT=$(git rev-parse HEAD)
+        if [ "$ACTUAL_COMMIT" != "$CC_DISCIPLINE_COMMIT" ]; then
+            echo_fail "commit 不匹配！预期: ${CC_DISCIPLINE_COMMIT:0:7}, 实际: ${ACTUAL_COMMIT:0:7}"
+            cd "$PROJECT_PATH"
+            rm -rf "$CC_DISCIPLINE_PATH"
+            exit 1
+        fi
+        # GPG 签名验证（可选，需要公钥）
+        if command -v gpg >/dev/null 2>&1 && git verify-commit HEAD >/dev/null 2>&1; then
+            echo_success "GPG 签名验证通过"
+        fi
         cd "$PROJECT_PATH"
-        echo_success "已克隆 cc-discipline (commit: ${CC_DISCIPLINE_COMMIT:0:7})"
+        echo_success "已克隆并验证 cc-discipline (commit: ${CC_DISCIPLINE_COMMIT:0:7})"
     else
-        echo_info "cc-discipline 已存在，如需更新请手动执行: git -C $CC_DISCIPLINE_PATH pull"
+        echo_info "cc-discipline 已存在"
+        EXISTING_COMMIT=$(git -C "$CC_DISCIPLINE_PATH" rev-parse HEAD 2>/dev/null || echo "")
+        if [ "$EXISTING_COMMIT" != "$CC_DISCIPLINE_COMMIT" ]; then
+            echo_warn "现有 commit (${EXISTING_COMMIT:0:7}) 与锁定版本 (${CC_DISCIPLINE_COMMIT:0:7}) 不一致，正在切换..."
+            git -C "$CC_DISCIPLINE_PATH" fetch origin
+            git -C "$CC_DISCIPLINE_PATH" checkout "$CC_DISCIPLINE_COMMIT"
+        fi
     fi
     echo_info "正在执行 cc-discipline 初始化..."
     # --force 模式下传递 --auto 给 cc-discipline，使其非交互运行

@@ -131,10 +131,29 @@ if (-not $SkipCcDiscipline) {
         git clone -b main https://github.com/TechHU-GS/cc-discipline.git $CcDisciplinePath
         Set-Location $CcDisciplinePath
         git checkout $CcDisciplineCommit
+        # 验证 commit 是否匹配锁定版本
+        $actualCommit = (git rev-parse HEAD).Trim()
+        if ($actualCommit -ne $CcDisciplineCommit) {
+            Write-Fail "commit 不匹配！预期: $($CcDisciplineCommit.Substring(0,7)), 实际: $($actualCommit.Substring(0, [Math]::Min(7, $actualCommit.Length)))"
+            Set-Location $ProjectPath
+            Remove-Item -Recurse -Force $CcDisciplinePath -ErrorAction SilentlyContinue
+            exit 1
+        }
+        # GPG 签名验证（可选，需要公钥）
+        git verify-commit HEAD 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Success "GPG 签名验证通过"
+        }
         Set-Location $ProjectPath
-        Write-Success "已克隆 cc-discipline (commit: $($CcDisciplineCommit.Substring(0,7)))"
+        Write-Success "已克隆并验证 cc-discipline (commit: $($CcDisciplineCommit.Substring(0,7)))"
     } else {
-        Write-Info "cc-discipline 已存在，如需更新请手动执行: git -C $CcDisciplinePath pull"
+        Write-Info "cc-discipline 已存在"
+        $existingCommit = (git -C $CcDisciplinePath rev-parse HEAD 2>&1).Trim()
+        if ($existingCommit -ne $CcDisciplineCommit) {
+            Write-Warn "现有 commit ($($existingCommit.Substring(0, [Math]::Min(7, $existingCommit.Length)))) 与锁定版本 ($($CcDisciplineCommit.Substring(0,7))) 不一致，正在切换..."
+            git -C $CcDisciplinePath fetch origin
+            git -C $CcDisciplinePath checkout $CcDisciplineCommit
+        }
     }
     Write-Info "正在执行 cc-discipline 初始化..."
     try {
