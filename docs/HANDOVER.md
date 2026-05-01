@@ -133,11 +133,14 @@ claude-code-init/
 
 ### 2.3 关键路径变更（v1.6.0 - v1.6.2）
 
-#### v1.6.2（第七轮 6-Agent 终审修复）
+#### v1.6.2（第七轮终审 + 收尾修复）
 - **smart-context.sh json_escape jq 修复**：删除 jq 分支（`jq -Rs '.'` 输出自带双引号导致 heredoc JSON 断裂），统一纯 bash 转义
-- **weekly-report.sh 崩溃修复**：非 Git 仓库中 `commit_count`/`review_reports`/`unstaged` 未初始化，`set -e` 下脚本崩溃，加默认值 0
+- **weekly-report.sh 崩溃修复**：非 Git 仓库中未初始化变量导致 `set -e` 下脚本崩溃，加默认值 0
+- **供应链强化**：ralph commit hash 硬编码（`6c53cb0`），pip `tmux-orche` 精确锁定（`==0.1.0`）
 - **版本号同步**：CLAUDE.md、SOUL.md、CHANGELOG.md → v1.6.2
 - **路径修正**：commands/help.md、capabilities.md 中 `scripts/` → `.claude/scripts/`
+- **文档修复**：CLAUDE.md 移除 `.claude/scripts/` 幽灵目录，SECURITY.md 消除 PGP 矛盾
+- **防御加固**：`configure-gitignore.sh` 添加 `set -e`，清理 `__pycache__/`
 
 #### v1.6.1（第五轮 42 项审查修复）
 - **安全加固**：pip 版本锁定（`pre-commit>=4.0`、`tmux-orche>=0.1.0`），`.npmignore` 防御深度，`init.sh` 信号捕获增强（`trap ... INT TERM`）
@@ -726,7 +729,7 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
-| **v1.6.2** | 2026-05-01 | Hook JSON 损坏修复 + 版本同步 + 路径修正 + 非 git 仓库防崩溃（58 测试，3 提交） |
+| **v1.6.2** | 2026-05-01 | Hook JSON 损坏 + 供应链硬编码 + 版本同步 + 路径修正 + 文档修复（58 测试，4 提交） |
 | v1.6.1 | 2026-05-01 | 安全加固 + 供应链锁定 + Skill 触发词去重 + 23 项新测试（35→58 测试） |
 | v1.6.0 | 2026-05-01 | 四轮 40 项审查修复：Hooks 重构 + 供应链锁定 + 模板扩展 + CI/CD 矩阵 |
 | v1.5.2 | 2026-04-30 | 死代码清理 + 文档修正 + 配置补全（多agent审查修复） |
