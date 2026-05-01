@@ -4,6 +4,36 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.2] - 2026-05-01
+
+### 第六轮收尾修复 — Hook JSON 损坏 + 版本同步 + 测试加固
+
+### Fixed
+- **smart-context.sh**: 修复 `json_escape()` 在 jq 环境下产出损坏 JSON 的问题（删除 jq 分支，统一纯 bash 转义）
+- **weekly-report.sh**: 修复非 Git 仓库中未初始化变量导致 `set -e` 下脚本崩溃
+- 版本号同步：CLAUDE.md、SOUL.md、CHANGELOG.md → v1.6.2
+
+### Changed
+- commands/help.md、capabilities.md 中的 `scripts/` 路径修正为 `.claude/scripts/`
+
+## [1.6.1] - 2026-05-01
+
+### 第五轮多角色审查修复 — 安全加固 + 供应链锁定
+
+### Fixed
+- ralph 仓库 commit 自动锁定（`git ls-remote` 替代硬编码）
+- 密钥扫描脚本异常处理（4 处 `pass` → `print(..., file=sys.stderr)`）
+- Python 脚本 stdout.buffer 崩溃防护（5 处 try/except AttributeError/OSError）
+- Skill 触发词去重（code-review, project-validate, error-fix）
+
+### Security
+- pip 依赖版本锁定：`pre-commit>=4.0`、`tmux-orche>=0.1.0`
+- `.npmignore` 防御深度：新增 `.env`、`.env.*`、`*.pem`、`*.key`
+- `init.sh` 信号捕获增强：`trap cleanup EXIT INT TERM`
+
+### Added
+- 语法测试：23 个新测试（8 Python + 11 Shell 语法 + 4 CLI 行为），测试总数 35 → 58
+
 ## [1.6.0] - 2026-05-01
 
 ### 第四轮多角色审查修复 — 全部 40 项问题闭环

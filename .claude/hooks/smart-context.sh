@@ -5,18 +5,14 @@
 
 # JSON 字符串转义函数（处理双引号和反斜杠）
 json_escape() {
-    if command -v jq >/dev/null 2>&1; then
-        printf '%s' "$1" | jq -Rs '.'
-    else
-        # 回退：纯 bash 参数展开转义（比 sed 更可移植）
-        # 注意：不在 while read pipeline 中追加 \n，因为 suggestion 始终为单行
-        local str="$1"
-        str="${str//\\/\\\\}"
-        str="${str//\"/\\\"}"
-        str="${str//$'\t'/\\t}"
-        str="${str//$'\r'/\\r}"
-        printf '%s' "$str"
-    fi
+    # 纯 bash 参数展开转义（比 sed/jq 更可移植且无依赖）
+    # 注意：不在 while read pipeline 中追加 \n，因为 suggestion 始终为单行
+    local str="$1"
+    str="${str//\\/\\\\}"
+    str="${str//\"/\\\"}"
+    str="${str//$'\t'/\\t}"
+    str="${str//$'\r'/\\r}"
+    printf '%s' "$str"
 }
 
 # 跨平台 timeout 兼容读取 stdin（防止挂起）

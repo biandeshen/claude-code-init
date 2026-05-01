@@ -43,6 +43,9 @@ fi
 
 # 1. Git 统计
 echo -e "${CYAN}--- Git 活动 ---${NC}"
+commit_count=0
+review_reports=0
+unstaged=0
 if git rev-parse --git-dir > /dev/null 2>&1; then
     AUTHOR_NAME=$(git config user.name 2>/dev/null || echo "Unknown")
     AUTHOR_EMAIL=$(git config user.email 2>/dev/null)
