@@ -223,7 +223,7 @@ if ($pythonCmd) {
         $null = python -c "import pre_commit" 2>$null
     } catch {
         Write-Info "正在安装 pre-commit..."
-        python -m pip install --quiet pre-commit
+        python -m pip install --quiet "pre-commit>=4.0"
         Write-Success "pre-commit 安装完成"
     }
     try {

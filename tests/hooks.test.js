@@ -44,10 +44,9 @@ describe('smart-context.sh Hook 测试', () => {
             encoding: 'utf-8',
             timeout: 5000
         });
-        if (result.trim()) {
-            const json = JSON.parse(result);
-            assert.ok(json.hookSpecificOutput, 'should contain hookSpecificOutput');
-        }
+        assert.ok(result.trim(), 'should produce output for auth file');
+        const json = JSON.parse(result);
+        assert.ok(json.hookSpecificOutput, 'should contain hookSpecificOutput');
     });
 
     // ── 场景 3：数据库文件检测 ──
@@ -61,12 +60,11 @@ describe('smart-context.sh Hook 测试', () => {
             encoding: 'utf-8',
             timeout: 5000
         });
-        if (result.trim()) {
-            const json = JSON.parse(result);
-            const suggestion = json.hookSpecificOutput.suggestion.toLowerCase();
-            assert.ok(suggestion.includes('brainstorming') || suggestion.includes('schema'),
-                'should suggest brainstorming for db-related files');
-        }
+        assert.ok(result.trim(), 'should produce output for db-related file');
+        const json = JSON.parse(result);
+        const suggestion = json.hookSpecificOutput.suggestion.toLowerCase();
+        assert.ok(suggestion.includes('brainstorming') || suggestion.includes('schema'),
+            'should suggest brainstorming for db-related files');
     });
 
     // ── 场景 4：git commit 检测 ──
@@ -99,10 +97,9 @@ describe('smart-context.sh Hook 测试', () => {
             encoding: 'utf-8',
             timeout: 5000
         });
-        if (result.trim()) {
-            const json = JSON.parse(result);
-            assert.ok(json.hookSpecificOutput, 'should contain hookSpecificOutput');
-        }
+        assert.ok(result.trim(), 'should produce output for git push --force');
+        const json = JSON.parse(result);
+        assert.ok(json.hookSpecificOutput, 'should contain hookSpecificOutput');
     });
 
     // ── 场景 5b：git push --force-with-lease 检测 ──
@@ -195,14 +192,13 @@ describe('smart-context.sh Hook 测试', () => {
             encoding: 'utf-8',
             timeout: 5000
         });
-        if (result.trim()) {
-            const json = JSON.parse(result);
-            const suggestion = json.hookSpecificOutput.suggestion.toLowerCase();
-            assert.ok(
-                suggestion.includes('team') || suggestion.includes('审查'),
-                'should suggest Agent Teams after /review'
-            );
-        }
+        assert.ok(result.trim(), 'should produce output for /review command');
+        const json = JSON.parse(result);
+        const suggestion = json.hookSpecificOutput.suggestion.toLowerCase();
+        assert.ok(
+            suggestion.includes('team') || suggestion.includes('审查'),
+            'should suggest Agent Teams after /review'
+        );
     });
 
     // ── stdin 超时不挂起 ──

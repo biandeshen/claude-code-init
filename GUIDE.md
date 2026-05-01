@@ -369,9 +369,8 @@ claude-code-init/
 │   ├── check_function_length.py
 │   ├── check_dependencies.py
 │   ├── check_import_order.py
-│   └── check_project_structure.py
-├── .claude/scripts/          # Claude Code 专用
-│   └── PROMPT.md             # 过夜任务清单
+│   ├── check_project_structure.py
+│   └── PROMPT.md              # 过夜任务清单
 └── configs/                  # 配置文件
     └── .pre-commit-config.yaml
 ```

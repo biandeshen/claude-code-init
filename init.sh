@@ -269,7 +269,7 @@ if command -v python3 >/dev/null 2>&1 || command -v python >/dev/null 2>&1; then
     # 检查 pre-commit 是否已安装
     $PYTHON_CMD -c "import pre_commit" 2>/dev/null || {
         echo_info "正在安装 pre-commit..."
-        $PYTHON_CMD -m pip install --quiet pre-commit 2>/dev/null && echo_success "pre-commit 安装完成"
+        $PYTHON_CMD -m pip install --quiet "pre-commit>=4.0" 2>/dev/null && echo_success "pre-commit 安装完成"
     }
     if command -v pre-commit >/dev/null 2>&1; then
         pre-commit install

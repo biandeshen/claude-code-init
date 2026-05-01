@@ -40,12 +40,13 @@ claude-code-init/
 ├── package.json           # npm 包配置
 ├── index.js               # npx 入口脚本
 ├── init.sh / init.ps1      # 初始化脚本
-├── templates/              # 5 个覆盖层模板 (→ 目标项目)
+├── templates/              # 6 个覆盖层模板 (→ 目标项目)
 │   ├── CLAUDE_Template.md
 │   ├── SOUL_Template.md
 │   ├── SPEC_Template.md
 │   ├── PLAN_Template.md
-│   └── ROUTINE_Template.md
+│   ├── ROUTINE_Template.md
+│   └── memory/              # 记忆系统模板 (→ .claude/memory/)
 ├── commands/              # 21 个斜杠命令 (→ .claude/commands/)
 ├── .claude/               # Claude Code 配置
 │   ├── skills/            # 10 个自定义 Skill (→ .claude/skills/)
@@ -69,7 +70,8 @@ claude-code-init/
 │   ├── AGENT_TEAMS_GUIDE.md
 │   └── PHASE2_PLAN.md     # Phase2 计划
 └── .github/workflows/     # CI/CD
-    └── ci.yml
+    ├── ci.yml
+    └── publish.yml
 ```
 
 ---

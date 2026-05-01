@@ -96,9 +96,6 @@ claude-code-init/
 │   │   └── project-init/
 │   ├── hooks/
 │   │   └── smart-context.sh   # 场景感知 Hook
-│   └── scripts/             # Claude Code 运行时数据（由 init 脚本复制填充）
-│       ├── PROMPT.md          # 过夜任务清单（源码随包发布）
-│       └── check_docs_consistency.py
 │
 ├── scripts/                 # Shell + Python 工具脚本
 │   ├── tmux-session.sh      # 无人值守
@@ -122,15 +119,14 @@ claude-code-init/
 ├── configs/
 │   └── .pre-commit-config.yaml
 │
-├── .claude-plugin/          # Plugin 市场配置
-│   └── plugin.json
-│
 └── docs/                    # 文档
     ├── HANDOVER.md           # 交接文档（本文件）
     ├── QUICKSTART.md
     ├── AGENT_TEAMS_GUIDE.md
     ├── TROUBLESHOOTING.md
-    └── ROADMAP.md
+    ├── ROADMAP.md
+    ├── HANDOVER-v1.6.0.md   # v1.6.0 交接文档
+    └── PHASE2_PLAN.md        # Phase2 计划
 ```
 
 ### 2.2 关键路径变更（v1.5.1）
@@ -699,6 +695,16 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 - validate_skills.sh Bash 3.2 兼容（无关联数组）
 - init.sh 源==目标相等检查（与 init.ps1 对齐）
 
+**Spec Generation 集成（5 新增）**：
+- SPEC_Template.md（7 节结构模板）
+- CLAUDE.md spec 索引行
+- SOUL.md spec 检查规则 + 5 分+ 示例
+- GUIDE.md 四层文档架构文档
+- CHANGELOG.md 创建
+
+---
+
+*本文档为 claude-code-init 项目交接专用，涵盖设计理念、目录结构、易遗漏点和常见问题。如有新增问题，请追加到对应章节。*
 **Spec Generation 集成（5 新增）**：
 - SPEC_Template.md（7 节结构模板）
 - CLAUDE.md spec 索引行

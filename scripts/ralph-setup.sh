@@ -105,7 +105,7 @@ install_tmux_orche() {
     echo_step "安装 tmux-orche（备选方案）..."
 
     if command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1; then
-        pip install tmux-orche 2>/dev/null || pip3 install tmux-orche 2>/dev/null
+        pip install "tmux-orche>=0.1.0" 2>/dev/null || pip3 install "tmux-orche>=0.1.0" 2>/dev/null
         echo_success "tmux-orche 安装完成"
     else
         echo_warn "pip 未安装，跳过 tmux-orche"
