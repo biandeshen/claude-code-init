@@ -16,11 +16,32 @@ const args = process.argv.slice(2);
 let projectPath = '.';
 
 for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--version' || args[i] === '-v') {
+        const pkg = require('./package.json');
+        console.log(`claude-code-init v${pkg.version}`);
+        process.exit(0);
+    }
     if (args[i] === '--project-path' && args[i + 1]) {
         projectPath = args[i + 1];
     } else if (args[i].startsWith('--project-path=')) {
         projectPath = args[i].split('=')[1];
     }
+}
+
+// 验证 projectPath
+const fs = require('fs');
+const resolved = path.resolve(projectPath);
+const rootPath = path.parse(resolved).root;
+// 禁止驱动器根目录（包括通过 ../ 回溯到根的情况）
+if (resolved === rootPath) {
+    console.error('[错误] 禁止使用根目录作为项目路径。');
+    console.error('请使用 --project-path ./my-project 指定子目录。');
+    process.exit(1);
+}
+// 禁止 shell 元字符
+if (/[\$`;|&<>(){}]/.test(projectPath)) {
+    console.error('[错误] 项目路径包含不安全字符。');
+    process.exit(1);
 }
 
 // 获取脚本所在目录

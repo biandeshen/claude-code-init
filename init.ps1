@@ -1,6 +1,6 @@
 ﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.5.4 | 2026-04-30
+# 版本: v1.5.6 | 2026-05-01
 
 param(
     [Parameter(Mandatory=$true)]
@@ -37,7 +37,7 @@ function Write-Info { param($msg) Write-Host "[信息] $msg" -ForegroundColor Gr
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  Claude Code 开发环境一键初始化 (v1.5.4)" -ForegroundColor Cyan
+Write-Host "  Claude Code 开发环境一键初始化 (v1.5.6)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 

@@ -34,17 +34,8 @@ if echo "$file_path" | grep -qiE "(auth|login|password|token|secret|session|encr
     if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
     suggestion="${suggestion}检测到你正在修改安全相关代码。「code-review」技能已自动加载。"
     # 确定性 Skill 激活（不依赖语义匹配）
-    escaped=$(json_escape "$suggestion")
-    cat <<EOF
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "skillToActivate": "code-review",
-    "suggestion": "$escaped"
-  }
-}
-EOF
-    exit 0
+    # 设置标志，在末尾统一 JSON 输出时包含 skillToActivate 字段
+    SKILL_ACTIVATED="code-review"
 fi
 
 # ─── 场景 3：编辑涉及数据库的文件 → 推荐架构评审 ───
@@ -74,7 +65,9 @@ fi
 
 # ─── 场景 6：rm -rf 物理阻断（最高优先级）───
 # 检测危险删除命令——物理阻断，Claude Code 无法绕过
-if echo "$command" | grep -qE "rm\s+-rf\s+(/|~|\.\.|\.)" 2>/dev/null; then
+# 覆盖：rm -rf /、rm -r -f /、rm --recursive --force /、rm -rf ~、rm -rf ../
+# 注意：变量展开（rm $VAR）和命令替换（rm $(...)）无法通过纯 shell 正则检测
+if echo "$command" | grep -qE "(^|[;&|])[[:space:]]*rm[[:space:]]+(-[rRf]+[[:space:]]*)+[[:space:]]*(/|~|[.][.])" 2>/dev/null; then
     cat <<EOF
 {
   "hookSpecificOutput": {
@@ -88,7 +81,7 @@ EOF
 fi
 
 # ─── 场景 7：执行 rm -rf 等危险删除命令 → 警告 ───
-if echo "$command" | grep -qE "rm\s+-[rRf]" 2>/dev/null; then
+if echo "$command" | grep -qE "(^|[;&|])[[:space:]]*rm[[:space:]]+(-[rRf]+|--recursive|--force)([[:space:]]|$)" 2>/dev/null; then
     if echo "$command" | grep -qE "rm\s+-[rRf].*\$|rm\s+-[rRf].*~" 2>/dev/null; then
         # 变量展开或 ~ 可能是危险模式
         if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
@@ -138,7 +131,18 @@ if [ -n "$suggestion" ]; then
     echo "$(date '+%Y-%m-%dT%H:%M:%S' 2>/dev/null) | smart-context | $suggestion" >> "$LOG_FILE" 2>/dev/null || true
 
     escaped=$(json_escape "$suggestion")
-    cat <<EOF
+    if [ -n "$SKILL_ACTIVATED" ]; then
+        cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "skillToActivate": "$SKILL_ACTIVATED",
+    "suggestion": "$escaped"
+  }
+}
+EOF
+    else
+        cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -146,6 +150,7 @@ if [ -n "$suggestion" ]; then
   }
 }
 EOF
+    fi
 fi
 
 exit 0

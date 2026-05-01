@@ -4,6 +4,34 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.6] - 2026-05-01
+
+### Fixed
+- **Router ↔ Brainstorming 触发词冲突 (P0)**: 路由 `架构、方案、设计` 改为跳转「需求头脑风暴」技能而非 `/architect` 命令，消除与需求分析触发词的分派歧义。
+- **code-review SKILL.md OWASP Top 10 缺失项 (P1)**: 安全清单补全 A04 不安全设计、A06 脆弱组件、A08 软件完整性、A09 日志监控、A10 SSRF。
+- **Router 决策表触发词扩展 (P1)**: 每个路由条目新增关键字同义词（代码审计、error、fix、refactor、security、validate 等），提升触发匹配率。
+- **Router 否定语义检测 (P1)**: 决策表前新增否定过滤规则（"不用/不要/跳过/取消/不需要"），防止否定式用户输入误触发技能路由。
+- **smart-context.sh rm -rf 正则增强 (P1)**: 危险命令检测覆盖 `rm -rf` 标志任意顺序（`rm -r -f`）及长选项形式（`rm --recursive --force`），并检测命令链前缀。
+
+### Changed
+- 版本号同步：package.json、init.sh、init.ps1、CLAUDE.md → v1.5.6。
+
+## [1.5.5] - 2026-05-01
+
+### Fixed
+- **smart-context.sh `exit 0` 阻断后续场景 (P0)**: 场景 2（安全文件）不再提前退出，场景 3~10 可达。`skillToActivate` 标志移入末尾统一 JSON 输出。
+- **PROMPT.md 部署链断裂 (P0)**: PROMPT.md 从 `.claude/scripts/` 移动到 `scripts/`，确保被 init.sh 部署到目标项目。tmux-session.sh 的默认任务文件不再断链。
+- **`.claude/scripts/` 过时 Python 副本 (P1)**: 删除 5 个版本不一致的 check_*.py 死代码文件及 `__pycache__/`。`scripts/` 成为唯一部署源。
+- **`index.js` 无 `--version` 标志 (P2)**: 新增 `--version` / `-v` 参数。
+- **`index.js` 无 `--project-path` 验证 (P2)**: 新增驱动器根目录、shell 元字符检测。
+- **命令数量不一致 (P2)**: CLAUDE.md（17→20）、init.sh（18→20）统一为实际值。
+- **`init.sh` 步骤命名误导 (P3)**: "复制 Python 校验脚本" → "复制校验脚本和 Shell 工具"。
+- **`init.sh` 运行时 banner 版本号 v1.5.3→v1.5.5**: 之前遗漏的版本同步。
+- **`init.sh` 命令列表补全**: 缺失 plan-eng-review、tdd 已补齐。
+
+### Changed
+- 版本号同步：package.json、init.sh、init.ps1、CLAUDE.md → v1.5.5。
+
 ## [1.5.4] - 2026-05-01
 
 ### Fixed

@@ -34,6 +34,11 @@ description: >
 - [ ] 认证/授权漏洞
 - [ ] 敏感信息泄露（密钥、日志）
 - [ ] 依赖第三方数据的验证
+- [ ] 不安全的设计模式（Insecure Design — OWASP A04）
+- [ ] 过期或有漏洞的依赖（Vulnerable Components — OWASP A06）
+- [ ] 反序列化与 CI/CD 完整性（Software Integrity — OWASP A08）
+- [ ] 日志安全与监控信息泄露（Logging & Monitoring — OWASP A09）
+- [ ] 服务端请求伪造（SSRF — OWASP A10）
 
 ### 3. 逻辑审查
 - [ ] 边界条件处理

@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.5.4 | 2026-04-30
+# 版本: v1.5.6 | 2026-05-01
 
 set -euo pipefail
 
@@ -54,7 +54,7 @@ echo_info() { echo -e "[信息] $1"; }
 
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.3)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.6)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 
@@ -180,8 +180,8 @@ else
     fi
 fi
 
-# 6. 复制 Python 校验脚本
-echo_step "复制校验脚本到 .claude/scripts/"
+# 6. 复制校验脚本和 Shell 工具
+echo_step "复制校验脚本和 Shell 工具到 .claude/scripts/"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 TARGET_SCRIPTS_DIR="$PROJECT_PATH/.claude/scripts"
 # 检查源目录与目标目录是否相同
@@ -502,7 +502,7 @@ echo -e "${GREEN}==============================================${NC}"
 echo ""
 echo -e "${CYAN}你现在拥有：${NC}"
 echo -e "  ${GREEN}✅${NC} 10 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）"
-echo -e "  ${GREEN}✅${NC} 18 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /plan-ceo-review /routine /messages /overnight-report）"
+echo -e "  ${GREEN}✅${NC} 20 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd）"
 echo -e "  ${GREEN}✅${NC} 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）"
 echo -e "  ${GREEN}✅${NC} 6 个项目完整性校验脚本"
 echo -e "  ${GREEN}✅${NC} Pre-commit 自动检查（9 个检查项）"
