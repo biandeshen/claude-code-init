@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.6.3 | 2026-05-01
+# 版本: v1.6.4 | 2026-05-02
 
 set -euo pipefail
 
@@ -12,6 +12,15 @@ shopt -s nullglob
 # 对于可选步骤（OpenSpec、cc-discipline），使用 || true 来忽略失败
 
 PROJECT_PATH="${1:-.}"
+# 参数校验: 防止 --* 被当作路径
+if [[ "$PROJECT_PATH" == --* ]]; then
+    echo "错误: 第一个参数应为项目路径，不能以 -- 开头"
+    echo "用法: ./init.sh <项目路径> [--force] [--skip-*]"
+    exit 1
+fi
+if [ "$PROJECT_PATH" != "." ] && [ ! -e "$PROJECT_PATH" ]; then
+    echo "[警告] 目录不存在: $PROJECT_PATH，将自动创建"
+fi
 ORIGINAL_PATH="$PROJECT_PATH"  # 保存原始输入用于显示
 FORCE_OVERWRITE=false
 SKIP_ECC=false
@@ -72,7 +81,7 @@ echo_info() { echo -e "[信息] $1"; }
 
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.6.3)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.6.4)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 
@@ -530,19 +539,14 @@ fi
 echo ""
 echo_step "处理 AI 开发配置文件"
 
-# 优先使用 PowerShell 脚本
-if command -v pwsh >/dev/null 2>&1 || command -v powershell >/dev/null 2>&1; then
-    CONFIGURE_SCRIPT="$SCRIPT_DIR/scripts/configure-gitignore.ps1"
-    if [ -f "$CONFIGURE_SCRIPT" ]; then
-        if command -v pwsh >/dev/null 2>&1; then
-            pwsh -NoProfile -ExecutionPolicy Bypass -File "$CONFIGURE_SCRIPT" -ProjectPath "$PROJECT_PATH"
-        else
-            powershell -NoProfile -ExecutionPolicy Bypass -File "$CONFIGURE_SCRIPT" -ProjectPath "$PROJECT_PATH"
-        fi
-    fi
-# 回退到 Bash 脚本
-elif [ -f "$SCRIPT_DIR/scripts/configure-gitignore.sh" ]; then
+# 优先使用 Bash 脚本（本机原生，零依赖）
+if [ -f "$SCRIPT_DIR/scripts/configure-gitignore.sh" ]; then
     bash "$SCRIPT_DIR/scripts/configure-gitignore.sh" "$PROJECT_PATH"
+# 回退到 PowerShell 脚本
+elif command -v pwsh >/dev/null 2>&1 && [ -f "$SCRIPT_DIR/scripts/configure-gitignore.ps1" ]; then
+    pwsh -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/scripts/configure-gitignore.ps1" -ProjectPath "$PROJECT_PATH"
+elif command -v powershell >/dev/null 2>&1 && [ -f "$SCRIPT_DIR/scripts/configure-gitignore.ps1" ]; then
+    powershell -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/scripts/configure-gitignore.ps1" -ProjectPath "$PROJECT_PATH"
 else
     echo_warn "未找到配置脚本，跳过 .gitignore 配置"
 fi
@@ -565,7 +569,7 @@ echo -e "${GREEN}==============================================${NC}"
 echo ""
 echo -e "${CYAN}你现在拥有：${NC}"
 echo -e "  ${GREEN}✅${NC} 9 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/初始化）"
-echo -e "  ${GREEN}✅${NC} 21 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd）"
+echo -e "  ${GREEN}✅${NC} 22 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd /ship-review）"
 echo -e "  ${GREEN}✅${NC} 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）"
 echo -e "  ${GREEN}✅${NC} 6 个项目完整性校验脚本"
 echo -e "  ${GREEN}✅${NC} Pre-commit 自动检查（9 个检查项）"

@@ -1,6 +1,6 @@
 # claude-code-init 项目交接文档
 
-> 版本：v1.6.3 | 最后更新：2026-05-01
+> 版本：v1.6.4 | 最后更新：2026-05-02
 > **历史交接文档**：见 [HANDOVER-v1.6.0.md](HANDOVER-v1.6.0.md)（v1.6.0 快照，已归档）。本文档为当前最新版本。
 
 ---
@@ -67,12 +67,12 @@ claude-code-init/
 │   ├── SPEC_Template.md      # 功能规格模板（7 节结构）
 │   └── memory/               # 记忆系统子模板
 │
-├── commands/                 # 自定义斜杠命令 (21 个)
+├── commands/                 # 自定义斜杠命令 (22 个)
 │   ├── help.md / capabilities.md / status.md
 │   ├── review.md / commit.md / fix.md / refactor.md / explain.md
 │   ├── validate.md / architect.md / team.md / qa.md / gc.md
 │   ├── routine.md / overnight.md / overnight-report.md
-│   ├── messages.md / remember.md / tdd.md
+│   ├── messages.md / remember.md / tdd.md / ship-review.md
 │   └── plan-ceo-review.md / plan-eng-review.md
 │
 ├── .claude/                  # Claude Code 专用配置
@@ -141,6 +141,23 @@ claude-code-init/
 - **路径修正**：commands/help.md、capabilities.md 中 `scripts/` → `.claude/scripts/`
 - **文档修复**：CLAUDE.md 移除 `.claude/scripts/` 幽灵目录，SECURITY.md 消除 PGP 矛盾
 - **防御加固**：`configure-gitignore.sh` 添加 `set -e`，清理 `__pycache__/`
+
+#### v1.6.3（MEMORY.local.md 路径修复 + 能力缺口修补）
+- **MEMORY.local.md 路径修复**：init.ps1/init.sh 中将 MEMORY.local.md 从项目根目录移至 `.claude/`（对齐 CLAUDE.local.md 的对称性）
+- **configure-gitignore 同步修复**：.ps1/.sh 版本同步更新 MEMORY.local.md 路径，修复 PLAN_Template.md 大小写不匹配
+- **check_path_consistency.py**：新增跨模块路径一致性检查（5 项）
+- **能力审计与修补**：8 维度审计发现 24 个缺口，修复 14 个
+- **版本号同步**：init.sh/init.ps1 版本字符串 v1.6.0 → v1.6.3
+
+#### v1.6.4（审查能力升级：/ship-review + 剩余缺口修复）
+- **`/ship-review` 命令**：新增发布前全面审查（3-phase：4 子 Agent 并行审查 → 交叉验证 → SHIP/NO SHIP 决策）
+- **G1.2**: code-review SKILL 移除裸触发词"检查"
+- **G1.3**: check_trigger_conflicts.py 重写为 YAML frontmatter 解析（修复跨行漏扫）
+- **G5.1**: init.sh 参数 `--*` 守卫
+- **G7.4**: init.sh 直调时目录存在检查
+- **G8.1**: init.sh gitignore 配置优先 bash，PowerShell 回退
+- **Router**: 新增 ship/release 触发词 → `/ship-review`
+- **文档**: 命令数 21→22
 
 #### v1.6.1（第五轮 42 项审查修复）
 - **安全加固**：pip 版本锁定（`pre-commit>=4.0`、`tmux-orche>=0.1.0`），`.npmignore` 防御深度，`init.sh` 信号捕获增强（`trap ... INT TERM`）
@@ -731,6 +748,8 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| **v1.6.4** | 2026-05-02 | 审查能力升级 — `/ship-review` 命令 + 剩余 5 个能力缺口修复 |
+| **v1.6.3** | 2026-05-01 | MEMORY.local.md 路径修复 + 14 个能力缺口修补 |
 | **v1.6.2** | 2026-05-01 | Hook JSON 损坏 + 供应链硬编码 + 版本同步 + 路径修正 + 文档修复（58 测试，4 提交） |
 | v1.6.1 | 2026-05-01 | 安全加固 + 供应链锁定 + Skill 触发词去重 + 23 项新测试（35→58 测试） |
 | v1.6.0 | 2026-05-01 | 四轮 40 项审查修复：Hooks 重构 + 供应链锁定 + 模板扩展 + CI/CD 矩阵 |
@@ -791,22 +810,25 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 ---
 
-## 十二、当前状态（v1.6.2）
+## 十二、当前状态（v1.6.4）
 
-### 已修复（本轮收尾）
-- S1: ralph commit hash 硬编码 ✓
-- S2: pip tmux-orche 版本精确锁定 ✓
-- C2: configure-gitignore.sh 添加 set -e ✓
-- D1: CLAUDE.md 结构图幽灵目录移除 ✓
-- D2: SECURITY.md PGP 矛盾消除 ✓
-- R1: __pycache__ 清理 ✓
+### 新增（本轮 — v1.6.4）
+- `/ship-review` 命令：发布前全面审查（多 Agent 并行 + 交叉验证 + SHIP/NO SHIP 决策）
+- G1.2: code-review SKILL 移除裸触发词"检查"
+- G1.3: check_trigger_conflicts.py 重写为 YAML frontmatter 解析（修复跨行漏扫）
+- G5.1+G7.4: init.sh 参数 `--*` 守卫 + 目录存在检查
+- G8.1: init.sh gitignore 配置优先 bash，PowerShell 回退
+
+### 已修复（v1.6.3）
+- MEMORY.local.md 路径从根目录 → `.claude/`
+- check_path_consistency.py 跨模块路径检查
+- 14 个能力缺口修补
 
 ### 已知未修复（均不影响发版）
 
 | # | 问题 | 严重度 | 不修复理由 |
 |---|------|:--:|------|
 | C1 | check_docs_consistency.py PROJECT_ROOT 路径 | 低 | 部署到目标项目后行为正确 |
-| C3 | init.sh 参数顺序边缘情况 | 极低 | index.js 调用顺序正确 |
 | S3 | GPG 验证为可选 | 低 | 安全门禁靠硬编码 commit hash，GPG 是锦上添花 |
 
 ### Phase 2 路线图（测试盲区，按需推进）
@@ -821,4 +843,4 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 ---
 
-*本文档为 claude-code-init 项目交接专用。v1.6.3，47 测试全部通过，9 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*
+*本文档为 claude-code-init 项目交接专用。v1.6.4，47 测试全部通过，9 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*

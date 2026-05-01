@@ -19,7 +19,8 @@ description: >
   状态、进度、status、项目状态、
   能力、功能、capabilities、能做什么、
   消息、messages、查看消息、团队消息、
-  过夜报告、overnight-report、任务报告
+  过夜报告、overnight-report、任务报告、
+  ship、发布、交付、上线审查、release-review、ship-review、发版审查
 
   英文触发词：review, commit, fix, refactor, explain, validate, test,
   check, architecture, design, bug, error, debug, quality, security,
@@ -27,7 +28,8 @@ description: >
   unattended, qa, ceo-review, eng-review,
   memory, remember, recall, preference,
   routine, cron, scheduled, gc, garbage, status, progress,
-  capabilities, features, messages, report
+  capabilities, features, messages, report,
+  ship, release, deploy
 ---
 
 # Development Workflow Router
@@ -83,6 +85,7 @@ description: >
 | **能力、功能、capabilities、能做什么** | 执行 `/capabilities` 命令 | "这个项目能做什么" |
 | **消息、messages、查看消息、团队消息** | 执行 `/messages` 命令 | "查看 Agent 团队消息" |
 | **过夜报告、overnight-report、任务报告** | 执行 `/overnight-report` 命令 | "查看过夜任务报告" |
+| **ship、发布、交付、上线审查、release review、ship review、发版审查** | 执行 `/ship-review` 命令 | "发布前全面审查" |
 
 ## 路由规则
 

@@ -162,6 +162,7 @@ AI 自动加载全部配置，**任务类型由 AI 自动评估**。
 | `/messages` | 查看 Agent 团队消息 |
 | `/opsx:propose <名称>` | 复杂功能 SDD 流程（AI 可能自动触发） |
 | `/remember` | 浏览/搜索/管理项目记忆 |
+| `/ship-review` | 发布前全面审查（多 Agent 并行） |
 
 ---
 
@@ -353,11 +354,12 @@ claude-code-init/
 │   ├── ROUTINE_Template.md
 │   └── memory/              # 记忆系统模板
 │       └── MEMORY.md         # 单文件记忆（含索引+A...）
-├── commands/              # 自定义斜杠命令 (21个)
+├── commands/              # 自定义斜杠命令 (22个)
 │   ├── review.md, commit.md, fix.md
 │   ├── refactor.md, explain.md, validate.md
 │   ├── team.md, qa.md, routine.md
 │   ├── remember.md
+│   ├── ship-review.md
 │   └── help.md, status.md, capabilities.md...
 ├── scripts/               # Shell 脚本工具
 │   ├── tmux-session.sh    # 无人值守会话管理

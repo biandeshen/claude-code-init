@@ -1,6 +1,6 @@
 ﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.6.3 | 2026-05-01
+# 版本: v1.6.4 | 2026-05-02
 
 param(
     [Parameter(Mandatory=$true)]
@@ -37,7 +37,7 @@ function Write-Info { param($msg) Write-Host "[信息] $msg" -ForegroundColor Gr
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  Claude Code 开发环境一键初始化 (v1.6.3)" -ForegroundColor Cyan
+Write-Host "  Claude Code 开发环境一键初始化 (v1.6.4)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -517,7 +517,7 @@ Write-Host "==============================================" -ForegroundColor Gre
 Write-Host ""
 Write-Host "你现在拥有：" -ForegroundColor Cyan
 Write-Host "  ✅ 10 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）" -ForegroundColor White
-Write-Host "  ✅ 21 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd）" -ForegroundColor White
+Write-Host "  ✅ 22 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd /ship-review）" -ForegroundColor White
 Write-Host "  ✅ 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）" -ForegroundColor White
 Write-Host "  ✅ 6 个项目完整性校验脚本" -ForegroundColor White
 Write-Host "  ✅ Pre-commit 自动检查（9 个检查项）" -ForegroundColor White
