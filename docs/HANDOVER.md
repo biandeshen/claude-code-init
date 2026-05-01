@@ -1,7 +1,7 @@
 # claude-code-init 项目交接文档
 
-> 版本：v1.6.0 | 最后更新：2026-05-01
-> **完整交接文档**：见 [HANDOVER-v1.6.0.md](HANDOVER-v1.6.0.md)，本文档保留作为历史参考。
+> 版本：v1.6.2 | 最后更新：2026-05-01
+> **历史交接文档**：见 [HANDOVER-v1.6.0.md](HANDOVER-v1.6.0.md)（v1.6.0 快照，已归档）。本文档为当前最新版本。
 
 ---
 
@@ -54,79 +54,69 @@ claude-code-init/
 ├── GUIDE.md                  # 完整使用文档
 ├── SECURITY.md               # 安全策略
 ├── CHANGELOG.md              # 版本变更日志
-├── package.json              # npm 分发配置
+├── package.json              # npm 分发配置 (v1.6.2)
 ├── index.js                  # npx 入口
-├── init.ps1 / init.sh        # 初始化脚本（步号已简化至 14-15 步，两者步号略有差异需同步）
+├── init.ps1 / init.sh        # 初始化脚本
+├── .gitattributes            # 跨平台 LF 强制策略
 │
 ├── templates/                # 覆盖层模板（初始化时复制到项目）
 │   ├── CLAUDE_Template.md    # AI 入口配置（含 spec 索引）
 │   ├── SOUL_Template.md      # 决策规则 + spec 检查
 │   ├── PLAN_Template.md      # 执行日志
 │   ├── ROUTINE_Template.md   # 云端定时任务模板
-│   └── SPEC_Template.md      # 功能规格模板（7 节结构）
+│   ├── SPEC_Template.md      # 功能规格模板（7 节结构）
+│   └── memory/               # 记忆系统子模板
 │
-├── commands/                # 自定义斜杠命令
-│   ├── help.md
-│   ├── review.md
-│   ├── commit.md
-│   ├── fix.md
-│   ├── refactor.md
-│   ├── explain.md
-│   ├── validate.md
-│   ├── architect.md
-│   ├── team.md              # Agent Teams
-│   ├── qa.md
-│   ├── status.md
-│   ├── capabilities.md
-│   ├── routine.md            # Claude Code Routines
-│   └── overnight.md          # 无人值守过夜任务
+├── commands/                 # 自定义斜杠命令 (21 个)
+│   ├── help.md / capabilities.md / status.md
+│   ├── review.md / commit.md / fix.md / refactor.md / explain.md
+│   ├── validate.md / architect.md / team.md / qa.md / gc.md
+│   ├── routine.md / overnight.md / overnight-report.md
+│   ├── messages.md / remember.md / tdd.md
+│   └── plan-ceo-review.md / plan-eng-review.md
 │
-├── .claude/                 # Claude Code 专用配置 ⚠️ 重要
+├── .claude/                  # Claude Code 专用配置
 │   ├── settings.json         # Hooks + 环境变量配置
-│   ├── skills/              # Skills 集合
-│   │   ├── router/          # 智能路由（核心）
-│   │   ├── code-review/
-│   │   ├── error-fix/
-│   │   ├── safe-refactoring/
-│   │   ├── tdd-workflow/
-│   │   ├── brainstorming/
-│   │   ├── git-commit/
-│   │   ├── project-validate/
-│   │   ├── code-explain/
-│   │   └── project-init/
+│   ├── skills/               # Skills 集合 (10 个 + TRIGGER_SPEC.md)
+│   │   ├── router/           # 智能路由（核心）
+│   │   ├── code-review/ / error-fix/ / safe-refactoring/
+│   │   ├── tdd-workflow/ / brainstorming/ / git-commit/
+│   │   ├── project-validate/ / code-explain/ / project-init/
+│   │   └── TRIGGER_SPEC.md   # 触发词去重规范
 │   ├── hooks/
-│   │   └── smart-context.sh   # 场景感知 Hook
+│   │   └── smart-context.sh  # 场景感知 Hook（纯 bash，无 jq 依赖）
 │
-├── scripts/                 # Shell + Python 工具脚本
-│   ├── tmux-session.sh      # 无人值守
-│   ├── check-env.sh         # 环境检查
-│   ├── check_secrets.py     # 密钥安全检查
-│   ├── check_function_length.py
-│   ├── check_dependencies.py
-│   ├── check_import_order.py
-│   ├── check_project_structure.py
-│   ├── configure-gitignore.sh / .ps1
-│   ├── validate_skills.sh   # Skills 命名校验
-│   ├── trigger-optimizer.sh # Skills 触发分析
-│   ├── weekly-report.sh     # 周报
-│   ├── lib/
-│   │   └── common.sh        # 公共函数库
-│   └── ...
+├── scripts/                  # Shell + Python 工具脚本
+│   ├── init 配套：init.sh, init.ps1, script_whitelist.json
+│   ├── 校验（Python）：check_secrets.py, check_function_length.py,
+│   │          check_dependencies.py, check_docs_consistency.py,
+│   │          check_import_order.py, check_project_structure.py,
+│   │          check_trigger_conflicts.py
+│   ├── 工具（Shell）：check-env.sh, check_ecc.sh, validate_skills.sh,
+│   │          trigger-optimizer.sh, tmux-session.sh, weekly-report.sh,
+│   │          configure-gitignore.sh / .ps1, ralph-setup.sh
+│   ├── lib/common.sh         # 公共函数库
+│   └── PROMPT.md             # tmux 会话 PROMPT
 │
-├── .github/workflows/       # CI/CD（Supply Chain 安全）
-│   └── ci.yml               # node-check, shellcheck, bash-syntax, markdown-lint, python-syntax
+├── tests/                    # 测试套件 (3 文件, 10 套件, 58 测试)
+│   ├── hooks.test.js         # Hook 12 场景端到端测试
+│   ├── index.test.js         # CLI 行为 + 基础检查 (14 测试)
+│   └── syntax.test.js        # 语法验证 (23 测试: Python + Shell + CLI)
+│
+├── .github/workflows/        # CI/CD（Supply Chain 安全）
+│   └── ci.yml                # node-check, shellcheck, bash-syntax, markdown-lint, python-syntax
 │
 ├── configs/
 │   └── .pre-commit-config.yaml
 │
-└── docs/                    # 文档
-    ├── HANDOVER.md           # 交接文档（本文件）
-    ├── QUICKSTART.md
+└── docs/                     # 文档
+    ├── HANDOVER.md            # 交接文档（本文件）
+    ├── HANDOVER-v1.6.0.md    # v1.6.0 快照（已归档）
+    ├── PHASE2_PLAN.md         # Phase2 计划
+    ├── MAINTENANCE-NOTES.md  # 维护注意事项
+    ├── QUICKSTART.md / TROUBLESHOOTING.md / ROADMAP.md
     ├── AGENT_TEAMS_GUIDE.md
-    ├── TROUBLESHOOTING.md
-    ├── ROADMAP.md
-    ├── HANDOVER-v1.6.0.md   # v1.6.0 交接文档
-    └── PHASE2_PLAN.md        # Phase2 计划
+    └── archive/               # 已归档引用文件
 ```
 
 ### 2.2 关键路径变更（v1.5.1）
@@ -140,6 +130,29 @@ claude-code-init/
 | 定时任务模板 | 无 | `templates/ROUTINE_Template.md` | Routines 集成 |
 | CI/CD | 无 | `.github/workflows/ci.yml` | 自动化质量门禁 |
 | update.ps1 | /update.ps1 | **已删除** | 空文件（仅 3 字节 BOM） |
+
+### 2.3 关键路径变更（v1.6.0 - v1.6.2）
+
+#### v1.6.2（第七轮 6-Agent 终审修复）
+- **smart-context.sh json_escape jq 修复**：删除 jq 分支（`jq -Rs '.'` 输出自带双引号导致 heredoc JSON 断裂），统一纯 bash 转义
+- **weekly-report.sh 崩溃修复**：非 Git 仓库中 `commit_count`/`review_reports`/`unstaged` 未初始化，`set -e` 下脚本崩溃，加默认值 0
+- **版本号同步**：CLAUDE.md、SOUL.md、CHANGELOG.md → v1.6.2
+- **路径修正**：commands/help.md、capabilities.md 中 `scripts/` → `.claude/scripts/`
+
+#### v1.6.1（第五轮 42 项审查修复）
+- **安全加固**：pip 版本锁定（`pre-commit>=4.0`、`tmux-orche>=0.1.0`），`.npmignore` 防御深度，`init.sh` 信号捕获增强（`trap ... INT TERM`）
+- **密钥扫描**：4 处 `pass` → `print(..., file=sys.stderr)` 异常处理
+- **Python 兼容**：5 处 `stdout.buffer` 崩溃防护（`try/except AttributeError/OSError`）
+- **Skill 触发词去重**：code-review、project-validate、error-fix 三处触发词消除跨 Skill 重叠
+- **测试体系**：新增 23 个语法验证测试（Python + Shell + CLI），测试总数 35 → 58
+
+#### v1.6.0（第四轮 40 项审查修复）
+- **供应链锁定**：cc-discipline 硬编码 commit hash，ralph 通过 `git ls-remote` 自动锁定
+- **Hooks 重构**：所有 10 个场景均覆盖端到端测试，`exit 0` 死代码修复
+- **PROMPT.md 部署链修复**：tmux 无限循环静默失败解决
+- **模板系统**：新增 `memory/` 子模板，`copy_template()` 支持版本感知合并
+- **CI/CD 扩展**：新增 publish.yml，CI 矩阵覆盖 3 OS × 3 Node
+- **文档去腐**：CLAUDE.md、GUIDE.md、HANDOVER.md 清除过时路径引用
 
 ---
 
@@ -271,6 +284,72 @@ init.ps1 和 init.sh 必须保持步号同步：
 | 16 | 全局偏好设置 | |
 
 > **注意**：init.sh 和 init.ps1 步号已出现差异。多次优化中 init.sh 修改更彻底（合并 3-4、删除 gstack），而 init.ps1 因编码问题未能完全同步。当前 init.sh ~14 步，init.ps1 ~15 步。
+
+### 3.11 json_escape 与 jq 互斥陷阱
+
+**教训**：`jq -Rs '.'` 的输出与 heredoc JSON 模板不兼容。
+
+```bash
+# 错误：jq -Rs '.' 输出自带双引号（如 "text\n"）
+# 嵌入 heredoc 的 "suggestion": "$escaped" → 产出现双引号 → JSON 断裂
+escaped=$(printf '%s' "$1" | jq -Rs '.')
+
+# 正确：纯 bash 参数展开，不引入外围引号
+local str="$1"
+str="${str//\\/\\\\}"
+str="${str//\"/\\\"}"
+str="${str//$'\t'/\\t}"
+str="${str//$'\r'/\\r}"
+printf '%s' "$str"
+```
+
+**根因**：jq 输出的是"一个完整的 JSON 值"（含外围引号），而 heredoc 中 `"$var"` 展开期望的只是"值的内容"（不含引号）。两者拼接产生 `""...""` 结构。不依赖 jq 是最简单可靠的方案。
+
+### 3.12 审查终止规则
+
+**经过 7 轮多角色 agent 审查的经验**：项目审查在 3-4 轮后出现严重的边际效益递减。
+
+- 第 1-3 轮：发现真实 P0 崩溃和功能缺陷（每轮 ~5-10 个）
+- 第 4-5 轮：发现边缘情况和文档不一致（~10-20 个，但多为 polish）
+- 第 6-7 轮：88% 以上的发现是文档格式、触发词措辞等 polish 项
+
+**建议**：3 轮多角色审查 + 1 轮针对性安全审查 = 到达终点。此后只修复用户报告的 bug，不再主动发起审查。
+
+### 3.13 第三方依赖版本锁定
+
+所有 `pip install` 和 `brew install` 命令必须锁定版本：
+
+```bash
+# 错误：浮动最新版，供应链风险
+pip install pre-commit
+
+# 正确：锁定最低版本
+pip install "pre-commit>=4.0"
+```
+
+适用于：`init.sh`（pre-commit）、`init.ps1`（pre-commit）、`ralph-setup.sh`（tmux-orche）、README 中所有 install 命令。
+
+### 3.14 Shell 脚本变量默认值
+
+在 `set -e` 开启的脚本中，条件分支内初始化的变量必须在分支外提供默认值：
+
+```bash
+set -e
+
+# 错误：commit_count 仅在 git 仓库分支内赋值，非 git 仓库中未定义
+if git rev-parse --git-dir; then
+    commit_count=$(git log --oneline --since="$THIS_WEEK" | wc -l)
+fi
+if [ "$commit_count" -gt 20 ]; then ...  # 非 git 仓库下崩溃
+
+# 正确：提前设定默认值
+commit_count=0
+if git rev-parse --git-dir; then
+    commit_count=$(git log --oneline --since="$THIS_WEEK" | wc -l)
+fi
+```
+
+本次修复：`weekly-report.sh` 中 `commit_count`、`review_reports`、`unstaged` 三个变量加上默认值 0。
 
 ---
 
@@ -647,6 +726,9 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| **v1.6.2** | 2026-05-01 | Hook JSON 损坏修复 + 版本同步 + 路径修正 + 非 git 仓库防崩溃（58 测试，3 提交） |
+| v1.6.1 | 2026-05-01 | 安全加固 + 供应链锁定 + Skill 触发词去重 + 23 项新测试（35→58 测试） |
+| v1.6.0 | 2026-05-01 | 四轮 40 项审查修复：Hooks 重构 + 供应链锁定 + 模板扩展 + CI/CD 矩阵 |
 | v1.5.2 | 2026-04-30 | 死代码清理 + 文档修正 + 配置补全（多agent审查修复） |
 | v1.5.1 | 2026-04-30 | 隐藏目录合规 + 架构安全 + Spec Generation 集成（26 文件变更） |
 | v1.5.0 | 2026-04-30 | Agent Teams 自动建议、Routines 集成、Plugin 市场 |
@@ -704,14 +786,4 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 ---
 
-*本文档为 claude-code-init 项目交接专用，涵盖设计理念、目录结构、易遗漏点和常见问题。如有新增问题，请追加到对应章节。*
-**Spec Generation 集成（5 新增）**：
-- SPEC_Template.md（7 节结构模板）
-- CLAUDE.md spec 索引行
-- SOUL.md spec 检查规则 + 5 分+ 示例
-- GUIDE.md 四层文档架构文档
-- CHANGELOG.md 创建
-
----
-
-*本文档为 claude-code-init 项目交接专用，涵盖设计理念、目录结构、易遗漏点和常见问题。如有新增问题，请追加到对应章节。*
+*本文档为 claude-code-init 项目交接专用。v1.6.2，58 测试全部通过，10 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*
