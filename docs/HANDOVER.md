@@ -789,4 +789,34 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 ---
 
+## 十二、当前状态（v1.6.2）
+
+### 已修复（本轮收尾）
+- S1: ralph commit hash 硬编码 ✓
+- S2: pip tmux-orche 版本精确锁定 ✓
+- C2: configure-gitignore.sh 添加 set -e ✓
+- D1: CLAUDE.md 结构图幽灵目录移除 ✓
+- D2: SECURITY.md PGP 矛盾消除 ✓
+- R1: __pycache__ 清理 ✓
+
+### 已知未修复（均不影响发版）
+
+| # | 问题 | 严重度 | 不修复理由 |
+|---|------|:--:|------|
+| C1 | check_docs_consistency.py PROJECT_ROOT 路径 | 低 | 部署到目标项目后行为正确 |
+| C3 | init.sh 参数顺序边缘情况 | 极低 | index.js 调用顺序正确 |
+| S3 | GPG 验证为可选 | 低 | 安全门禁靠硬编码 commit hash，GPG 是锦上添花 |
+
+### Phase 2 路线图（测试盲区，按需推进）
+- init.sh/init.ps1 端到端执行测试（T1）
+- Hook 场景 8 语义安全检测（T2）
+- index.js 主路径执行测试（T3）
+- init.sh --skip-*/--force 参数验证（T4）
+- 模板版本比较函数测试（T5）
+- Hook stdin 超时回退路径（T6）
+- Hook JSON 转义边界情况（T7）
+- pre-commit 实际安装验证（T8）
+
+---
+
 *本文档为 claude-code-init 项目交接专用。v1.6.2，58 测试全部通过，10 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*
