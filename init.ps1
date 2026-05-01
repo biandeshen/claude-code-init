@@ -189,7 +189,7 @@ Write-Step "复制校验脚本和 Shell 工具到 .claude/scripts/"
 # 不包括：check-env.sh、configure-gitignore.*、lib/（仅 init 时用）
 # 不包括：__pycache__/（编译缓存）
 $ScriptWhitelist = @(
-    "check_dependencies.py", "check_docs_consistency.py",
+    "check-env.sh", "check_dependencies.py", "check_docs_consistency.py",
     "check_ecc.sh", "check_function_length.py",
     "check_import_order.py", "check_path_consistency.py",
     "check_project_structure.py", "check_secrets.py",

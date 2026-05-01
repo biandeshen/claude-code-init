@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict';
 /**
  * claude-code-init - Claude Code 项目脚手架
  *

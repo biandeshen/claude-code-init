@@ -250,7 +250,7 @@ print(' '.join(data['scripts']))
     fi
 fi
 if [ -z "$SCRIPT_WHITELIST" ]; then
-    SCRIPT_WHITELIST="check_dependencies.py check_docs_consistency.py check_ecc.sh check_function_length.py check_import_order.py check_path_consistency.py check_project_structure.py check_secrets.py check_trigger_conflicts.py tmux-session.sh weekly-report.sh ralph-setup.sh trigger-optimizer.sh validate_skills.sh PROMPT.md"
+    SCRIPT_WHITELIST="check-env.sh check_dependencies.py check_docs_consistency.py check_ecc.sh check_function_length.py check_import_order.py check_path_consistency.py check_project_structure.py check_secrets.py check_trigger_conflicts.py tmux-session.sh weekly-report.sh ralph-setup.sh trigger-optimizer.sh validate_skills.sh PROMPT.md"
 fi
 
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"

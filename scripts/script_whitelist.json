@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "lastUpdated": "2026-05-01",
   "excluded": [
-    "check-env.sh",
     "configure-gitignore.sh",
     "__pycache__/"
   ],
-  "excludedReason": "check-env.sh and configure-gitignore.sh are init-only, not deployed; __pycache__/ is build cache",
+  "excludedReason": "configure-gitignore.sh is init-only, not deployed; __pycache__/ is build cache",
   "scripts": [
+    "check-env.sh",
     "check_dependencies.py",
     "check_docs_consistency.py",
     "check_ecc.sh",

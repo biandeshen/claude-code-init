@@ -1,10 +1,21 @@
 #!/bin/bash
 # scripts/check-env.sh
 # Claude Code 开发环境完整性检查
+# 注意：此脚本是自包含的，不依赖 lib/common.sh（部署后无此依赖）
 
-# 加载公共函数库
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/lib/common.sh"
+# ─── 颜色输出（自包含，不依赖 common.sh） ───
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+GRAY='\033[0;90m'
+NC='\033[0m'
+
+echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
+echo_success() { echo -e "${GREEN}[成功]${NC} $1"; }
+echo_warn() { echo -e "${YELLOW}[警告]${NC} $1"; }
+echo_fail() { echo -e "${RED}[失败]${NC} $1"; }
+echo_info() { echo -e "[信息] $1"; }
 
 echo -e "${CYAN}=== Claude Code 开发环境检查 ===${NC}"
 echo ""
