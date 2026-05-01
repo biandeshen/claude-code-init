@@ -15,6 +15,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = $PSScriptRoot
+$CleanupNeeded = $false
+$InitCompleted = $false
 
 # 路径规范化比较（处理符号链接、junction、不同路径表示形式）
 function Test-SamePath {
@@ -40,6 +42,8 @@ Write-Host "==============================================" -ForegroundColor Cya
 Write-Host "  Claude Code 开发环境一键初始化 (v1.6.5)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
+
+try {
 
 # 1. 确认目标目录
 Write-Step "确认目标目录: $ProjectPath"
@@ -67,6 +71,9 @@ if (-not (Test-Path ".git")) {
 } else {
     Write-Info "Git 仓库已存在，跳过"
 }
+
+# Git 初始化成功后，标记需要清理（脚本中途退出时清理）
+$CleanupNeeded = $true
 
 # 3. 安装核心 Claude Code 插件 (ECC + Superpowers)
 if ($SkipECC -and $SkipSuperpowers) {
@@ -537,10 +544,12 @@ if (Test-Path $memoryLocalPath) {
 Write-Step "配置 .gitignore"
 $gitignoreSh = Join-Path $ScriptDir "scripts\configure-gitignore.sh"
 $gitignorePs1 = Join-Path $ScriptDir "scripts\configure-gitignore.ps1"
+# --force 模式下自动输入 "1"（全部忽略），避免交互
+$configureInput = if ($Force) { "1" } else { "" }
 if (Test-Path $gitignoreSh) {
-    bash "$gitignoreSh" "$ProjectPath"
+    $configureInput | bash "$gitignoreSh" "$ProjectPath"
 } elseif (Test-Path $gitignorePs1) {
-    & $gitignorePs1 -ProjectPath $ProjectPath
+    $configureInput | & $gitignorePs1 -ProjectPath $ProjectPath
 } else {
     Write-Warn "未找到配置脚本，跳过 .gitignore 配置"
 }
@@ -551,6 +560,9 @@ $checkEnvScript = Join-Path $ScriptDir "scripts\check-env.sh"
 if (Test-Path $checkEnvScript) {
     Write-Info "环境检查脚本已复制到项目"
 }
+
+# 标记初始化完成（防止 cleanup 误删）
+$InitCompleted = $true
 
 # 完成
 Write-Host ""
@@ -595,3 +607,19 @@ Write-Host ""
 Write-Host "如需更新规范，运行:" -ForegroundColor Gray
 Write-Host "  git -C `"$ScriptDir`" pull" -ForegroundColor Gray
 Write-Host ""
+
+} catch {
+    Write-Fail "初始化失败: $_"
+    $InitCompleted = $false
+    exit 1
+} finally {
+    if (-not $InitCompleted -and $CleanupNeeded) {
+        Write-Host ""
+        Write-Warn "⚠️  初始化未完成，正在清理..."
+        $claudeDir = "$ProjectPath\.claude"
+        if (Test-Path $claudeDir) {
+            Remove-Item -Recurse -Force $claudeDir
+            Write-Warn "已清理 $claudeDir"
+        }
+    }
+}

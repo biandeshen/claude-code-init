@@ -590,13 +590,18 @@ echo ""
 echo_step "处理 AI 开发配置文件"
 
 # 优先使用 Bash 脚本（本机原生，零依赖）
+# --force 模式下自动选 "1"（全部忽略），避免交互
+CONFIGURE_INPUT=""
+if [ "$FORCE_OVERWRITE" = true ]; then
+    CONFIGURE_INPUT="1"
+fi
 if [ -f "$SCRIPT_DIR/scripts/configure-gitignore.sh" ]; then
-    bash "$SCRIPT_DIR/scripts/configure-gitignore.sh" "$PROJECT_PATH"
+    echo "$CONFIGURE_INPUT" | bash "$SCRIPT_DIR/scripts/configure-gitignore.sh" "$PROJECT_PATH"
 # 回退到 PowerShell 脚本
 elif command -v pwsh >/dev/null 2>&1 && [ -f "$SCRIPT_DIR/scripts/configure-gitignore.ps1" ]; then
-    pwsh -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/scripts/configure-gitignore.ps1" -ProjectPath "$PROJECT_PATH"
+    echo "$CONFIGURE_INPUT" | pwsh -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/scripts/configure-gitignore.ps1" -ProjectPath "$PROJECT_PATH"
 elif command -v powershell >/dev/null 2>&1 && [ -f "$SCRIPT_DIR/scripts/configure-gitignore.ps1" ]; then
-    powershell -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/scripts/configure-gitignore.ps1" -ProjectPath "$PROJECT_PATH"
+    echo "$CONFIGURE_INPUT" | powershell -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/scripts/configure-gitignore.ps1" -ProjectPath "$PROJECT_PATH"
 else
     echo_warn "未找到配置脚本，跳过 .gitignore 配置"
 fi

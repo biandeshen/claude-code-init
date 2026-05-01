@@ -49,7 +49,7 @@ suggestion=""
 
 # ─── 场景 1：编辑测试文件 → 推荐 TDD ───
 if echo "$file_path" | grep -qE "(^|/)tests?/" 2>/dev/null; then
-    suggestion="检测到你正在编辑测试文件。建议使用「tdd-workflow」技能来强制执行红-绿-重构循环，输入 /tdd-workflow 手动触发。 | "
+    suggestion="检测到你正在编辑测试文件。建议使用「tdd」技能来强制执行红-绿-重构循环，输入 /tdd 手动触发。 | "
 fi
 
 # ─── 场景 2：编辑安全相关文件 → 确定性加载 code-review ───

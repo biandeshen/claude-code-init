@@ -279,8 +279,8 @@ description: >
 - 检查 `~/.claude/plugins/everything-claude-code` 目录是否存在
 - 未安装时自动执行降级策略并提示：
   - `/qa` → 降级为手动测试或 `/review`
-  - `/plan-ceo-review` → 降级为 `/brainstorming`
-  - `/plan-eng-review` → 降级为 `/brainstorming` + 架构自审
+  - `/plan-ceo-review` → 降级为「brainstorming」技能自动触发
+  - `/plan-eng-review` → 降级为「brainstorming」技能自动触发 + 架构自审
 
 ## 输出格式
 
