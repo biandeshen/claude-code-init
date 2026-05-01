@@ -6,7 +6,7 @@
 
 exclude: |
   (?x)(
-    ^\.claude/.claude/scripts/|
+    ^\.claude/scripts/|
     ^venv/|
     ^\.venv/
   )

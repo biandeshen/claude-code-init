@@ -239,10 +239,10 @@ if [ -f "$SCRIPT_DIR/scripts/script_whitelist.json" ]; then
         WHITELIST_FILE="$SCRIPT_DIR/scripts/script_whitelist.json"
         SCRIPT_WHITELIST=$("$PYTHON_BIN" -c "
 import json, sys
-with open(sys.argv[1]) as f:
+with open(sys.argv[1], encoding='utf-8') as f:
     data = json.load(f)
 print(' '.join(data['scripts']))
-" "$WHITELIST_FILE" 2>/dev/null)
+" "$WHITELIST_FILE" 2>/dev/null || true)
     fi
 fi
 if [ -z "$SCRIPT_WHITELIST" ]; then
@@ -454,7 +454,49 @@ if [ -d "$HOOKS_SOURCE_DIR" ]; then
 fi
 if [ -f "$SETTINGS_SOURCE" ]; then
     if [ -f "$SETTINGS_TARGET" ]; then
-        echo_warn ".claude/settings.json 已存在，如需合并 Hook 配置请手动处理"
+        # 备份已有配置
+        cp "$SETTINGS_TARGET" "$SETTINGS_TARGET.bak"
+        # 尝试合并 claude-code-init 的 hooks/env 到已有配置中
+        MERGE_PYTHON=""
+        if command -v python3 >/dev/null 2>&1; then
+            MERGE_PYTHON="python3"
+        elif command -v python >/dev/null 2>&1; then
+            MERGE_PYTHON="python"
+        fi
+        if [ -n "$MERGE_PYTHON" ]; then
+            if "$MERGE_PYTHON" -c "
+import json, sys
+try:
+    with open(sys.argv[1], encoding='utf-8') as f:
+        src = json.load(f)
+    with open(sys.argv[2], encoding='utf-8') as f:
+        tgt = json.load(f)
+except Exception:
+    sys.exit(1)
+for k, v in src.get('env', {}).items():
+    if k not in tgt.get('env', {}):
+        tgt.setdefault('env', {})[k] = v
+for htype in ('SessionStart', 'PreToolUse', 'PostToolUse'):
+    for hook in src.get('hooks', {}).get(htype, []):
+        exists = any(
+            h.get('matcher') == hook.get('matcher')
+            and h.get('command') == hook.get('command')
+            for h in tgt.get('hooks', {}).get(htype, [])
+        )
+        if not exists:
+            tgt.setdefault('hooks', {}).setdefault(htype, []).append(hook)
+with open(sys.argv[2], 'w', encoding='utf-8') as f:
+    json.dump(tgt, f, indent=2, ensure_ascii=False)
+    f.write('\n')
+" "$SETTINGS_SOURCE" "$SETTINGS_TARGET" 2>/dev/null; then
+                rm -f "$SETTINGS_TARGET.bak"
+                echo_success "已合并 settings.json（smart-context hooks + Agent Teams 环境变量）"
+            else
+                echo_warn "settings.json 合并失败，备份保留在 .bak，请手动处理"
+            fi
+        else
+            echo_warn "settings.json 已存在，无法自动合并（Python 不可用），备份保留在 .bak，请手动合并"
+        fi
     else
         cp "$SETTINGS_SOURCE" "$SETTINGS_TARGET"
         echo_success "已复制 settings.json 到 .claude/"
@@ -582,8 +624,8 @@ if [ "$SKIP_CCDISCIPLINE" != true ]; then
 fi
 echo -e "  ${GREEN}✅${NC} 22 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd /ship-review）"
 echo -e "  ${GREEN}✅${NC} 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）"
-echo -e "  ${GREEN}✅${NC} 6 个项目完整性校验脚本"
-echo -e "  ${GREEN}✅${NC} Pre-commit 自动检查（9 个检查项）"
+echo -e "  ${GREEN}✅${NC} 9 个项目完整性校验脚本"
+echo -e "  ${GREEN}✅${NC} Pre-commit 自动检查（18 个检查项）"
 echo -e "  ${GREEN}✅${NC} 无人值守长任务环境（tmux + Ralph Wiggum 循环）"
 echo -e "  ${GREEN}✅${NC} Agent Teams 并行开发/审查（/team）"
 echo -e "  ${GREEN}✅${NC} gstack 角色体系（CEO审查/架构审查/QA测试/6-Agent 发布审查）"

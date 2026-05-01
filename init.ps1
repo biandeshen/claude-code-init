@@ -406,7 +406,39 @@ if (-not (Test-SamePath $HooksSourceDir $HooksTargetDir) -and (Test-Path $HooksS
 }
 if (Test-Path $SettingsSource) {
     if (Test-Path $SettingsTarget) {
-        Write-Warn ".claude/settings.json 已存在，如需合并 Hook 配置请手动处理"
+        Copy-Item -Path $SettingsTarget -Destination "$SettingsTarget.bak" -Force
+        try {
+            $src = Get-Content $SettingsSource -Raw -Encoding UTF8 | ConvertFrom-Json
+            $tgt = Get-Content $SettingsTarget -Raw -Encoding UTF8 | ConvertFrom-Json
+            # Merge env
+            if ($src.env) {
+                foreach ($key in $src.env.PSObject.Properties.Name) {
+                    if (-not $tgt.env -or (-not ($tgt.env.$key))) {
+                        if (-not $tgt.env) { $tgt | Add-Member -NotePropertyName 'env' -NotePropertyValue @{} }
+                        $tgt.env | Add-Member -NotePropertyName $key -NotePropertyValue $src.env.$key -Force
+                    }
+                }
+            }
+            # Merge hooks
+            foreach ($htype in @('SessionStart', 'PreToolUse', 'PostToolUse')) {
+                $srcHooks = $src.hooks.$htype
+                if ($srcHooks) {
+                    if (-not $tgt.hooks) { $tgt | Add-Member -NotePropertyName 'hooks' -NotePropertyValue @{} }
+                    if (-not $tgt.hooks.$htype) { $tgt.hooks | Add-Member -NotePropertyName $htype -NotePropertyValue @() }
+                    foreach ($hook in $srcHooks) {
+                        $exists = ($tgt.hooks.$htype | Where-Object { $_.matcher -eq $hook.matcher -and $_.command -eq $hook.command }) -ne $null
+                        if (-not $exists) {
+                            $tgt.hooks.$htype += $hook
+                        }
+                    }
+                }
+            }
+            $tgt | ConvertTo-Json -Depth 10 | Set-Content -Path $SettingsTarget -Encoding UTF8
+            Remove-Item -Path "$SettingsTarget.bak" -Force
+            Write-Success "已合并 settings.json（smart-context hooks + Agent Teams 环境变量）"
+        } catch {
+            Write-Warn "settings.json 合并失败，备份保留在 .bak，请手动处理"
+        }
     } else {
         Copy-Item -Path $SettingsSource -Destination $SettingsTarget -Force
         Write-Success "已复制 settings.json 到 .claude/"
@@ -533,8 +565,8 @@ if (-not $SkipCcDiscipline) {
 }
 Write-Host "  ✅ 22 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd /ship-review）" -ForegroundColor White
 Write-Host "  ✅ 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）" -ForegroundColor White
-Write-Host "  ✅ 6 个项目完整性校验脚本" -ForegroundColor White
-Write-Host "  ✅ Pre-commit 自动检查（9 个检查项）" -ForegroundColor White
+Write-Host "  ✅ 9 个项目完整性校验脚本" -ForegroundColor White
+Write-Host "  ✅ Pre-commit 自动检查（18 个检查项）" -ForegroundColor White
 Write-Host "  ✅ 无人值守长任务环境（tmux + Ralph Wiggum 循环）" -ForegroundColor White
 Write-Host "  ✅ Agent Teams 并行开发/审查（/team）" -ForegroundColor White
 Write-Host "  ✅ gstack 角色体系（CEO审查/架构审查/QA测试/6-Agent 发布审查）" -ForegroundColor White
