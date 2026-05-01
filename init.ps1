@@ -1,6 +1,6 @@
 ﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.6.0 | 2026-05-01
+# 版本: v1.6.3 | 2026-05-01
 
 param(
     [Parameter(Mandatory=$true)]
@@ -37,7 +37,7 @@ function Write-Info { param($msg) Write-Host "[信息] $msg" -ForegroundColor Gr
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  Claude Code 开发环境一键初始化 (v1.6.0)" -ForegroundColor Cyan
+Write-Host "  Claude Code 开发环境一键初始化 (v1.6.3)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -174,9 +174,11 @@ Write-Step "复制校验脚本和 Shell 工具到 .claude/scripts/"
 # 不包括：check-env.sh、configure-gitignore.*、lib/（仅 init 时用）
 # 不包括：__pycache__/（编译缓存）
 $ScriptWhitelist = @(
-    "check_dependencies.py", "check_function_length.py",
-    "check_import_order.py", "check_project_structure.py",
-    "check_secrets.py", "check_docs_consistency.py",
+    "check_dependencies.py", "check_docs_consistency.py",
+    "check_ecc.sh", "check_function_length.py",
+    "check_import_order.py", "check_path_consistency.py",
+    "check_project_structure.py", "check_secrets.py",
+    "check_trigger_conflicts.py",
     "tmux-session.sh", "weekly-report.sh", "ralph-setup.sh",
     "trigger-optimizer.sh", "validate_skills.sh", "PROMPT.md"
 )
