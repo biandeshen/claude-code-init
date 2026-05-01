@@ -25,7 +25,7 @@ STANDARD_LIBRARY = {
     # 基础类型
     "bool", "int", "float", "str", "bytes", "bytearray", "list", "dict", "set", "tuple", "frozenset",
     # 常用模块
-    "re", "json", "time", "datetime", "random", "math", "statistics",
+    "re", "json", "time", "random", "math",
     "collections", "itertools", "functools", "operator", "contextlib",
     "pathlib", "argparse", "getopt", "getpass", "optparse", "shlex",
     # 文件处理
@@ -33,7 +33,7 @@ STANDARD_LIBRARY = {
     # 类型
     "typing", "types", "abc", "copy", "pprint", "reprlib",
     # IO
-    "io", "fileinput", "stat", "statvfs",
+    "stat", "statvfs",
     # 文本
     "string", "textwrap", "unicodedata", "stringprep", "readline",
     # 格式化
@@ -51,7 +51,7 @@ STANDARD_LIBRARY = {
     # 高级
     "logging", "traceback", "warnings",
     "threading", "multiprocessing", "concurrent", "asyncio",
-    "subprocess", "sched", "queue", "_thread",
+    "subprocess", "queue", "_thread",
     # 程序生命周期
     "atexit", "sched",
     # 持久化
@@ -66,7 +66,7 @@ STANDARD_LIBRARY = {
     "gc", "weakref", "enum", "dataclasses",
     "codecs", "locale", "gettext", "platform",
     "errno", "ctypes", "signal", "mmap", "resource",
-    "ipaddress", "enum",
+    "ipaddress",
 }
 
 # 第三方库（可以通过配置文件扩展）

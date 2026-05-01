@@ -19,10 +19,8 @@ if command -v timeout >/dev/null 2>&1; then
     event_data=$(timeout 5 cat 2>/dev/null)
 elif command -v perl >/dev/null 2>&1; then
     event_data=$(perl -e 'alarm 5; eval { local $SIG{ALRM} = sub { die "timeout\n" }; print <STDIN> }' 2>/dev/null)
-elif command -v dd >/dev/null 2>&1; then
-    event_data=$(dd bs=4096 count=128 2>/dev/null)
 else
-    # 最终回退：使用 read -t 逐行读取，最多读 5 行后超时
+    # 回退：使用 read -t 逐行读取，最多读 5 行后超时（不要用 dd，它会阻塞等待 EOF）
     event_data=""
     for _ in 1 2 3 4 5; do
         IFS= read -t 1 line 2>/dev/null || break
@@ -89,9 +87,10 @@ fi
 
 # ─── 场景 6：rm -rf 物理阻断（最高优先级）───
 # 检测危险删除命令——物理阻断，Claude Code 无法绕过
-# 覆盖：rm -rf /、sudo rm -rf /、rm -r -f /、rm --recursive --force /、rm -rf ~、rm -rf ../
+# 覆盖：rm -rf /、sudo rm -rf /、nice rm -rf /、nohup rm -rf / 等
+# 检测常见命令前缀（sudo/command/nice/nohup/env/time/systemd-run/busybox/chroot）
 # 注意：变量展开（rm $VAR）和命令替换（rm $(...)）无法通过纯 shell 正则检测
-if echo "$command" | grep -qE "(^|[;&|])[[:space:]]*(sudo[[:space:]]+|command[[:space:]]+)?rm[[:space:]]+(-[rRf]+[[:space:]]*)+[[:space:]]*(/|~|[.][.])" 2>/dev/null; then
+if echo "$command" | grep -qE "(^|[;&|])[[:space:]]*((sudo|command|nice|nohup|env|time|systemd-run|busybox|chroot)[[:space:]]+)?rm[[:space:]]+(-[rRf]+[[:space:]]*)+[[:space:]]*(/|~|[.][.])" 2>/dev/null; then
     cat <<EOF
 {
   "hookSpecificOutput": {
@@ -118,6 +117,8 @@ if echo "$command" | grep -qE "(^|[;&|])[[:space:]]*rm[[:space:]]+(-[rRf]+|--rec
 fi
 
 # ─── 场景 8：语义级安全检测（函数名检测）───
+# 测试模式下跳过（避免 git diff HEAD 在有未提交更改的环境中误触发）
+if [ "${HOOK_TEST_MODE:-0}" != "1" ]; then
 # 获取最近编辑的函数名
 edited_function=$(git diff HEAD 2>/dev/null | grep "^@@" -A5 | sed -n 's/.*(def\|function\|class\|fn)\s\+\([a-zA-Z_][a-zA-Z0-9_]*\).*/\1/p' | head -1)
 
@@ -126,12 +127,16 @@ if echo "$edited_function" | grep -qiE "(encrypt|decrypt|hash|token|auth|login|p
     if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
     suggestion="${suggestion}检测到你正在编辑安全敏感函数「$edited_function」，建议使用「code-review」技能重点审查安全性。"
 fi
+fi
 
 # ─── 场景 9：夜间无人值守推荐 ───
-current_hour=$(date +%H 2>/dev/null || echo "12")
-if [ "$current_hour" -ge 18 ] && [ "$current_hour" -le 23 ]; then
-    if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
-    suggestion="${suggestion}已到夜间，是否设置云端 Routine 定时执行？输入 /routine 创建定时任务。"
+# 测试模式下跳过时间依赖检测（避免 CI 夜间失败）
+if [ "${HOOK_TEST_MODE:-0}" != "1" ]; then
+    current_hour=$(date +%H 2>/dev/null || echo "12")
+    if [ "$current_hour" -ge 18 ] && [ "$current_hour" -le 23 ]; then
+        if [ -n "$suggestion" ]; then suggestion="$suggestion "; fi
+        suggestion="${suggestion}已到夜间，是否设置云端 Routine 定时执行？输入 /routine 创建定时任务。"
+    fi
 fi
 
 # ─── 场景 10：首次审查后推荐 Agent Teams ───

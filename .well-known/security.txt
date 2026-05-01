@@ -7,13 +7,11 @@ Contact: mailto:biandeshen@outlook.com
 Contact: https://github.com/biandeshen/claude-code-init/security/advisories/new
 
 # 加密
-Encryption: https://github.com/biandeshen.gpg
+Encryption: https://github.com/biandeshen/claude-code-init/blob/main/public-key.asc
 
 # 策略
 Policy: https://github.com/biandeshen/claude-code-init/blob/main/SECURITY.md
 
-# 项目信息
-Project: https://github.com/biandeshen/claude-code-init
 Preferred-Languages: en, zh
 
 # 时效

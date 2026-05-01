@@ -515,7 +515,7 @@ Write-Host "==============================================" -ForegroundColor Gre
 Write-Host ""
 Write-Host "你现在拥有：" -ForegroundColor Cyan
 Write-Host "  ✅ 10 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）" -ForegroundColor White
-Write-Host "  ✅ 18 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /plan-ceo-review /routine /messages /overnight-report）" -ForegroundColor White
+Write-Host "  ✅ 21 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd）" -ForegroundColor White
 Write-Host "  ✅ 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）" -ForegroundColor White
 Write-Host "  ✅ 6 个项目完整性校验脚本" -ForegroundColor White
 Write-Host "  ✅ Pre-commit 自动检查（9 个检查项）" -ForegroundColor White

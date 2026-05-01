@@ -178,7 +178,7 @@ def check_config_file(file_path: str) -> list:
                             )
                             break
 
-    except Exception as e:
+    except (IOError, OSError, UnicodeDecodeError) as e:
         print(f"检查文件失败 {file_path}: {e}")
 
     return errors

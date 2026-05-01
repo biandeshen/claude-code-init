@@ -45,7 +45,6 @@
 
 对于敏感漏洞，请使用以下 PGP 密钥加密报告内容：
 - 密钥指纹：`B1A8 3E9F 2C4D 6E7F 8A90 B2C4 D6E7 F8A9 0B1C 2D3E`
-- 密钥下载：`https://github.com/biandeshen.gpg`
+- 密钥下载：`https://github.com/biandeshen/claude-code-init/blob/main/public-key.asc`
 
-> 注意：PGP 密钥尚在配置中。在密钥可用前，请通过邮件发送漏洞报告。
-> 我们收到加密报告后会通过同一渠道回复解密后的确认信息。
+> 注意：PGP 密钥尚在配置中。密钥就绪后会更新此文档。

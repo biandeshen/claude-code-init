@@ -210,12 +210,22 @@ echo_step "复制校验脚本和 Shell 工具到 .claude/scripts/"
 # 不包括：__pycache__/（编译缓存）
 # 优先从 script_whitelist.json 读取，不存在则使用硬编码列表
 if [ -f "$SCRIPT_DIR/scripts/script_whitelist.json" ]; then
-    SCRIPT_WHITELIST=$(python3 -c "
-import json
-with open('$SCRIPT_DIR/scripts/script_whitelist.json') as f:
+    # 检测可用的 Python 解释器（Windows Git Bash 可能只有 python）
+    PYTHON_BIN=""
+    if command -v python3 >/dev/null 2>&1; then
+        PYTHON_BIN="python3"
+    elif command -v python >/dev/null 2>&1; then
+        PYTHON_BIN="python"
+    fi
+    if [ -n "$PYTHON_BIN" ]; then
+        WHITELIST_FILE="$SCRIPT_DIR/scripts/script_whitelist.json"
+        SCRIPT_WHITELIST=$("$PYTHON_BIN" -c "
+import json, sys
+with open(sys.argv[1]) as f:
     data = json.load(f)
 print(' '.join(data['scripts']))
-" 2>/dev/null)
+" "$WHITELIST_FILE" 2>/dev/null)
+    fi
 fi
 if [ -z "$SCRIPT_WHITELIST" ]; then
     SCRIPT_WHITELIST="check_dependencies.py check_function_length.py check_import_order.py check_project_structure.py check_secrets.py check_docs_consistency.py check_trigger_conflicts.py check_ecc.sh tmux-session.sh weekly-report.sh ralph-setup.sh trigger-optimizer.sh validate_skills.sh PROMPT.md"
@@ -552,7 +562,7 @@ echo -e "${GREEN}==============================================${NC}"
 echo ""
 echo -e "${CYAN}你现在拥有：${NC}"
 echo -e "  ${GREEN}✅${NC} 9 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/初始化）"
-echo -e "  ${GREEN}✅${NC} 21 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd）"
+echo -e "  ${GREEN}✅${NC} 21 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd）"
 echo -e "  ${GREEN}✅${NC} 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）"
 echo -e "  ${GREEN}✅${NC} 6 个项目完整性校验脚本"
 echo -e "  ${GREEN}✅${NC} Pre-commit 自动检查（9 个检查项）"

@@ -46,7 +46,7 @@ claude-code-init/
 │   ├── SPEC_Template.md
 │   ├── PLAN_Template.md
 │   └── ROUTINE_Template.md
-├── commands/              # 20 个斜杠命令 (→ .claude/commands/)
+├── commands/              # 21 个斜杠命令 (→ .claude/commands/)
 ├── .claude/               # Claude Code 配置
 │   ├── skills/            # 10 个自定义 Skill (→ .claude/skills/)
 │   ├── scripts/           # Python 校验 + PROMPT.md (→ .claude/scripts/)
