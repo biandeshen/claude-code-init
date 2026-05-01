@@ -4,6 +4,7 @@
 
 > **完整流程见**: `.claude/skills/tdd-workflow/SKILL.md`
 > 本文件为快捷入口，完整 TDD 工作流（含验收测试、质量门禁等）由对应 Skill 提供。
+> 如果 tdd-workflow 技能未自动加载，请说 "加载 tdd-workflow 技能"。
 
 ## 用法
 

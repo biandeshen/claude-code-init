@@ -2,6 +2,7 @@
 
 > **完整指令见**: `.claude/skills/code-review/SKILL.md`
 > 本文件为快捷入口，完整审查维度（OWASP 安全清单 + 逻辑审查）由对应 Skill 提供。
+> 如果 code-review 技能未自动加载，请说 "加载 code-review 技能"。
 
 全面代码审查：
 

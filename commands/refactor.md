@@ -2,6 +2,7 @@
 
 > **完整指令见**: `.claude/skills/safe-refactoring/SKILL.md`
 > 本文件为快捷入口，完整重构流程（含检查清单、覆盖率对比等）由对应 Skill 提供。
+> 如果 safe-refactoring 技能未自动加载，请说 "加载 safe-refactoring 技能"。
 
 安全重构，不改变外部行为：
 

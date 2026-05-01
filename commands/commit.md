@@ -2,6 +2,7 @@
 
 > **完整指令见**: `.claude/skills/git-commit/SKILL.md`
 > 本文件为快捷入口，完整提交流程（含 pre-commit 检查、push 确认等）由对应 Skill 提供。
+> 如果 git-commit 技能未自动加载，请说 "加载 git-commit 技能"。
 
 执行 Conventional Commits 规范化提交：
 

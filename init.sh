@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.5.9 | 2026-05-01
+# 版本: v1.6.0 | 2026-05-01
 
 set -euo pipefail
 
@@ -54,7 +54,7 @@ echo_info() { echo -e "[信息] $1"; }
 
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.9)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.6.0)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 

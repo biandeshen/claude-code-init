@@ -4,6 +4,18 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.0] - 2026-05-01
+
+### 第四轮多角色审查修复 — 全部 40 项问题闭环
+
+自 v1.5.4，经 5 个批次的系统性修复，覆盖 8 个 CRITICAL、13 个 HIGH、19 个 MEDIUM 级别问题。
+
+### Added
+- 骨架命令 fallback 提示：7 个命令（commit/review/fix/refactor/explain/validate/tdd）新增 "如果 Skill 未加载" 手动触发说明。
+
+### Changed
+- 版本号同步：package.json、init.sh、init.ps1、CLAUDE.md → v1.6.0。
+
 ## [1.5.9] - 2026-05-01
 
 ### Fixed

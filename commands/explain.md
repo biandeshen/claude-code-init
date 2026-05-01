@@ -2,6 +2,7 @@
 
 > **完整指令见**: `.claude/skills/code-explain/SKILL.md`
 > 本文件为快捷入口，完整解释框架（含动态分析、适用场景矩阵等）由对应 Skill 提供。
+> 如果 code-explain 技能未自动加载，请说 "加载 code-explain 技能"。
 
 解释代码的架构、数据流和关键决策：
 

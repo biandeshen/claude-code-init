@@ -2,6 +2,7 @@
 
 > **完整指令见**: `.claude/skills/project-validate/SKILL.md`
 > 本文件为快捷入口，完整校验流水线（含违规分级、自动修复建议等）由对应 Skill 提供。
+> 如果 project-validate 技能未自动加载，请说 "加载 project-validate 技能"。
 
 按顺序执行 .claude/scripts/ 中的 5 个校验脚本：
 
