@@ -214,7 +214,7 @@ PLAN.md    ← 执行层：任务执行的实时日志
 | **Plan.md** | 任务执行日志，记录每一步的实际操作 | 复杂功能开发**中** | "14:32 修改 auth.py → ✅ → 下一步..." |
 
 > **核心原则**：Spec 管"做什么"（事前设计），Plan 管"做了什么"（事后记录）。
-> 参考模板：[SPEC_Template.md](.claude/SPEC_Template.md) | [PLAN_Template.md](.claude/PLAN_Template.md)
+> 参考模板：[SPEC_Template.md](templates/SPEC_Template.md) | [PLAN_Template.md](templates/PLAN_Template.md)
 
 ### Spec 与 OpenSpec 的关系
 

@@ -490,10 +490,10 @@ EOF
 fi
 
 # 创建 MEMORY.local.md (个人私密记忆，不提交)
-if [ -f "$PROJECT_PATH/MEMORY.local.md" ]; then
+if [ -f "$PROJECT_PATH/.claude/MEMORY.local.md" ]; then
     if [ "$FORCE_OVERWRITE" = true ]; then
         echo_warn "MEMORY.local.md 已存在，--force 模式：覆盖"
-        cat > "$PROJECT_PATH/MEMORY.local.md" << 'LOCALEOF'
+        cat > "$PROJECT_PATH/.claude/MEMORY.local.md" << 'LOCALEOF'
 # 个人私密记忆
 # 此文件会被 .gitignore 忽略，不会提交到仓库
 # 记录个人偏好、工作习惯等不适合团队共享的内容
@@ -509,7 +509,7 @@ LOCALEOF
         echo_warn "MEMORY.local.md 已存在，跳过创建（使用 --force 可覆盖）"
     fi
 else
-    cat > "$PROJECT_PATH/MEMORY.local.md" << 'LOCALEOF'
+    cat > "$PROJECT_PATH/.claude/MEMORY.local.md" << 'LOCALEOF'
 # 个人私密记忆
 # 此文件会被 .gitignore 忽略，不会提交到仓库
 # 记录个人偏好、工作习惯等不适合团队共享的内容
@@ -520,7 +520,7 @@ else
 ---
 <!-- 在此记录个人偏好设置、临时笔记等内容 -->
 LOCALEOF
-    echo_success "已创建 MEMORY.local.md (gitignored)"
+    echo_success "已创建 MEMORY.local.md (.claude/)"
 fi
 
 # 12. 处理 .gitignore（调用独立脚本）

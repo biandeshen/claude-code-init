@@ -168,7 +168,7 @@ describe('init.sh Functional Checks', () => {
 
     test('init.sh: MEMORY.local.md has existence check', () => {
         const content = fs.readFileSync(path.join(projectRoot, 'init.sh'), 'utf-8');
-        assert.ok(content.includes('-f "$PROJECT_PATH/MEMORY.local.md"'), 'MEMORY.local.md should have existence check');
+        assert.ok(content.includes('-f "$PROJECT_PATH/.claude/MEMORY.local.md"'), 'MEMORY.local.md should have existence check');
     });
 });
 

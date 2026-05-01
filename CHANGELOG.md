@@ -4,6 +4,17 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.3] - 2026-05-01
+
+### Fixed
+- **MEMORY.local.md 路径不一致**：`init.sh`/`init.ps1` 中 MEMORY.local.md 创建在项目根目录，与 CLAUDE.local.md（`.claude/CLAUDE.local.md`）不一致。修复为 `.claude/MEMORY.local.md`
+- **configure-gitignore 规则同步**：四个 gitignore 配置脚本中 `MEMORY.local.md` 更新为 `.claude/MEMORY.local.md`，与 init 脚本保持一致
+- **大小写兼容**：`configure-gitignore.*` 中 `PLAN_TEMPLATE.md` → `PLAN_Template.md`，匹配实际文件名，确保 Linux 下 gitignore 正确匹配
+
+### Changed
+- GUIDE.md: 修复模板文件 markdown 链接（`.claude/` → `templates/`）
+- HANDOVER.md: 目录图中移除 `scripts/init.sh, init.ps1` 幽灵引用
+
 ## [1.6.2] - 2026-05-01
 
 ### 第六轮收尾修复 — Hook JSON 损坏 + 版本同步 + 测试加固

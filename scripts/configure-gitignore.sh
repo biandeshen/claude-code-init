@@ -50,7 +50,7 @@ case $choice in
 .pre-commit-config.yaml
 CLAUDE.md
 SOUL.md
-PLAN_TEMPLATE.md
+PLAN_Template.md
 openspec/
 # === claude-code-init ==="
         echo_success "已将所有 AI 配置文件加入 .gitignore"
@@ -59,7 +59,7 @@ openspec/
         rules="# === claude-code-init ===
 # Claude Code 个人本地文件（务必忽略）
 .claude/CLAUDE.local.md
-MEMORY.local.md
+.claude/MEMORY.local.md
 # === claude-code-init ==="
         echo_success "已忽略个人偏好文件，其他配置可提交"
         ;;
@@ -67,7 +67,7 @@ MEMORY.local.md
         rules="# === claude-code-init ===
 # Claude Code 个人本地文件
 .claude/CLAUDE.local.md
-MEMORY.local.md
+.claude/MEMORY.local.md
 # === claude-code-init ==="
         echo_success "所有 AI 配置文件提交就绪"
         ;;
@@ -78,7 +78,7 @@ MEMORY.local.md
 .pre-commit-config.yaml
 CLAUDE.md
 SOUL.md
-PLAN_TEMPLATE.md
+PLAN_Template.md
 openspec/
 # === claude-code-init ==="
         echo_warn "无效选择，已按默认处理（全部忽略）"

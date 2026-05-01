@@ -455,7 +455,7 @@ if (Test-Path $claudeLocalPath) {
 }
 
 # 创建 MEMORY.local.md (个人私密记忆，不提交)
-$memoryLocalPath = "$ProjectPath\MEMORY.local.md"
+$memoryLocalPath = "$ProjectPath\.claude\MEMORY.local.md"
 if (Test-Path $memoryLocalPath) {
     if ($Force) {
         Write-Warn "MEMORY.local.md 已存在，-Force 模式：覆盖"
