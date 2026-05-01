@@ -1,16 +1,14 @@
 ---
 name: code-review
-version: 1.0.0
-lastUpdated: 2026-05-01
 description: >
   对代码进行全面的质量审查。当用户提到审查代码、检查质量、review、
   帮我看看代码、帮我检查一下代码、代码质量分析时自动加载。
   也适用于提交前的最终检查。
 
-  中文触发词：审查、检查、review、看看代码、检查质量、代码审计、
-  代码分析、帮我review、帮我检查、安全、漏洞、加密、安全审查
+  中文触发词：审查、检查、看看代码、检查质量、代码审计、
+  质量分析、帮我review、帮我检查、安全、漏洞、加密、安全审查
 
-  英文触发词：review, check, examine, inspect, audit, quality, analyze code
+  英文触发词：review, check, examine, inspect, audit, quality
 ---
 
 # Code Review Protocol

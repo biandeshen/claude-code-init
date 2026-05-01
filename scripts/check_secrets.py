@@ -249,9 +249,8 @@ def check_python_files(file_paths: list) -> list:
                                 )
                                 break
 
-        except (IOError, OSError, UnicodeDecodeError):
-            # 文件读取错误，跳过该文件
-            pass
+        except (IOError, OSError, UnicodeDecodeError) as e:
+            print(f"警告: 无法读取文件 {file_path}: {e}", file=sys.stderr)
 
     return errors
 
@@ -281,9 +280,8 @@ def check_markdown_files(file_paths: list) -> list:
                         f"   匹配内容: {match_text[:30]}...\n"
                         f"   建议: 从 {file_path} 中删除此内容\n"
                     )
-        except (IOError, OSError, UnicodeDecodeError):
-            # 文件读取错误，跳过该文件
-            pass
+        except (IOError, OSError, UnicodeDecodeError) as e:
+            print(f"警告: 无法读取文件 {file_path}: {e}", file=sys.stderr)
 
     return errors
 
@@ -383,8 +381,10 @@ def main():
         if staged_files and staged_files[0]:
             errors.extend(check_python_files(staged_files))
             errors.extend(check_shell_files(staged_files))
-    except (IOError, OSError, UnicodeDecodeError):
-        pass
+    except (FileNotFoundError, OSError) as e:
+        # git 未安装或不在 git 仓库中，跳过暂存区检查
+        if not isinstance(e, FileNotFoundError):
+            print(f"警告: 暂存区检查失败: {e}", file=sys.stderr)
 
     # 5. 检查 Markdown 文件（记忆文件等）
     md_files = []

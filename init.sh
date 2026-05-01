@@ -61,7 +61,7 @@ cleanup() {
         echo -e "${YELLOW}已清理 ${PROJECT_PATH}/.claude${NC}"
     fi
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
 echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
 echo_success() { echo -e "${GREEN}[成功]${NC} $1"; }

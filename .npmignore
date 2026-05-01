@@ -5,6 +5,12 @@
 # GitHub
 .github/
 
+# Security (defense-in-depth—.gitignore covers this, but .npmignore is independent)
+.env
+.env.*
+*.pem
+*.key
+
 # Node
 node_modules/
 

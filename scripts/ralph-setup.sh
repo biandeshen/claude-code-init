@@ -18,7 +18,7 @@ fi
 
 RALPH_REPO="https://github.com/snarktank/ralph.git"
 RALPH_DIR="$HOME/.claude/skills/ralph"
-RALPH_COMMIT="main"  # 锁定版本（改为具体 commit hash 可固定版本）
+RALPH_COMMIT=""  # 留空则自动锁定 main 分支最新 commit（供应链安全：固定提交哈希）
 INSTALL_MODE="${1:-ralph}"
 
 # 检查 Claude Code 是否安装
@@ -55,23 +55,42 @@ install_jq() {
 install_ralph() {
     echo_step "安装 Ralph Wiggum..."
 
+    # 供应链安全：自动锁定 main 分支最新 commit
+    if [ -z "$RALPH_COMMIT" ]; then
+        RALPH_COMMIT=$(git ls-remote "$RALPH_REPO" refs/heads/main 2>/dev/null | cut -f1)
+        if [ -z "$RALPH_COMMIT" ]; then
+            echo_fail "无法获取 ralph 仓库最新 commit hash，请检查网络连接"
+            return 1
+        fi
+        echo_info "已锁定 ralph 版本: ${RALPH_COMMIT:0:8}"
+    fi
+
     if [ -d "$RALPH_DIR" ]; then
         echo_warn "Ralph 已存在于 $RALPH_DIR"
-        read -p "是否更新？(y/n) " update
+        # 检查已安装版本与锁定版本是否一致
+        local installed_commit=""
+        if [ -d "$RALPH_DIR/.git" ]; then
+            installed_commit=$(cd "$RALPH_DIR" && git rev-parse HEAD 2>/dev/null)
+        fi
+        if [ "$installed_commit" = "$RALPH_COMMIT" ]; then
+            echo_success "Ralph 版本与锁定版本一致 (${RALPH_COMMIT:0:8})"
+            return 0
+        fi
+        read -p "已安装版本 (${installed_commit:0:8}) 与锁定版本 (${RALPH_COMMIT:0:8}) 不一致，是否更新？(y/n) " update
         if [ "$update" = "y" ]; then
             cd "$RALPH_DIR"
-            git pull
-            cd - > /dev/null
-            echo_success "Ralph 已更新"
-        fi
-    else
-        git clone "$RALPH_REPO" "$RALPH_DIR"
-        if [ "$RALPH_COMMIT" != "main" ]; then
-            cd "$RALPH_DIR"
+            git fetch origin main
             git checkout "$RALPH_COMMIT"
             cd - > /dev/null
+            echo_success "Ralph 已更新至 ${RALPH_COMMIT:0:8}"
         fi
-        echo_success "Ralph 已克隆到 $RALPH_DIR"
+    else
+        # 先 clone，再 checkout 到锁定 commit
+        git clone --filter=blob:none "$RALPH_REPO" "$RALPH_DIR"
+        cd "$RALPH_DIR"
+        git checkout "$RALPH_COMMIT"
+        cd - > /dev/null
+        echo_success "Ralph 已安装 (版本: ${RALPH_COMMIT:0:8})"
     fi
 
     # 复制 CLAUDE.md 到项目（可选）

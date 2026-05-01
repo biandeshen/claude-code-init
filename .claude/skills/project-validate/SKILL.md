@@ -1,16 +1,14 @@
 ---
 name: project-validate
-version: 1.0.0
-lastUpdated: 2026-05-01
 description: >
   项目完整性校验工作流。当用户提到运行校验、检查项目、validate、
   检查代码规范、完整性检查时自动加载。
   运行结构检查、密钥安全、函数长度、依赖方向、import顺序五项检查。
 
-  中文触发词：校验、validate、检查项目、完整性、代码规范检查、
-  运行检查、帮我检查
+  中文触发词：校验、检查项目、完整性、代码规范检查、
+  运行检查、项目检查
 
-  英文触发词：validate, check, lint, verify, check project, validation
+  英文触发词：validate, lint, verify, check project, validation
 ---
 
 # Project Validate Protocol

@@ -17,7 +17,6 @@
     ".claude/skills/",
     ".claude/hooks/",
     ".claude/settings.json",
-    ".claude/complexity-rules.yaml",
     "!scripts/__pycache__/"
   ],
   "scripts": {

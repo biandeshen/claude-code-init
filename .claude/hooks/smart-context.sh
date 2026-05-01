@@ -8,9 +8,14 @@ json_escape() {
     if command -v jq >/dev/null 2>&1; then
         printf '%s' "$1" | jq -Rs '.'
     else
-        # 回退：基础转义（反斜杠、双引号）
+        # 回退：纯 bash 参数展开转义（比 sed 更可移植）
         # 注意：不在 while read pipeline 中追加 \n，因为 suggestion 始终为单行
-        printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+        local str="$1"
+        str="${str//\\/\\\\}"
+        str="${str//\"/\\\"}"
+        str="${str//$'\t'/\\t}"
+        str="${str//$'\r'/\\r}"
+        printf '%s' "$str"
     fi
 }
 

@@ -94,7 +94,10 @@ THIRD_PARTY = {
 if sys.platform == "win32":
     import io as _io_module
     io = _io_module
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    except (AttributeError, OSError):
+        pass  # 管道/重定向环境，保持默认编码
 
 
 def get_import_category(imp: str) -> int:

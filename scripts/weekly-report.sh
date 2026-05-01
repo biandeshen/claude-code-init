@@ -34,7 +34,7 @@ echo ""
 # 平台检测：为 macOS BSD find 准备兼容的时间过滤器
 if [ "$(uname)" = "Darwin" ]; then
     WEEK_REF=$(mktemp /tmp/cci_week_ref_XXXXXX) || { echo "无法创建临时文件"; exit 1; }
-    trap 'rm -f "$WEEK_REF"' EXIT
+    trap 'rm -f "$WEEK_REF"' EXIT INT TERM
     FIND_TIME_FILTER="-newer $WEEK_REF"
     touch -t "$(echo "$THIS_WEEK" | tr -d '-')0000" "$WEEK_REF"
 else

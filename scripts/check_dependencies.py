@@ -23,7 +23,10 @@ from pathlib import Path
 if sys.platform == "win32":
     import io as _io_module
     io = _io_module
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    except (AttributeError, OSError):
+        pass  # 管道/重定向环境，保持默认编码
 
 # 默认依赖方向规则
 DEFAULT_RULES = {

@@ -17,7 +17,10 @@ from pathlib import Path
 # Windows 编码修复
 if sys.platform == "win32":
     import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    except (AttributeError, OSError):
+        pass  # 管道/重定向环境，保持默认编码
 
 MAX_LINES = 50
 
