@@ -4,6 +4,19 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.8] - 2026-05-01
+
+### Fixed
+- **Agent Teams 文档精准化 (P1)**: `commands/team.md` 顶部新增实现说明，明确标注当前为 prompt-level 本质，非真实进程隔离。Roadmap Phase 2 为进程级目标。
+- **Agent Teams 约束声明 (P1)**: `commands/team.md` 新增 Token 预算（2000/5000）、超时控制（20 轮）、输出格式要求三大硬约束。
+- **Pre-commit 顺序优化 (P1)**: ruff --fix 从自定义检查之后移至最前，确保后续检查基于格式化后的代码，消除 ruff 修复后代码不被重新检查的风险。
+- **check_secrets 扫描范围扩展 (P1)**: types 从 `[yaml, python]` 扩展为 `[yaml, python, text]`，覆盖 `.md` 等文本文件中的密钥泄露。
+- **index.js 未测试平台警告 (P2)**: 非 Linux/macOS/Windows 平台增加警告提示。
+- **PostToolUse hook 启用 (P2)**: `.claude/settings.json` 新增 PostToolUse hook 配置（Bash matcher → smart-context.sh）。
+
+### Changed
+- 版本号同步：package.json、init.sh、init.ps1、CLAUDE.md → v1.5.8。
+
 ## [1.5.7] - 2026-05-01
 
 ### Fixed

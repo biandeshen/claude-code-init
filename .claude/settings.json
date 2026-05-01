@@ -12,6 +12,12 @@
         "matcher": "Bash",
         "command": "bash .claude/hooks/smart-context.sh"
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "command": "bash .claude/hooks/smart-context.sh"
+      }
     ]
   }
 }

@@ -13,10 +13,24 @@ exclude: |
 
 repos:
   # ============================================================
-  # 自定义检查脚本
+  # 代码格式检查（优先运行，确保后续检查基于格式化后的代码）
   # ============================================================
 
-  # 1. 项目结构检查
+  # 1. ruff 代码格式检查
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.1
+    hooks:
+      - id: ruff
+        args: [--fix]
+        types_or: [python, pyi]
+      - id: ruff-format
+        types_or: [python, pyi]
+
+  # ============================================================
+  # 自定义检查脚本（基于 ruff 格式化后的代码）
+  # ============================================================
+
+  # 2. 项目结构检查
   - repo: local
     hooks:
       - id: check-project-structure
@@ -26,7 +40,7 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
 
-  # 2. 依赖方向检查
+  # 3. 依赖方向检查
   - repo: local
     hooks:
       - id: check-dependencies
@@ -36,7 +50,7 @@ repos:
         files: ^(src|lib|tests|app|core|skills)/.*\.py$
         stages: [pre-commit]
 
-  # 3. 函数长度检查
+  # 4. 函数长度检查
   - repo: local
     hooks:
       - id: check-function-length
@@ -46,7 +60,7 @@ repos:
         files: \.py$
         stages: [pre-commit]
 
-  # 4. import 顺序检查
+  # 5. import 顺序检查
   - repo: local
     hooks:
       - id: check-import-order
@@ -56,30 +70,20 @@ repos:
         files: \.py$
         stages: [pre-commit]
 
-  # 5. 密钥安全检查
+  # 6. 密钥安全检查（扩展扫描范围含 text 类型，覆盖 .md 文件）
   - repo: local
     hooks:
       - id: check-secrets
         name: Security check (secrets)
         entry: python .claude/scripts/check_secrets.py
         language: system
-        types: [yaml, python]
+        types: [yaml, python, text]
         pass_filenames: false
         stages: [pre-commit]
 
   # ============================================================
-  # 代码格式检查 (需要 pip install)
+  # 类型检查
   # ============================================================
-
-  # 6. ruff 代码格式检查
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.1
-    hooks:
-      - id: ruff
-        args: [--fix]
-        types_or: [python, pyi]
-      - id: ruff-format
-        types_or: [python, pyi]
 
   # 7. mypy 类型检查
   - repo: https://github.com/pre-commit/mirrors-mypy

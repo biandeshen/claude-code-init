@@ -138,6 +138,9 @@ try {
         }
     } else {
         // Unix/macOS: 使用 Bash
+        if (!['linux', 'darwin'].includes(process.platform)) {
+            console.warn(`[警告] 平台 "${process.platform}" 未被完整测试，将使用 Bash 路径尝试初始化。`);
+        }
         console.log('[执行] init.sh');
         const initScript = path.join(scriptDir, 'init.sh');
         const result = spawnSync('bash', [
