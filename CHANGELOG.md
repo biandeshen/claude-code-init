@@ -4,6 +4,21 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.9] - 2026-05-01
+
+### Fixed
+- **complexity-rules.yaml 风险因子补全 (P2)**: 新增模板/命令/Skill 变更、SOUL/CLAUDE 核心规则修改、init 脚本变更、模板文件修改 4 项风险因子，与 SOUL.md 对齐。
+- **init.sh SOUL 模板缺失保护 (P2)**: SOUL_Template.md 不存在时安全跳过，输出警告而非静默失败。
+
+### Added
+- **qa.md / plan-ceo-review.md ECC 依赖声明 (P2)**: 头部新增依赖声明和本地降级替代方案。
+- **SECURITY.md 威胁向量同步 (P2)**: 新增 smart-context.sh 10 场景实时保护详情。
+- **Router ECC 安装检测 (P2)**: 新增降级策略前 ECC 检测逻辑，未安装时自动降级并提示。
+- **Skill 触发词规范文档 (P2)**: 新建 `.claude/skills/TRIGGER_SPEC.md`，定义触发词格式/命名/协作规范。
+
+### Changed
+- 版本号同步：package.json、init.sh、init.ps1、CLAUDE.md → v1.5.9。
+
 ## [1.5.8] - 2026-05-01
 
 ### Fixed

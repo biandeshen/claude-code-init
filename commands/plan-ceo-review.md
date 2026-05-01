@@ -1,5 +1,8 @@
 # /plan-ceo-review - 产品级需求审查
 
+> **依赖声明**：本命令依赖 ECC (Everything Claude Code) 插件。未安装时请使用本地替代方案。
+> 本地替代：`/brainstorming` 进行需求分析与头脑风暴。
+
 在编写任何代码行之前，强制挑战需求的合理性。
 
 ## 触发条件

@@ -19,6 +19,16 @@
 - 所有外部依赖使用固定版本/提交 hash
 - cc-discipline 提供物理防火墙，阻断危险操作
 
+### Hook 级实时保护
+- `smart-context.sh`：10 种场景实时检测，包括：
+  - 安全文件编辑 → 自动加载 code-review 技能
+  - `rm -rf /` 危险删除命令物理阻断
+  - `git push --force` 强制推送警告
+  - 敏感函数编辑提醒
+  - 夜间无人值守推荐
+  - 首次 /review 后推荐 Agent Teams
+  - stdin 读取超时保护（5 秒）
+
 ## 第三方依赖
 
 | 依赖 | 来源 | 版本策略 |

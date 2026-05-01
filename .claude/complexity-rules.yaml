@@ -33,6 +33,9 @@ risk_factors:
   - condition: "影响模块超过 1 个"
     score: 1
     type: count
+  - condition: "涉及模板/命令/Skill 结构变更"
+    score: 1
+    type: flag
   - condition: "涉及 API、数据库 schema 或数据结构变更"
     score: 1
     type: flag
@@ -43,6 +46,15 @@ risk_factors:
     score: 2
     type: flag
   - condition: "修改安全相关代码（认证、授权、加密实现）"
+    score: 2
+    type: flag
+  - condition: "修改 SOUL.md / CLAUDE.md 核心规则"
+    score: 2
+    type: flag
+  - condition: "新增/修改 init 脚本"
+    score: 2
+    type: flag
+  - condition: "修改 templates/ 模板文件"
     score: 2
     type: flag
   - condition: "修改数据库查询或 schema"

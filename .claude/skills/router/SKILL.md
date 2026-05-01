@@ -253,6 +253,16 @@ description: >
 
 需要时使用 web search 验证技术方案的时效性。
 
+## ECC 安装检测
+
+执行降级策略前，检测 ECC (Everything Claude Code) 是否安装：
+- 检查 `.claude/settings.json` 中是否包含 ECC 相关配置
+- 检查 `~/.claude/plugins/everything-claude-code` 目录是否存在
+- 未安装时自动执行降级策略并提示：
+  - `/qa` → 降级为手动测试或 `/review`
+  - `/plan-ceo-review` → 降级为 `/brainstorming`
+  - `/plan-eng-review` → 降级为 `/brainstorming` + 架构自审
+
 ## 输出格式
 
 ```markdown

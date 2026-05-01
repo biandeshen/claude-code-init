@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.5.8 | 2026-05-01
+# 版本: v1.5.9 | 2026-05-01
 
 set -euo pipefail
 
@@ -54,7 +54,7 @@ echo_info() { echo -e "[信息] $1"; }
 
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.8)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.9)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 
@@ -310,7 +310,11 @@ copy_template() {
 
 if [ -d "$TEMPLATE_DIR" ]; then
     copy_template "$TEMPLATE_DIR/CLAUDE_Template.md" "$PROJECT_PATH/CLAUDE.md" "CLAUDE.md"
-    copy_template "$TEMPLATE_DIR/SOUL_Template.md" "$PROJECT_PATH/SOUL.md" "SOUL.md"
+    if [ -f "$TEMPLATE_DIR/SOUL_Template.md" ]; then
+        copy_template "$TEMPLATE_DIR/SOUL_Template.md" "$PROJECT_PATH/SOUL.md" "SOUL.md"
+    else
+        echo_warn "SOUL_Template.md 不存在，跳过 SOUL.md 生成"
+    fi
     mkdir -p "$PROJECT_PATH/.claude"
     copy_template "$TEMPLATE_DIR/PLAN_Template.md" "$PROJECT_PATH/.claude/PLAN_Template.md" "PLAN_Template.md"
     copy_template "$TEMPLATE_DIR/SPEC_Template.md" "$PROJECT_PATH/.claude/SPEC_Template.md" "SPEC_Template.md"
