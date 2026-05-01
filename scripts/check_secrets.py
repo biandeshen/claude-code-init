@@ -44,6 +44,11 @@ SECRET_PATTERNS = [
     r"AKIA[0-9A-Z]{16}",                  # AWS Access Key ID
     r"eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}",  # JWT Token
     r"-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",  # Private Key Block
+    (r'xox[baprs]-[a-zA-Z0-9-]+', 'Slack Token', 'HIGH'),
+    (r'ya29\.[0-9A-Za-z\-_]+', 'Google OAuth Token', 'HIGH'),
+    (r'sk_live_[a-zA-Z0-9]{24,}', 'Stripe Live Key', 'CRITICAL'),
+    (r'pk_live_[a-zA-Z0-9]{24,}', 'Stripe Live Publishable Key', 'HIGH'),
+    (r'rk_live_[a-zA-Z0-9]{24,}', 'Stripe Live Restricted Key', 'CRITICAL'),
 ]
 
 # 白名单（允许的值）

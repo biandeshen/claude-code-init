@@ -4,7 +4,7 @@
  * 运行: npm test 或 node --test tests/*.test.js
  */
 
-const { test } = require('node:test');
+const { test, describe } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 const fs = require('fs');
@@ -140,4 +140,116 @@ test('init.ps1 锁定 cc-discipline 版本', () => {
         content.includes('rev-parse HEAD'),
         'init.ps1 必须验证 commit 完整性'
     );
+});
+
+// ============================================================
+// init.sh 功能性检查
+// ============================================================
+
+describe('init.sh Functional Checks', () => {
+    test('init.sh: contains copy_template function', () => {
+        const content = fs.readFileSync(path.join(projectRoot, 'init.sh'), 'utf-8');
+        assert.ok(content.includes('copy_template()'), 'init.sh should define copy_template');
+    });
+
+    test('init.sh: contains FORCE_OVERWRITE handling', () => {
+        const content = fs.readFileSync(path.join(projectRoot, 'init.sh'), 'utf-8');
+        assert.ok(content.includes('FORCE_OVERWRITE'), 'init.sh should handle --force flag');
+    });
+
+    test('init.sh: CLAUDE.local.md has existence check', () => {
+        const content = fs.readFileSync(path.join(projectRoot, 'init.sh'), 'utf-8');
+        assert.ok(content.includes('-f "$PROJECT_PATH/.claude/CLAUDE.local.md"'), 'CLAUDE.local.md should have existence check');
+    });
+
+    test('init.sh: MEMORY.local.md has existence check', () => {
+        const content = fs.readFileSync(path.join(projectRoot, 'init.sh'), 'utf-8');
+        assert.ok(content.includes('-f "$PROJECT_PATH/MEMORY.local.md"'), 'MEMORY.local.md should have existence check');
+    });
+});
+
+// ============================================================
+// init.ps1 功能性检查
+// ============================================================
+
+describe('init.ps1 Functional Checks', () => {
+    test('init.ps1: contains Copy-Template function', () => {
+        const content = fs.readFileSync(path.join(projectRoot, 'init.ps1'), 'utf-8');
+        assert.ok(content.includes('Copy-Template'), 'init.ps1 should define Copy-Template');
+    });
+
+    test('init.ps1: CLAUDE.local.md has Test-Path check', () => {
+        const content = fs.readFileSync(path.join(projectRoot, 'init.ps1'), 'utf-8');
+        assert.ok(content.includes('Test-Path $claudeLocalPath'), 'CLAUDE.local.md should have Test-Path check');
+    });
+
+    test('init.ps1: MEMORY.local.md has Test-Path check', () => {
+        const content = fs.readFileSync(path.join(projectRoot, 'init.ps1'), 'utf-8');
+        assert.ok(content.includes('Test-Path $memoryLocalPath'), 'MEMORY.local.md should have Test-Path check');
+    });
+});
+
+// ============================================================
+// Skills 存在性检查
+// ============================================================
+
+describe('Skills Existence', () => {
+    test('Skills: all 10 skills have SKILL.md with YAML frontmatter', () => {
+        const skillsDir = path.join(projectRoot, '.claude', 'skills');
+        const skillDirs = fs.readdirSync(skillsDir).filter(d => {
+            return fs.statSync(path.join(skillsDir, d)).isDirectory();
+        });
+
+        const expectedSkills = [
+            'brainstorming', 'code-explain', 'code-review', 'error-fix',
+            'git-commit', 'project-init', 'project-validate', 'router',
+            'safe-refactoring', 'tdd-workflow'
+        ];
+
+        for (const skill of expectedSkills) {
+            const skillMd = path.join(skillsDir, skill, 'SKILL.md');
+            assert.ok(fs.existsSync(skillMd), `Skill ${skill} should have SKILL.md`);
+            const content = fs.readFileSync(skillMd, 'utf-8');
+            assert.ok(content.startsWith('---'), `Skill ${skill} should have YAML frontmatter`);
+            assert.ok(content.includes('name:'), `Skill ${skill} should have name field`);
+        }
+    });
+});
+
+// ============================================================
+// Router 决策表
+// ============================================================
+
+describe('Router Decision Table', () => {
+    test('Router: decision table has code-explain and project-init entries', () => {
+        const routerMd = path.join(projectRoot, '.claude', 'skills', 'router', 'SKILL.md');
+        const content = fs.readFileSync(routerMd, 'utf-8');
+        assert.ok(content.includes('代码解释') || content.includes('code-explain'), 'Router should route to code-explain');
+        assert.ok(content.includes('项目初始化') || content.includes('project-init'), 'Router should route to project-init');
+    });
+});
+
+// ============================================================
+// 安全特性
+// ============================================================
+
+describe('Security', () => {
+    test('Security: .gitignore contains .env entries', () => {
+        const gitignore = path.join(projectRoot, '.gitignore');
+        const content = fs.readFileSync(gitignore, 'utf-8');
+        assert.ok(content.includes('.env'), '.gitignore should include .env pattern');
+    });
+});
+
+// ============================================================
+// 跨平台
+// ============================================================
+
+describe('Cross-platform', () => {
+    test('Cross-platform: .gitattributes exists and covers .sh files', () => {
+        const gaFile = path.join(projectRoot, '.gitattributes');
+        assert.ok(fs.existsSync(gaFile), '.gitattributes should exist');
+        const content = fs.readFileSync(gaFile, 'utf-8');
+        assert.ok(content.includes('*.sh text eol=lf'), '.gitattributes should enforce LF for .sh files');
+    });
 });

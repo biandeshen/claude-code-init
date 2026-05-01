@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.5.3 | 2026-04-30
+# 版本: v1.5.4 | 2026-04-30
 
 set -euo pipefail
 
@@ -31,13 +31,20 @@ for arg in "$@"; do
     esac
 done
 
-# 颜色输出
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-GRAY='\033[0;90m'
-NC='\033[0m' # No Color
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# 加载公共库（颜色输出 + 工具函数）
+if [ -f "$SCRIPT_DIR/scripts/lib/common.sh" ]; then
+    source "$SCRIPT_DIR/scripts/lib/common.sh"
+else
+    # 如果找不到 common.sh，使用内联定义作为后备
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    CYAN='\033[0;36m'
+    GRAY='\033[0;90m'
+    NC='\033[0m'
+fi
 
 echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
 echo_success() { echo -e "${GREEN}[成功]${NC} $1"; }
@@ -45,11 +52,9 @@ echo_warn() { echo -e "${YELLOW}[警告]${NC} $1"; }
 echo_fail() { echo -e "${RED}[失败]${NC} $1"; }
 echo_info() { echo -e "[信息] $1"; }
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.2)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.3)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 
@@ -175,7 +180,7 @@ else
     fi
 fi
 
-# 7. 复制 Python 校验脚本
+# 6. 复制 Python 校验脚本
 echo_step "复制校验脚本到 .claude/scripts/"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 TARGET_SCRIPTS_DIR="$PROJECT_PATH/.claude/scripts"
@@ -191,7 +196,7 @@ else
     echo_info "scripts 目录为空或不存在，跳过"
 fi
 
-# 8. 复制 Pre-commit 配置
+# 7. 复制 Pre-commit 配置
 echo_step "复制 Pre-commit 配置"
 PRECOMMIT_CONFIG="$SCRIPT_DIR/configs/.pre-commit-config.yaml"
 TARGET_PRECOMMIT_CONFIG="$PROJECT_PATH/.pre-commit-config.yaml"
@@ -202,7 +207,7 @@ else
     echo_info "Pre-commit 配置不存在，跳过"
 fi
 
-# 9. 安装 Pre-commit hooks
+# 8. 安装 Pre-commit hooks
 echo_step "安装 Pre-commit Hooks"
 
 # 检查 Python 是否可用
@@ -225,7 +230,7 @@ else
     echo -e "  ${YELLOW}手动安装 hooks: pre-commit install${NC}"
 fi
 
-# 10. 复制覆盖层模板
+# 9. 复制覆盖层模板
 echo_step "复制覆盖层模板"
 TEMPLATE_DIR="$SCRIPT_DIR/templates"
 
@@ -302,7 +307,7 @@ else
     echo_warn "模板目录不存在，跳过模板复制"
 fi
 
-# 10.1 模板版本检查
+# 9.1 模板版本检查
 echo_step "检查模板版本"
 check_template_version() {
     _src="$1"
@@ -323,7 +328,7 @@ check_template_version "$TEMPLATE_DIR/SPEC_Template.md" "$PROJECT_PATH/.claude/S
 check_template_version "$TEMPLATE_DIR/ROUTINE_Template.md" "$PROJECT_PATH/.claude/ROUTINE_Template.md"
 echo_success "模板版本检查完成"
 
-# 10.2 复制记忆系统模板
+# 9.2 复制记忆系统模板
 echo_step "复制记忆系统模板"
 MEMORY_TEMPLATE="$TEMPLATE_DIR/memory/MEMORY.md"
 if [ -f "$MEMORY_TEMPLATE" ]; then
@@ -335,7 +340,7 @@ else
     echo_info "记忆模板不存在，跳过"
 fi
 
-# 11. 复制自定义命令
+# 10. 复制自定义命令
 echo_step "复制自定义命令"
 COMMANDS_DIR="$SCRIPT_DIR/commands"
 TARGET_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
@@ -347,7 +352,7 @@ else
     echo_info "命令目录不存在，跳过"
 fi
 
-# 11.1 复制 Skills
+# 10.1 复制 Skills
 echo_step "复制 Skills"
 SKILLS_DIR="$SCRIPT_DIR/.claude/skills"
 TARGET_SKILLS_DIR="$PROJECT_PATH/.claude/skills"
@@ -359,7 +364,7 @@ else
     echo_info "Skills 目录不存在，跳过"
 fi
 
-# 11.2 复制 Hooks 和 settings.json
+# 10.2 复制 Hooks 和 settings.json
 echo_step "复制 Hooks 和设置"
 HOOKS_SOURCE_DIR="$SCRIPT_DIR/.claude/hooks"
 HOOKS_TARGET_DIR="$PROJECT_PATH/.claude/hooks"
@@ -379,7 +384,7 @@ if [ -f "$SETTINGS_SOURCE" ]; then
     fi
 fi
 
-# 12. 创建本地偏好文件 (gitignored)
+# 11. 创建本地偏好文件 (gitignored)
 echo_step "创建 CLAUDE.local.md (本地偏好)"
 mkdir -p "$PROJECT_PATH/.claude"
 if [ -f "$PROJECT_PATH/.claude/CLAUDE.local.md" ]; then
@@ -461,7 +466,7 @@ LOCALEOF
     echo_success "已创建 MEMORY.local.md (gitignored)"
 fi
 
-# 13. 处理 .gitignore（调用独立脚本）
+# 12. 处理 .gitignore（调用独立脚本）
 echo ""
 echo_step "处理 AI 开发配置文件"
 
@@ -482,7 +487,7 @@ else
     echo_warn "未找到配置脚本，跳过 .gitignore 配置"
 fi
 
-# 14. 运行环境检查
+# 13. 运行环境检查
 echo ""
 echo_step "运行环境完整性检查"
 if [ -f "$SCRIPT_DIR/scripts/check-env.sh" ]; then
@@ -516,7 +521,7 @@ echo "  5. 输入 /status 查看项目状态仪表盘"
 echo "  6. 输入 /capabilities 按场景查看全部能力"
 echo ""
 
-# 15. 全局偏好设置引导（跨所有项目生效）
+# 14. 全局偏好设置引导（跨所有项目生效）
 echo -e "${YELLOW}[建议] 设置全局偏好（跨所有项目生效）：${NC}"
 GLOBAL_CLAUDE="$HOME/.claude/CLAUDE.md"
 echo -e "  ${GRAY}将你的通用编码偏好写入 $GLOBAL_CLAUDE${NC}"
@@ -527,5 +532,7 @@ echo -e "  ${GRAY}- 注释使用中文${NC}"
 echo ""
 
 echo -e "如需更新规范，运行:"
+echo -e "  git -C \"$SCRIPT_DIR\" pull"
+echo ""
 echo -e "  git -C \"$SCRIPT_DIR\" pull"
 echo ""

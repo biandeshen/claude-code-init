@@ -43,6 +43,8 @@ cd my-project
 claude
 ```
 
+> **注意**：如果 npx 方式不可用，可使用 `git clone` 方式（见下方）。
+
 ### 方式二：手动克隆
 
 ```bash
@@ -105,7 +107,7 @@ tmux attach -t claude-overnight
    - 复杂任务 → TDD 或完整流程
 3. **安全保障**：Pre-commit Hooks 拦截敏感信息泄露
 
-> 详细规则见 [SOUL.md](templates/SOUL_Template.md)
+> 详细规则见 [SOUL.md](SOUL.md)
 
 ## 版本兼容性
 

@@ -33,7 +33,9 @@ GITIGNORE_PATH="$PROJECT_PATH/.gitignore"
 if [ -f "$GITIGNORE_PATH" ]; then
     # 移除 claude-code-init 标记的块
     existing=$(sed '/# === claude-code-init ===/,/# === claude-code-init ===/d' "$GITIGNORE_PATH" 2>/dev/null || cat "$GITIGNORE_PATH")
-    existing=$(echo "$existing" | sed '/^[[:space:]]*$/d' | sed '$a\')
+    existing=$(echo "$existing" | sed '/^[[:space:]]*$/d')
+    # Ensure trailing newline (portable alternative to GNU sed '$a\')
+    [ -n "$existing" ] && existing="$existing"$'\n'
 else
     existing=""
 fi

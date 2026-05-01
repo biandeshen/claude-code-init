@@ -61,7 +61,7 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 ~/tools/claude-code-init/init.sh /path/to/your-project
 ```
 
-初始化后自动具备：ECC 全家桶、Superpowers、OpenSpec、cc-discipline、校验脚本和 Pre-commit 配置。
+初始化后可手动安装以下增强插件（在 Claude Code 中执行 `/plugin` 命令）：ECC 全家桶、Superpowers、OpenSpec、cc-discipline、校验脚本和 Pre-commit 配置。
 
 ---
 
@@ -402,6 +402,8 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| v1.5.3 | 2026-05-01 | 安全加固(P0/P1密钥检测增强)、版本一致性修复 |
+| v1.5.2 | 2026-05-01 | 安全修复(.env保护)、信任边界加固 |
 | v1.5.1 | 2026-04-30 | 全线跨平台兼容修复(38项)、安全加固、CI门禁强化、MIT License |
 | v1.5.0 | 2026-04-30 | Agent Teams 并行开发、无人值守长任务、Skills 触发词优化、文档交接 |
 | v1.4.1 | 2026-04-28 | 移除误导性 Skip 参数文档、添加系统依赖检查、修复静默失败 |

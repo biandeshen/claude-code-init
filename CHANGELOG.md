@@ -4,6 +4,29 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.4] - 2026-05-01
+
+### Fixed
+- **`.gitignore` 缺 `.env` 保护 (P0)**: 新增 `.env`、`.env.*`、`*.pem`、`*.key` 规则。
+- **`check_secrets.py` 秘钥检测增强 (P1)**: 新增 Slack/Google OAuth/Stripe live key 检测模式。
+- **`init.sh` 版本显示不一致 (P1)**: 运行时 banner 修正为 v1.5.4。
+- **废弃 `plugin.json` 删除 (P1)**: 文件已废弃且版本停滞，已删除。
+- **GUIDE.md 虚假声明修正 (P1)**: 插件安装说明从"自动具备"改为"手动安装"。
+- **`sed '$a\'` macOS 兼容性 (P1)**: `configure-gitignore.sh` 改用便携式换行追加。
+- **`CLAUDE_Template.md` 双版本行统一 (P1)**: 两条不同日期的版本声明合并为一条。
+- **`init.sh` 步骤编号断裂 (P2)**: 修正为连续编号 1-14。
+- **版本一致性 (P2)**: HANDOVER.md、MAINTENANCE-NOTES.md、GUIDE.md、CLAUDE.md 版本历史同步至 v1.5.4。
+- **SOUL.md 更新至 v1.2.0 (P2)**: 项目自身 dogfood 最新模板，添加记忆规则/动态阈值引用。
+
+### Added
+- **`.gitattributes` 文件 (P1)**: 强制 LF（.sh/.py/.md）和 CRLF（.ps1）行尾，防止 Windows 克隆破坏 shebang。
+- **测试覆盖扩展 (P1)**: 新增 11 个测试（init.sh/init.ps1 功能检查、Skills 存在性、Router 路由、安全性、跨平台），从 12 增至 23 个。
+
+### Changed
+- **`init.sh` 颜色定义统一 (P2)**: 内联颜色定义替换为 `source scripts/lib/common.sh`。
+- **README.md 死链接修正**: SOUL_Template.md 路径修正为 SOUL.md。
+- **`help.md` 命令表补充**: 新增 `/plan-eng-review` 和 `/tdd` 条目。
+
 ## [1.5.3] - 2026-05-01
 
 ### Fixed
@@ -120,7 +143,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - Initial release with basic scaffolding functionality.
 
-[Unreleased]: https://github.com/biandeshen/claude-code-init/compare/v1.5.3...HEAD
+[Unreleased]: https://github.com/biandeshen/claude-code-init/compare/v1.5.4...HEAD
+[1.5.4]: https://github.com/biandeshen/claude-code-init/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/biandeshen/claude-code-init/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/biandeshen/claude-code-init/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/biandeshen/claude-code-init/compare/v1.5.0...v1.5.1

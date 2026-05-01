@@ -1,6 +1,6 @@
 {
   "name": "@biandeshen/claude-code-init",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "Claude Code 通用开发环境脚手架，一键初始化 AI 编码规范与自动化工作流",
   "main": "index.js",
   "bin": {
