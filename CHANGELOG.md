@@ -4,6 +4,31 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.6.5] - 2026-05-02
+
+### Changed
+- **`/ship-review` 6 角色升级**：审查团队从 4 角色扩展为 6 角色（Security / Architecture / Correctness / Code Quality / Test Coverage / Documentation），对齐 Google Code Review Standard 13 维度 + c-CRAB 学术基准 10 类别
+- **交叉验证机制**：Phase 2 新增矩阵构建 + 矛盾检测 + 盲区扫描（Performance / Compatibility / i18n / Logging）
+
+### Fixed
+- G1.2: code-review SKILL.md 移除裸触发词 "检查，" 防止误触发
+- G1.3: check_trigger_conflicts.py 重写，修复 YAML `>` 折叠块标量解析（多行触发词列表现在正确提取）
+
+## [1.6.4] - 2026-05-02
+
+### Added
+- **`/ship-review` 命令**：发布前 4 Agent 平行审查（Security+Quality / Architecture / Correctness / Documentation），含 blocker/advisory/note 分类 + SHIP/NO SHIP 决策
+
+### Fixed
+- G5.1: init.sh 参数校验 — `--*` 不再被当作项目路径
+- G7.4: init.sh 目录检查 — 目录不存在时给出"将自动创建"警告
+- G8.1: init.sh gitignore 配置 — bash-first（本机原生），pwsh/powershell 回退
+
+### Changed
+- Router: 添加 ship/release 触发词路由
+- help.md: 新增 `/ship-review` 命令条目
+- GUIDE.md: 命令数 21→22
+
 ## [1.6.3] - 2026-05-01
 
 ### Fixed

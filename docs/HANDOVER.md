@@ -818,14 +818,16 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 ---
 
-## 十二、当前状态（v1.6.4）
+## 十二、当前状态（v1.6.5）
 
-### 新增（本轮 — v1.6.4）
-- `/ship-review` 命令：发布前全面审查（多 Agent 并行 + 交叉验证 + SHIP/NO SHIP 决策）
-- G1.2: code-review SKILL 移除裸触发词"检查"
-- G1.3: check_trigger_conflicts.py 重写为 YAML frontmatter 解析（修复跨行漏扫）
-- G5.1+G7.4: init.sh 参数 `--*` 守卫 + 目录存在检查
-- G8.1: init.sh gitignore 配置优先 bash，PowerShell 回退
+### 新增（本轮 — v1.6.5）
+- `/ship-review` 6 角色升级：Security / Architecture / Correctness / Code Quality / Test Coverage / Documentation
+- 每个角色对齐 Google 审查规范 + c-CRAB 学术基准（10 维度全覆盖）
+- 交叉验证增强：矛盾检测规则 + 盲点扫描（Performance, Compatibility, i18n, Logging）
+
+### 已修复（v1.6.4）
+- `/ship-review` 命令初版 + 5 个能力缺口修复
+- G1.2/G1.3/G5.1/G7.4/G8.1 全部修补
 
 ### 已修复（v1.6.3）
 - MEMORY.local.md 路径从根目录 → `.claude/`

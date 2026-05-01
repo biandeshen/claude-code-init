@@ -405,6 +405,11 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 | 版本 | 日期 | 变更 |
 |------|------|------|
 | v1.6.0 | 2026-05-01 | 第四轮审查修复完整闭环 — 40 项问题全部修复，骨架命令 fallback 提示收尾 |
+| v1.6.1 | 2026-05-01 | 第五轮多角色审查修复 — 安全加固 + 供应链锁定 + 语法测试扩展 |
+| v1.6.2 | 2026-05-01 | 第六轮收尾修复 — Hook JSON 损坏 + 版本同步 + 测试加固 |
+| v1.6.3 | 2026-05-01 | MEMORY.local.md 路径修正 + gitignore 规则同步 + 大小写兼容 |
+| v1.6.4 | 2026-05-02 | `/ship-review` 4 Agent 审查 + init.sh 参数校验/目录检查/gitignore bash-first |
+| v1.6.5 | 2026-05-02 | `/ship-review` 6 角色升级 — 对齐 Google Code Review Standard + c-CRAB 10 维度 |
 | v1.5.9 | 2026-05-01 | 第四轮审查修复 Batch 5 — 风险因子补全 + ECC 依赖声明 + Router ECC 检测 + 触发词规范 |
 | v1.5.8 | 2026-05-01 | 第四轮审查修复 Batch 4 — Agent Teams 文档精准化 + Pre-commit 顺序优化 + check_secrets 扩展 + PostToolUse hook |
 | v1.5.7 | 2026-05-01 | 第四轮审查修复 Batch 3 — Memory GC + access_count + Skill 回滚规范 + timeout + JSON 转义 + 选择性部署 |

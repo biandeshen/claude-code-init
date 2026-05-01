@@ -81,7 +81,7 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 让 AI 在你离开后继续工作：
 ```bash
 # macOS/Linux
-bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
+bash .claude/scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 # Windows
 tmux new-session -d -s claude-overnight

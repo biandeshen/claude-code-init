@@ -493,13 +493,16 @@ if (Test-Path $memoryLocalPath) {
     Write-Success "已创建 MEMORY.local.md (gitignored)"
 }
 
-# 13. 配置 .gitignore
+# 13. 配置 .gitignore（bash-first，与 init.sh 对齐）
 Write-Step "配置 .gitignore"
-$gitignoreScript = Join-Path $ScriptDir "scripts\configure-gitignore.ps1"
-if (Test-Path $gitignoreScript) {
-    & $gitignoreScript -ProjectPath $ProjectPath
+$gitignoreSh = Join-Path $ScriptDir "scripts\configure-gitignore.sh"
+$gitignorePs1 = Join-Path $ScriptDir "scripts\configure-gitignore.ps1"
+if (Test-Path $gitignoreSh) {
+    bash "$gitignoreSh" "$ProjectPath"
+} elseif (Test-Path $gitignorePs1) {
+    & $gitignorePs1 -ProjectPath $ProjectPath
 } else {
-    Write-Warn "configure-gitignore.ps1 未找到，跳过 .gitignore 配置"
+    Write-Warn "未找到配置脚本，跳过 .gitignore 配置"
 }
 
 # 14. 运行环境检查

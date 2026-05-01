@@ -53,12 +53,20 @@ claude-code-init/
 │   ├── hooks/             # Pre-commit hooks (→ .claude/hooks/)
 │   └── settings.json      # Claude Code 设置文件
 ├── scripts/               # Shell + Python 工具脚本 (→ .claude/scripts/)
+│   ├── check_*.py         # Python 校验脚本 (check_dependencies/function_length/import_order/
+│   │                      #   project_structure/secrets/docs_consistency/
+│   │                      #   trigger_conflicts/path_consistency)
+│   ├── check_ecc.sh       # ECC 安装检测
+│   ├── check-env.sh       # 环境检查
+│   ├── configure-gitignore.*  # .gitignore 配置
 │   ├── tmux-session.sh    # 无人值守会话管理
 │   ├── ralph-setup.sh     # Ralph 插件安装
 │   ├── weekly-report.sh   # 周报生成
 │   ├── validate_skills.sh # Skills 健康检查
-│   ├── check-env.sh       # 环境检查
-│   └── configure-gitignore.*
+│   ├── trigger-optimizer.sh  # 触发词优化
+│   ├── PROMPT.md          # 无人值守任务提示词
+│   ├── script_whitelist.json # 脚本部署白名单
+│   └── lib/               # 共享函数库
 ├── configs/               # 配置文件
 │   └── .pre-commit-config.yaml
 ├── docs/                  # 深度文档

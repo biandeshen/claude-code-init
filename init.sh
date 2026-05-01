@@ -238,7 +238,7 @@ print(' '.join(data['scripts']))
     fi
 fi
 if [ -z "$SCRIPT_WHITELIST" ]; then
-    SCRIPT_WHITELIST="check_dependencies.py check_function_length.py check_import_order.py check_project_structure.py check_secrets.py check_docs_consistency.py check_trigger_conflicts.py check_ecc.sh tmux-session.sh weekly-report.sh ralph-setup.sh trigger-optimizer.sh validate_skills.sh PROMPT.md"
+    SCRIPT_WHITELIST="check_dependencies.py check_docs_consistency.py check_ecc.sh check_function_length.py check_import_order.py check_path_consistency.py check_project_structure.py check_secrets.py check_trigger_conflicts.py tmux-session.sh weekly-report.sh ralph-setup.sh trigger-optimizer.sh validate_skills.sh PROMPT.md"
 fi
 
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
@@ -568,7 +568,7 @@ echo -e "${GREEN}  Claude Code 开发环境初始化完成！${NC}"
 echo -e "${GREEN}==============================================${NC}"
 echo ""
 echo -e "${CYAN}你现在拥有：${NC}"
-echo -e "  ${GREEN}✅${NC} 9 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/初始化）"
+echo -e "  ${GREEN}✅${NC} 10 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/初始化/路由）"
 echo -e "  ${GREEN}✅${NC} 22 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd /ship-review）"
 echo -e "  ${GREEN}✅${NC} 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）"
 echo -e "  ${GREEN}✅${NC} 6 个项目完整性校验脚本"
