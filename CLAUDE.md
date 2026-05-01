@@ -87,6 +87,7 @@ claude-code-init/
 
 ## 版本历史
 
+- `v1.6.0` (2026-05-01)：第四轮审查修复完整闭环 — 40 项问题全部修复，骨架命令 fallback 提示收尾
 - `v1.5.9` (2026-05-01)：第四轮审查修复 Batch 5 — 风险因子补全 + ECC 依赖声明 + Router ECC 检测 + 触发词规范
 - `v1.5.8` (2026-05-01)：第四轮审查修复 Batch 4 — Agent Teams 文档精准化 + Pre-commit 顺序优化 + check_secrets 扩展 + PostToolUse hook
 - `v1.5.7` (2026-05-01)：第四轮审查修复 Batch 3 — Memory GC + access_count + Skill 回滚规范 + timeout + JSON 转义 + 选择性部署
