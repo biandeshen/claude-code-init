@@ -158,6 +158,14 @@ if (-not $SkipCcDiscipline) {
         if ($Force) { $ccArgs += "--auto" }
         bash "$CcDisciplinePath/init.sh" @ccArgs
         Write-Success "cc-discipline 已安装"
+        # 验证 cc-discipline 部署完整性
+        $ccDiscVerFile = "$ProjectPath\.claude\.cc-discipline-version"
+        if (Test-Path $ccDiscVerFile) {
+            $ccDiscVer = Get-Content $ccDiscVerFile -Raw
+            if ($ccDiscVer.Trim() -eq "unknown" -or [string]::IsNullOrWhiteSpace($ccDiscVer)) {
+                Write-Warn "cc-discipline 版本检测异常，部分功能可能不正常"
+            }
+        }
     } catch {
         Write-Warn "cc-discipline 初始化失败，请手动执行: bash $CcDisciplinePath/init.sh"
     }
@@ -519,7 +527,10 @@ Write-Host "  Claude Code 开发环境初始化完成！" -ForegroundColor Green
 Write-Host "==============================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "你现在拥有：" -ForegroundColor Cyan
-Write-Host "  ✅ 10 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）" -ForegroundColor White
+Write-Host "  ✅ 10 个核心 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/初始化/路由）" -ForegroundColor White
+if (-not $SkipCcDiscipline) {
+    Write-Host "  ✅ + cc-discipline 额外技能（commit/evaluate/investigate/retro 等）" -ForegroundColor White
+}
 Write-Host "  ✅ 22 个自定义命令（/review /commit /gc /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd /ship-review）" -ForegroundColor White
 Write-Host "  ✅ 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）" -ForegroundColor White
 Write-Host "  ✅ 6 个项目完整性校验脚本" -ForegroundColor White
