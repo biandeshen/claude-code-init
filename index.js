@@ -21,6 +21,20 @@ for (let i = 0; i < args.length; i++) {
         console.log(`claude-code-init v${pkg.version}`);
         process.exit(0);
     }
+    if (args[i] === '--help' || args[i] === '-h') {
+        console.log(`
+用法: npx @biandeshen/claude-code-init [选项]
+
+选项:
+  --project-path <路径>  目标项目目录（默认: 当前目录）
+  --version, -v          显示版本号
+  --help, -h             显示此帮助信息
+
+示例:
+  npx @biandeshen/claude-code-init --project-path ./my-project
+`);
+        process.exit(0);
+    }
     if (args[i] === '--project-path' && args[i + 1]) {
         projectPath = args[i + 1];
     } else if (args[i].startsWith('--project-path=')) {

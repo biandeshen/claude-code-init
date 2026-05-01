@@ -328,7 +328,7 @@ claude --version
 | 组件 | 最低版本 | 推荐版本 |
 |------|----------|----------|
 | Claude Code | 2.0 | 最新稳定版 |
-| Node.js | 16 | 18+ |
+| Node.js | 18 | 18+ |
 | Python | 3.8 | 3.10+ |
 | Git | 2.30 | 最新稳定版 |
 | PowerShell (Windows) | 5.1 | 7+ |

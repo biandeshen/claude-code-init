@@ -44,11 +44,11 @@ SECRET_PATTERNS = [
     r"AKIA[0-9A-Z]{16}",                  # AWS Access Key ID
     r"eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}",  # JWT Token
     r"-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",  # Private Key Block
-    (r'xox[baprs]-[a-zA-Z0-9-]+', 'Slack Token', 'HIGH'),
-    (r'ya29\.[0-9A-Za-z\-_]+', 'Google OAuth Token', 'HIGH'),
-    (r'sk_live_[a-zA-Z0-9]{24,}', 'Stripe Live Key', 'CRITICAL'),
-    (r'pk_live_[a-zA-Z0-9]{24,}', 'Stripe Live Publishable Key', 'HIGH'),
-    (r'rk_live_[a-zA-Z0-9]{24,}', 'Stripe Live Restricted Key', 'CRITICAL'),
+    r"xox[baprs]-[a-zA-Z0-9-]+",                               # Slack Token
+    r"ya29\.[0-9A-Za-z\-_]+",                                   # Google OAuth Token
+    r"sk_live_[a-zA-Z0-9]{24,}",                                # Stripe Live Key
+    r"pk_live_[a-zA-Z0-9]{24,}",                                # Stripe Live Publishable Key
+    r"rk_live_[a-zA-Z0-9]{24,}",                                # Stripe Live Restricted Key
 ]
 
 # 白名单（允许的值）
@@ -135,7 +135,7 @@ def check_config_file(file_path: str) -> list:
             if isinstance(config, (dict, list)):
                 errors = _walk_yaml(config, file_path=file_path)
                 return errors
-        except (yaml.YAMLError, Exception):
+        except yaml.YAMLError:
             # YAML 解析失败，回退到逐行检查
             pass
 
@@ -249,7 +249,8 @@ def check_python_files(file_paths: list) -> list:
                                 )
                                 break
 
-        except Exception:
+        except (IOError, OSError, UnicodeDecodeError):
+            # 文件读取错误，跳过该文件
             pass
 
     return errors
@@ -280,7 +281,8 @@ def check_markdown_files(file_paths: list) -> list:
                         f"   匹配内容: {match_text[:30]}...\n"
                         f"   建议: 从 {file_path} 中删除此内容\n"
                     )
-        except Exception:
+        except (IOError, OSError, UnicodeDecodeError):
+            # 文件读取错误，跳过该文件
             pass
 
     return errors
@@ -347,7 +349,8 @@ def check_shell_files(file_paths: list) -> list:
                                 )
                                 break
 
-        except Exception:
+        except (IOError, OSError, UnicodeDecodeError):
+            # 文件读取错误，跳过该文件
             pass
 
     return errors
@@ -380,7 +383,7 @@ def main():
         if staged_files and staged_files[0]:
             errors.extend(check_python_files(staged_files))
             errors.extend(check_shell_files(staged_files))
-    except Exception:
+    except (IOError, OSError, UnicodeDecodeError):
         pass
 
     # 5. 检查 Markdown 文件（记忆文件等）

@@ -1,7 +1,11 @@
 ---
 name: project-init
+version: 1.0.0
+lastUpdated: 2026-05-01
 description: >
-  新项目初始化时自动加载。检查项目结构完整性、导航 CLAUDE.md/SOUL.md、
+  新项目初始化时自动加载。中文触发词：初始化项目、初始化环境、设置项目、
+  帮我设置开发环境、首次启动、project init、setup、initialize。
+  检查项目结构完整性、导航 CLAUDE.md/SOUL.md、
   确认 SPEC 模板和校验脚本就位。由 Router 在用户说"初始化项目"或
   "帮我设置项目"时触发。
 ---
@@ -52,12 +56,6 @@ description: >
 - Git 可用
 - Python/Node.js 版本
 - Pre-commit 已安装
-
-## 触发词
-
-- 初始化项目、初始化环境、设置项目
-- 帮我设置开发环境、首次启动
-- project init, setup, initialize
 
 ## 失败处理（回滚机制）
 

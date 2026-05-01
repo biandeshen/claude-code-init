@@ -28,20 +28,32 @@ STANDARD_LIBRARY = {
     "re", "json", "time", "datetime", "random", "math", "statistics",
     "collections", "itertools", "functools", "operator", "contextlib",
     "pathlib", "argparse", "getopt", "getpass", "optparse", "shlex",
+    # 文件处理
+    "shutil", "glob", "tempfile", "filecmp", "fileinput",
     # 类型
     "typing", "types", "abc", "copy", "pprint", "reprlib",
     # IO
-    "fileinput", "stat", "statvfs",
+    "io", "fileinput", "stat", "statvfs",
     # 文本
     "string", "textwrap", "unicodedata", "stringprep", "readline",
     # 格式化
     "xml", "csv", "html",
     # 网络
     "urllib", "http", "socket", "socketserver",
+    # 安全 / 哈希
+    "hashlib", "hmac", "secrets", "base64",
+    # 标识
+    "uuid",
+    # 日期时间
+    "calendar", "datetime",
+    # 数字
+    "decimal", "statistics", "fractions", "numbers",
     # 高级
     "logging", "traceback", "warnings",
     "threading", "multiprocessing", "concurrent", "asyncio",
     "subprocess", "sched", "queue", "_thread",
+    # 程序生命周期
+    "atexit", "sched",
     # 持久化
     "pickle", "copyreg", "shelve", "dbm", "sqlite3",
     "marshal", "gzip", "bz2", "lzma", "zipfile", "tarfile",
@@ -54,6 +66,7 @@ STANDARD_LIBRARY = {
     "gc", "weakref", "enum", "dataclasses",
     "codecs", "locale", "gettext", "platform",
     "errno", "ctypes", "signal", "mmap", "resource",
+    "ipaddress", "enum",
 }
 
 # 第三方库（可以通过配置文件扩展）

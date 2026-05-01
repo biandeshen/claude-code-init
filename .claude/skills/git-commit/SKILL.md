@@ -1,5 +1,7 @@
 ---
 name: git-commit
+version: 1.0.0
+lastUpdated: 2026-05-01
 description: >
   规范化代码提交工作流。当用户提到提交代码、commit、push、保存更改
   时自动加载。自动分析变更、生成符合 Conventional Commits 规范的

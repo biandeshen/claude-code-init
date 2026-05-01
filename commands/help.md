@@ -14,7 +14,7 @@
 | 刚修复了一个 bug | `/commit` — 规范提交 |
 | 正在讨论技术方案 | `/architect <方案>` — 架构评审 |
 | 刚完成多个功能 | `/team 3` — 启动多人审查 |
-| 快到下班时间 | `bash .claude/scripts/tmux-session.sh` — 启动过夜任务 |
+| 快到下班时间 | `bash scripts/tmux-session.sh` — 启动过夜任务 |
 
 如果匹配到上述场景，**首先输出推荐的 1-2 个命令**，再输出完整的场景导航表格。
 

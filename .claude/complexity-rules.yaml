@@ -17,14 +17,14 @@ readonly_rules:
     description: 中文只读语义
     score: 0
 
-  # 例外：敏感搜索自动升级
-  readonly_escalation:
-    triggers:
-      - "搜索敏感字段（password|secret|token|key|credential）"
-      - "扫描 .env 文件"
-      - "以 -S/-G 搜索二进制模式"
-    escalation_score: 3
-    action: "立即停止 → 输出安全审计报告 → 等待用户确认"
+# 例外：敏感搜索自动升级
+readonly_escalation:
+  triggers:
+    - "搜索敏感字段（password|secret|token|key|credential）"
+    - "扫描 .env 文件"
+    - "以 -S/-G 搜索二进制模式"
+  escalation_score: 3
+  action: "立即停止 → 输出安全审计报告 → 等待用户确认"
 
 # ============================================================
 # 规则二：风险因子评分（叠加计算）
@@ -62,6 +62,15 @@ risk_factors:
     type: flag
   - condition: "修改 API 接口契约（参数、返回值、行为）"
     score: 2
+    type: flag
+  - condition: "修改前端 DOM 结构或交互逻辑"
+    score: 1
+    type: flag
+  - condition: "修改无测试覆盖的代码"
+    score: 2
+    type: flag
+  - condition: "调用外部 API 或第三方服务"
+    score: 1
     type: flag
 
 # ============================================================
@@ -129,3 +138,69 @@ fallback:
   default_score: 3
   default_mode: "tdd"
   description: "无法判断时默认 3 分，强制走 Plan + TDD"
+
+# ============================================================
+# 规则八：否定模式（用户意图反转）
+# ============================================================
+negation_patterns:
+  strong_negation:
+    - "不要(用|使用|执行|运行|创建|修改|删除)"
+    - "别(用|使用|执行|运行|创建|修改|删除)"
+    - "不用(了|管|)"
+    - "取消"
+    - "跳过"
+    - "忽略"
+    - "停止"
+    - "stop"
+    - "cancel"
+    - "skip"
+    - "ignore"
+  weak_negation:
+    - "暂时(不|别|不用)"
+    - "先(不|别|不用)"
+    - "maybe later"
+    - "not now"
+    - "later"
+  conditional_negation:
+    - "除非"
+    - "(如果|假如).*(就)?(不|别)"
+    - "unless"
+    - "if.*not"
+    - "only if"
+
+# ============================================================
+# 规则九：触发词优先级（当多个 Skill 匹配时）
+# ============================================================
+trigger_priority:
+  default_strategy: "highest_score"
+  tie_breaker: "first_match"
+  context_patterns:
+    - context: "正在编辑文件"
+      priority_skills: [code-review, tdd-workflow]
+      weight: 2.0
+    - context: "执行 git 操作"
+      priority_skills: [git-commit, code-review]
+      weight: 1.5
+    - context: "讨论需求或方案"
+      priority_skills: [brainstorming, project-validate]
+      weight: 1.5
+    - context: "出现错误或异常"
+      priority_skills: [error-fix, code-review]
+      weight: 2.0
+    - context: "初始化项目"
+      priority_skills: [project-init]
+      weight: 3.0
+
+# ============================================================
+# 规则十：回滚策略
+# ============================================================
+rollback_policy:
+  max_retries: 3
+  retry_delay: 2s
+  rollback_scope:
+    file_level:
+      skills: [error-fix, tdd-workflow, project-init]
+    commit_level:
+      skills: [safe-refactoring, git-commit]
+    no_rollback:
+      skills: [code-review, code-explain, project-validate, brainstorming, router]

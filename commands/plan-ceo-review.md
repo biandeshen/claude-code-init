@@ -81,4 +81,3 @@
 ## 相关命令
 
 - `/plan-eng-review` - 技术架构审查
-- `/autoplan` - 自动串联多个评审

@@ -1,5 +1,7 @@
 ---
 name: error-fix
+version: 1.0.0
+lastUpdated: 2026-05-01
 description: >
   系统化错误修复工作流。当用户提到修复错误、fix bug、调试、找出问题、
   报错、修复这个、帮我看看哪里出错了时自动加载。

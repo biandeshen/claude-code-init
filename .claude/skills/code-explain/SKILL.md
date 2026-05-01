@@ -1,5 +1,7 @@
 ---
 name: code-explain
+version: 1.0.0
+lastUpdated: 2026-05-01
 description: >
   深度代码解释工作流。当用户提到解释代码、看懂这段代码、这段逻辑是做什么的、
   请分析这个函数、帮我理解、读懂代码时自动加载。

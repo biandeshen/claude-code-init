@@ -8,10 +8,9 @@ json_escape() {
     if command -v jq >/dev/null 2>&1; then
         printf '%s' "$1" | jq -Rs '.'
     else
-        # 回退：基础转义（反斜杠、双引号、换行符、控制字符）
-        printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\//\\\//g' \
-            | while IFS= read -r line; do printf '%s\\n' "$line"; done \
-            | sed 's/\\n$//'
+        # 回退：基础转义（反斜杠、双引号）
+        # 注意：不在 while read pipeline 中追加 \n，因为 suggestion 始终为单行
+        printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
     fi
 }
 
@@ -20,8 +19,15 @@ if command -v timeout >/dev/null 2>&1; then
     event_data=$(timeout 5 cat 2>/dev/null)
 elif command -v perl >/dev/null 2>&1; then
     event_data=$(perl -e 'alarm 5; eval { local $SIG{ALRM} = sub { die "timeout\n" }; print <STDIN> }' 2>/dev/null)
+elif command -v dd >/dev/null 2>&1; then
+    event_data=$(dd bs=4096 count=128 2>/dev/null)
 else
-    event_data=$(cat 2>/dev/null)
+    # 最终回退：使用 read -t 逐行读取，最多读 5 行后超时
+    event_data=""
+    for _ in 1 2 3 4 5; do
+        IFS= read -t 1 line 2>/dev/null || break
+        event_data="$event_data$line"$'\n'
+    done
 fi
 if [ -z "$event_data" ]; then
     exit 0
@@ -35,6 +41,10 @@ file_path=$(echo "$event_data" | sed -n 's/.*"file_path"\s*:\s*"\([^"]*\)".*/\1/
 
 # 提取 command
 command=$(echo "$event_data" | sed -n 's/.*"command"\s*:\s*"\([^"]*\)".*/\1/p')
+# 加固：限制命令长度，防止注入
+command="${command:0:500}"
+# 加固：移除控制字符，防止 JSON 注入
+command=$(echo "$command" | tr -d '\000-\010\016-\037')
 
 suggestion=""
 
@@ -79,9 +89,9 @@ fi
 
 # ─── 场景 6：rm -rf 物理阻断（最高优先级）───
 # 检测危险删除命令——物理阻断，Claude Code 无法绕过
-# 覆盖：rm -rf /、rm -r -f /、rm --recursive --force /、rm -rf ~、rm -rf ../
+# 覆盖：rm -rf /、sudo rm -rf /、rm -r -f /、rm --recursive --force /、rm -rf ~、rm -rf ../
 # 注意：变量展开（rm $VAR）和命令替换（rm $(...)）无法通过纯 shell 正则检测
-if echo "$command" | grep -qE "(^|[;&|])[[:space:]]*rm[[:space:]]+(-[rRf]+[[:space:]]*)+[[:space:]]*(/|~|[.][.])" 2>/dev/null; then
+if echo "$command" | grep -qE "(^|[;&|])[[:space:]]*(sudo[[:space:]]+|command[[:space:]]+)?rm[[:space:]]+(-[rRf]+[[:space:]]*)+[[:space:]]*(/|~|[.][.])" 2>/dev/null; then
     cat <<EOF
 {
   "hookSpecificOutput": {

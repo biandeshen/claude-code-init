@@ -31,6 +31,10 @@ test('package.json 格式有效', () => {
 test('package.json 中声明的 files 全部存在', () => {
     const pkg = require(path.join(projectRoot, 'package.json'));
     for (const f of pkg.files) {
+        // 跳过 npm 否定模式（以 ! 开头，如 !scripts/__pycache__/）
+        if (f.startsWith('!')) {
+            continue;
+        }
         const fullPath = path.join(projectRoot, f);
         assert.ok(
             fs.existsSync(fullPath),

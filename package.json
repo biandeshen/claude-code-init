@@ -17,9 +17,11 @@
     ".claude/skills/",
     ".claude/hooks/",
     ".claude/settings.json",
-    ".claude/complexity-rules.yaml"
+    ".claude/complexity-rules.yaml",
+    "!scripts/__pycache__/"
   ],
   "scripts": {
+    "prepack": "rm -rf scripts/__pycache__",
     "start": "node index.js",
     "test": "node --test tests/*.test.js"
   },

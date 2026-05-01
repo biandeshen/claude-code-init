@@ -1,5 +1,7 @@
 ---
 name: workflow-router
+version: 1.0.0
+lastUpdated: 2026-05-01
 description: >
   智能工作流路由器。根据用户意图自动选择最合适的开发工作流。
   当用户提到以下场景时自动加载：代码审查、提交代码、修复错误、重构代码、

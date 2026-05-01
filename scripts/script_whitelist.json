@@ -1,0 +1,27 @@
+{
+  "description": "Script deployment whitelist — init.sh and init.ps1 read this to determine which scripts to copy to .claude/scripts/",
+  "version": "1.0.0",
+  "lastUpdated": "2026-05-01",
+  "excluded": [
+    "check-env.sh",
+    "configure-gitignore.sh",
+    "__pycache__/"
+  ],
+  "excludedReason": "check-env.sh and configure-gitignore.sh are init-only, not deployed; __pycache__/ is build cache",
+  "scripts": [
+    "check_dependencies.py",
+    "check_docs_consistency.py",
+    "check_ecc.sh",
+    "check_function_length.py",
+    "check_import_order.py",
+    "check_project_structure.py",
+    "check_secrets.py",
+    "check_trigger_conflicts.py",
+    "ralph-setup.sh",
+    "tmux-session.sh",
+    "trigger-optimizer.sh",
+    "validate_skills.sh",
+    "weekly-report.sh",
+    "PROMPT.md"
+  ]
+}

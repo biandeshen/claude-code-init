@@ -46,6 +46,23 @@ else
     NC='\033[0m'
 fi
 
+# ─── 错误清理机制 ───
+# 在脚本中途失败时清理已创建的目标目录结构
+CLEANUP_NEEDED=false
+INIT_COMPLETED=false
+
+cleanup() {
+    if [ "$INIT_COMPLETED" = false ] && [ "$CLEANUP_NEEDED" = true ]; then
+        echo ""
+        echo -e "${YELLOW}⚠️  初始化未完成，正在清理...${NC}"
+        if [ -d "$PROJECT_PATH/.claude" ]; then
+            rm -rf "$PROJECT_PATH/.claude"
+        fi
+        echo -e "${YELLOW}已清理 ${PROJECT_PATH}/.claude${NC}"
+    fi
+}
+trap cleanup EXIT
+
 echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
 echo_success() { echo -e "${GREEN}[成功]${NC} $1"; }
 echo_warn() { echo -e "${YELLOW}[警告]${NC} $1"; }
@@ -80,6 +97,9 @@ if [ ! -d ".git" ]; then
 else
     echo_info "Git 仓库已存在，跳过"
 fi
+
+# Git 初始化成功后，标记需要清理（脚本中途退出时清理）
+CLEANUP_NEEDED=true
 
 # 3. 安装核心 Claude Code 插件 (ECC + Superpowers)
 if [ "$SKIP_ECC" = true ] && [ "$SKIP_SUPERPOWERS" = true ]; then
@@ -188,7 +208,18 @@ echo_step "复制校验脚本和 Shell 工具到 .claude/scripts/"
 # - Shell 工具脚本（Skills/Router 引用）
 # 不包括：check-env.sh、configure-gitignore.*、lib/common.sh（仅 init 时用）
 # 不包括：__pycache__/（编译缓存）
-SCRIPT_WHITELIST="check_dependencies.py check_function_length.py check_import_order.py check_project_structure.py check_secrets.py check_docs_consistency.py tmux-session.sh weekly-report.sh ralph-setup.sh trigger-optimizer.sh validate_skills.sh PROMPT.md"
+# 优先从 script_whitelist.json 读取，不存在则使用硬编码列表
+if [ -f "$SCRIPT_DIR/scripts/script_whitelist.json" ]; then
+    SCRIPT_WHITELIST=$(python3 -c "
+import json
+with open('$SCRIPT_DIR/scripts/script_whitelist.json') as f:
+    data = json.load(f)
+print(' '.join(data['scripts']))
+" 2>/dev/null)
+fi
+if [ -z "$SCRIPT_WHITELIST" ]; then
+    SCRIPT_WHITELIST="check_dependencies.py check_function_length.py check_import_order.py check_project_structure.py check_secrets.py check_docs_consistency.py check_trigger_conflicts.py check_ecc.sh tmux-session.sh weekly-report.sh ralph-setup.sh trigger-optimizer.sh validate_skills.sh PROMPT.md"
+fi
 
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 TARGET_SCRIPTS_DIR="$PROJECT_PATH/.claude/scripts"
@@ -510,6 +541,9 @@ if [ -f "$SCRIPT_DIR/scripts/check-env.sh" ]; then
     echo_info "环境检查脚本已复制到项目"
 fi
 
+# 标记初始化完成（防止 cleanup 误删）
+INIT_COMPLETED=true
+
 # 完成
 echo ""
 echo -e "${GREEN}==============================================${NC}"
@@ -517,8 +551,8 @@ echo -e "${GREEN}  Claude Code 开发环境初始化完成！${NC}"
 echo -e "${GREEN}==============================================${NC}"
 echo ""
 echo -e "${CYAN}你现在拥有：${NC}"
-echo -e "  ${GREEN}✅${NC} 10 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/路由/无人值守路由）"
-echo -e "  ${GREEN}✅${NC} 20 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd）"
+echo -e "  ${GREEN}✅${NC} 9 个可自动触发的 Skills（审查/提交/TDD/重构/修复/解释/校验/头脑风暴/初始化）"
+echo -e "  ${GREEN}✅${NC} 21 个自定义命令（/review /commit /architect /fix /refactor /explain /validate /help /team /qa /capabilities /status /remember /overnight /overnight-report /plan-ceo-review /plan-eng-review /routine /messages /tdd）"
 echo -e "  ${GREEN}✅${NC} 场景感知 Hook（编辑测试文件→推荐TDD，编辑安全文件→推荐审查，夜间→推荐无人值守）"
 echo -e "  ${GREEN}✅${NC} 6 个项目完整性校验脚本"
 echo -e "  ${GREEN}✅${NC} Pre-commit 自动检查（9 个检查项）"
@@ -548,7 +582,5 @@ echo -e "  ${GRAY}- 注释使用中文${NC}"
 echo ""
 
 echo -e "如需更新规范，运行:"
-echo -e "  git -C \"$SCRIPT_DIR\" pull"
-echo ""
 echo -e "  git -C \"$SCRIPT_DIR\" pull"
 echo ""

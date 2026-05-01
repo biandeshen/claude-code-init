@@ -1,0 +1,20 @@
+# Security.txt (RFC 9116)
+# 安全漏洞报告联系信息
+# 此文件由 claude-code-init 项目维护
+
+# 联系信息
+Contact: mailto:biandeshen@outlook.com
+Contact: https://github.com/biandeshen/claude-code-init/security/advisories/new
+
+# 加密
+Encryption: https://github.com/biandeshen.gpg
+
+# 策略
+Policy: https://github.com/biandeshen/claude-code-init/blob/main/SECURITY.md
+
+# 项目信息
+Project: https://github.com/biandeshen/claude-code-init
+Preferred-Languages: en, zh
+
+# 时效
+Expires: 2027-05-01T00:00:00.000Z

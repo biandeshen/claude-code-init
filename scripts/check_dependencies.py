@@ -35,16 +35,25 @@ DEFAULT_RULES = {
 CONFIG_FILE = ".dependency-rules.json"
 
 
+def deep_merge(base: dict, override: dict) -> dict:
+    """深度合并两个字典，嵌套的 dict 递归合并而非覆盖"""
+    result = base.copy()
+    for key, value in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = deep_merge(result[key], value)
+        else:
+            result[key] = value
+    return result
+
+
 def load_rules() -> dict:
     """从配置文件加载规则，配置文件不存在则使用默认规则"""
     if Path(CONFIG_FILE).exists():
         try:
             with open(CONFIG_FILE, encoding="utf-8") as f:
                 custom_rules = json.load(f)
-            # 合并默认规则和自定义规则
-            merged = DEFAULT_RULES.copy()
-            merged.update(custom_rules)
-            return merged
+            # 深度合并默认规则和自定义规则，避免浅覆盖
+            return deep_merge(DEFAULT_RULES, custom_rules)
         except Exception as e:
             print(f"[WARN] 无法加载 {CONFIG_FILE}: {e}，使用默认规则")
     return DEFAULT_RULES

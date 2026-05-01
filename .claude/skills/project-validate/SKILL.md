@@ -1,5 +1,7 @@
 ---
 name: project-validate
+version: 1.0.0
+lastUpdated: 2026-05-01
 description: >
   项目完整性校验工作流。当用户提到运行校验、检查项目、validate、
   检查代码规范、完整性检查时自动加载。

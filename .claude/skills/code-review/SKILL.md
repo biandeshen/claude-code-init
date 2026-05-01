@@ -1,5 +1,7 @@
 ---
 name: code-review
+version: 1.0.0
+lastUpdated: 2026-05-01
 description: >
   对代码进行全面的质量审查。当用户提到审查代码、检查质量、review、
   帮我看看代码、帮我检查一下代码、代码质量分析时自动加载。

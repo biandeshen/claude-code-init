@@ -45,7 +45,7 @@
 
 | 场景 | 命令 | 说明 |
 |------|------|------|
-| 过夜任务 | `bash .claude/scripts/tmux-session.sh` | 让 AI 通宵工作 |
+| 过夜任务 | `bash scripts/tmux-session.sh` | 让 AI 通宵工作 |
 | 查看报告 | `/overnight-report` | 汇总昨晚的工作成果 |
 | 状态仪表盘 | `/status` | 项目完整状态概览 |
 
@@ -54,7 +54,7 @@
 | 场景 | 命令 | 说明 |
 |------|------|------|
 | 运行所有检查 | `/validate` | 执行全部 5 个校验脚本 |
-| 依赖检查 | `python .claude/scripts/check_dependencies.py` | 检查项目依赖 |
+| 依赖检查 | `python scripts/check_dependencies.py` | 检查项目依赖 |
 
 ## 常用命令速查
 

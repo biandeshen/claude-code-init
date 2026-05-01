@@ -226,7 +226,7 @@ PLAN.md    ← 执行层：任务执行的实时日志
 
 ## 校验脚本
 
-初始化后会复制 `.claude/scripts/` 目录到项目：
+初始化脚本会从 `scripts/`（源码包）将校验脚本复制到目标项目的 `.claude/scripts/`：
 
 | 脚本 | 说明 | Pre-commit |
 |------|------|:----------:|
@@ -352,7 +352,7 @@ claude-code-init/
 │   ├── ROUTINE_Template.md
 │   └── memory/              # 记忆系统模板
 │       └── MEMORY.md         # 单文件记忆（含索引+A...）
-├── commands/              # 自定义斜杠命令 (18个)
+├── commands/              # 自定义斜杠命令 (21个)
 │   ├── review.md, commit.md, fix.md
 │   ├── refactor.md, explain.md, validate.md
 │   ├── team.md, qa.md, routine.md
@@ -402,6 +402,13 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| v1.6.0 | 2026-05-01 | 第四轮审查修复完整闭环 — 40 项问题全部修复，骨架命令 fallback 提示收尾 |
+| v1.5.9 | 2026-05-01 | 第四轮审查修复 Batch 5 — 风险因子补全 + ECC 依赖声明 + Router ECC 检测 + 触发词规范 |
+| v1.5.8 | 2026-05-01 | 第四轮审查修复 Batch 4 — Agent Teams 文档精准化 + Pre-commit 顺序优化 + check_secrets 扩展 + PostToolUse hook |
+| v1.5.7 | 2026-05-01 | 第四轮审查修复 Batch 3 — Memory GC + access_count + Skill 回滚规范 + timeout + JSON 转义 + 选择性部署 |
+| v1.5.6 | 2026-05-01 | 第四轮审查修复 Batch 2 — Router/Brainstorming 路由冲突 + OWASP 补全 + 否定语义 + rm -rf 正则增强 + 触发词扩展 |
+| v1.5.5 | 2026-05-01 | 第四轮审查修复 Batch 1 — hook exit 0 致命修复 + PROMPT.md 部署链 + 过时代码清理 + 版本标志 |
+| v1.5.4 | 2026-05-01 | 第三轮多角色审查修复 — 安全加固 P0/P1 密钥检测增强 + 版本一致性修复 |
 | v1.5.3 | 2026-05-01 | 安全加固(P0/P1密钥检测增强)、版本一致性修复 |
 | v1.5.2 | 2026-05-01 | 安全修复(.env保护)、信任边界加固 |
 | v1.5.1 | 2026-04-30 | 全线跨平台兼容修复(38项)、安全加固、CI门禁强化、MIT License |

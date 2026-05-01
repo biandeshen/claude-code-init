@@ -1,5 +1,7 @@
 ---
 name: safe-refactoring
+version: 1.0.0
+lastUpdated: 2026-05-01
 description: >
   安全重构工作流。当用户提到重构、整理代码、优化结构、提取方法、
   重命名、改善代码结构时自动加载。

@@ -82,5 +82,6 @@ Claude Code 云端 Routines 可以在你关机后自动执行任务。
 ## 下一步
 
 - 查看 `/help` 了解所有可用命令
+- 查看 `GUIDE.md` 获取完整使用指南
 - 查看 `/capabilities` 按场景了解系统能力
 - 查看 `/status` 了解项目当前状态

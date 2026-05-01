@@ -16,7 +16,7 @@
 ## 工作流程
 
 1. **解析任务**：AI 分析任务描述，拆分为原子任务
-2. **生成清单**：自动创建 `.claude/scripts/PROMPT.md`
+2. **生成清单**：自动创建 `scripts/PROMPT.md`
 3. **设定参数**：根据任务复杂度自动设定 `--max-turns` 和 `--max-budget-usd`
 4. **启动会话**：在 tmux 中启动 Claude Code 无人值守循环
 

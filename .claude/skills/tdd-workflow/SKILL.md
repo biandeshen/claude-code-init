@@ -1,5 +1,7 @@
 ---
 name: tdd-workflow
+version: 1.0.0
+lastUpdated: 2026-05-01
 description: >
   测试驱动开发工作流。当用户提到用TDD、测试驱动开发、先写测试、
   红绿重构、写测试用例时自动加载。
