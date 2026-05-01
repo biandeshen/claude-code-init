@@ -629,9 +629,9 @@ Lead 汇总结果
 |------|----------|------|
 | CLAUDE_Template.md | `/CLAUDE.md` | AI 入口配置，含 spec 索引 |
 | SOUL_Template.md | `/SOUL.md` | 决策规则，含 spec 检查 |
-| PLAN_Template.md | `/PLAN.md` | 执行日志 |
-| SPEC_Template.md | `/docs/specs/SPEC_Template.md` | 功能规格模板（7 节结构） |
-| ROUTINE_Template.md | `/docs/ROUTINE_Template.md` | 定时任务模板 |
+| PLAN_Template.md | `/.claude/PLAN_Template.md` | 执行日志 |
+| SPEC_Template.md | `/.claude/SPEC_Template.md` | 功能规格模板（7 节结构） |
+| ROUTINE_Template.md | `/.claude/ROUTINE_Template.md` | 定时任务模板 |
 
 ### 8.4 校验脚本
 
@@ -821,11 +821,4 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 ---
 
-*本文档为 claude-code-init 项目交接专用。v1.6.3，58 测试全部通过，10 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*
-- pre-commit 实际安装验证（T8）
-
----
-
-*本文档为 claude-code-init 项目交接专用。v1.6.2，58 测试全部通过，10 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*
-
-*本文档为 claude-code-init 项目交接专用。v1.6.2，58 测试全部通过，10 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*
+*本文档为 claude-code-init 项目交接专用。v1.6.3，47 测试全部通过，9 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*

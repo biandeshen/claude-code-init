@@ -40,7 +40,7 @@ claude-code-init/
 ├── package.json           # npm 包配置
 ├── index.js               # npx 入口脚本
 ├── init.sh / init.ps1      # 初始化脚本
-├── templates/              # 6 个覆盖层模板 (→ 目标项目)
+├── templates/              # 5 个模板 + 1 个子模板(memory/) (→ 目标项目)
 │   ├── CLAUDE_Template.md
 │   ├── SOUL_Template.md
 │   ├── SPEC_Template.md

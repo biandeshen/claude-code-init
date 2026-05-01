@@ -62,6 +62,7 @@ cleanup() {
     fi
 }
 trap cleanup EXIT INT TERM
+trap 'echo_fail "初始化在第 $LINENO 行失败" 1>&2' ERR
 
 echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
 echo_success() { echo -e "${GREEN}[成功]${NC} $1"; }
@@ -129,7 +130,7 @@ if [ "$SKIP_ECC" != true ] || [ "$SKIP_SUPERPOWERS" != true ]; then
         echo_info "跳过插件确认 (--force 模式)"
     else
         echo -e "${YELLOW} 如果你已完成安装，请输入 y 继续；否则请输入 n 退出${NC}"
-        read -p "是否已完成插件安装？(y/n) " confirm
+        read -r -p "是否已完成插件安装？(y/n) " confirm
         if [ "$confirm" != "y" ]; then
             echo -e "${RED}请先完成插件安装，再重新运行此脚本。${NC}"
             exit 1
@@ -238,7 +239,9 @@ if [ "$SCRIPTS_DIR" = "$TARGET_SCRIPTS_DIR" ]; then
     echo_info "源目录与目标目录相同，已跳过脚本复制"
 elif [ -d "$SCRIPTS_DIR" ]; then
     mkdir -p "$TARGET_SCRIPTS_DIR"
-    for file in $SCRIPT_WHITELIST; do
+    # 安全：白名单文件名只允许 [a-zA-Z0-9._-] 字符
+    SAFE_WHITELIST=$(echo "$SCRIPT_WHITELIST" | tr ' ' '\n' | grep -E '^[a-zA-Z0-9._-]+$' | tr '\n' ' ')
+    for file in $SAFE_WHITELIST; do
         if [ -f "$SCRIPTS_DIR/$file" ]; then
             cp "$SCRIPTS_DIR/$file" "$TARGET_SCRIPTS_DIR/"
         fi

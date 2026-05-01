@@ -77,7 +77,7 @@ repos:
         name: Security check (secrets)
         entry: python scripts/check_secrets.py
         language: system
-        types: [yaml, python, text]
+        types: [yaml, python, text, shell, javascript]
         pass_filenames: false
         stages: [pre-commit]
 

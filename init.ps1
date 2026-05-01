@@ -222,10 +222,10 @@ if (-not $pythonCmd) { $pythonCmd = Get-Command python -ErrorAction SilentlyCont
 if ($pythonCmd) {
     # 检查 pre-commit 是否已安装
     try {
-        $null = python -c "import pre_commit" 2>$null
+        $null = & $pythonCmd -c "import pre_commit" 2>$null
     } catch {
         Write-Info "正在安装 pre-commit..."
-        python -m pip install --quiet "pre-commit>=4.0"
+        & $pythonCmd -m pip install --quiet "pre-commit>=4.0"
         Write-Success "pre-commit 安装完成"
     }
     try {

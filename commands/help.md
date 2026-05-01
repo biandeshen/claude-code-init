@@ -61,14 +61,14 @@
 | `/architect <方案>` | 架构评审 | 长 |
 | `/fix` | 自动修复错误 | 中 |
 | `/refactor` | 安全重构 | 长 |
-| \`/tdd\` | TDD 测试驱动开发 |
+| `/tdd` | TDD 测试驱动开发 |
 | `/explain <目标>` | 代码解释 | 短 |
 | `/validate` | 运行项目校验脚本 | 短 |
 | `/help` | 显示本帮助 | 短 |
 | `/team <数量> <任务>` | 启动 Agent 团队 | 长 |
 | `/qa <目标>` | 质量保证测试 | 中 |
 | `/plan-ceo-review <需求>` | 产品需求审查 | 中 |
-| \`/plan-eng-review\` | 技术架构评审 |
+| `/plan-eng-review` | 技术架构评审 |
 | `/routine <描述>` | 云端定时任务管理 | 短 |
 | `/overnight` | 启动无人值守长任务 | 长 |
 | `/overnight-report` | 查看过夜任务报告 | 短 |
@@ -76,6 +76,7 @@
 | `/capabilities` | 按场景索引系统能力 | 短 |
 | `/remember` | 浏览/搜索/管理项目记忆 | 短 |
 | `/messages` | 查看 Agent 团队消息 | 短 |
+| `/gc` | 清理过期项目记忆 | 短 |
 
 ### OpenSpec SDD 流程（开发复杂功能时按顺序使用）
 | 命令 | 用途 |

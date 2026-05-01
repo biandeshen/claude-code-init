@@ -8,7 +8,8 @@
 
 ### 检查 Claude Code 版本
 
-确保 Claude Code 版本 >= 2.0（`/plugin` 命令需要）：
+确保 Claude Code 版本 >= 2.0（`/plugin` 命令需要）。
+系统要求：Bash 3.2+ (macOS) / Bash 4+ (Linux)，PowerShell 5.1+ (Windows)。
 ```bash
 claude --version
 ```

@@ -13,13 +13,21 @@ description: >
   重构、refactor、解释、explain、评审、架构、校验、validate、测试、
   开发新功能、帮我看看代码、帮我检查一下、代码质量、团队、并行、
   过夜、夜间、无人值守、qa、需求审查、架构评审、
-  记忆、记住、回忆、备忘、之前怎么、偏好设置
+  记忆、记住、回忆、备忘、之前怎么、偏好设置、
+  定时任务、routine、云端任务、定时执行、
+  垃圾回收、gc、清理记忆、整理记忆、
+  状态、进度、status、项目状态、
+  能力、功能、capabilities、能做什么、
+  消息、messages、查看消息、团队消息、
+  过夜报告、overnight-report、任务报告
 
   英文触发词：review, commit, fix, refactor, explain, validate, test,
   check, architecture, design, bug, error, debug, quality, security,
   audit, refactor, restructure, deploy, team, parallel, overnight,
   unattended, qa, ceo-review, eng-review,
-  memory, remember, recall, preference
+  memory, remember, recall, preference,
+  routine, cron, scheduled, gc, garbage, status, progress,
+  capabilities, features, messages, report
 ---
 
 # Development Workflow Router
@@ -69,6 +77,12 @@ description: >
 | **qa、测试验证、质量保证** | 执行 `/qa` 命令 | "跑一遍完整 QA 测试" |
 | **需求审查、ceo-review** | 执行 `/plan-ceo-review` 命令 | "帮我审视下这个需求" |
 | **架构评审、eng-review** | 执行 `/plan-eng-review` 命令 | "评审一下技术架构" |
+| **定时任务、routine、云端任务、定时执行** | 执行 `/routine` 命令 | "帮我创建一个每晚10点的定时任务" |
+| **垃圾回收、gc、清理记忆、整理记忆** | 执行 `/gc` 命令 | "清理过期的项目记忆" |
+| **状态、进度、status、项目状态** | 执行 `/status` 命令 | "看看项目当前状态" |
+| **能力、功能、capabilities、能做什么** | 执行 `/capabilities` 命令 | "这个项目能做什么" |
+| **消息、messages、查看消息、团队消息** | 执行 `/messages` 命令 | "查看 Agent 团队消息" |
+| **过夜报告、overnight-report、任务报告** | 执行 `/overnight-report` 命令 | "查看过夜任务报告" |
 
 ## 路由规则
 

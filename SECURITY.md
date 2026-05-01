@@ -43,6 +43,5 @@
 
 ## PGP 加密报告
 
-对于敏感漏洞，请使用以下 PGP 密钥加密报告内容：
-<!-- PGP 密钥尚在配置中，就绪后会更新此处。临时可通过 GitHub Security Advisory 私密报告。 -->
-- 密钥下载：`https://github.com/biandeshen/claude-code-init/blob/main/public-key.asc`
+对于敏感漏洞，请通过 GitHub Security Advisory 私密报告。
+<!-- PGP 密钥尚在配置中，就绪后会更新此处。 -->
