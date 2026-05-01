@@ -101,3 +101,8 @@ else
 fi
 
 echo_success ".gitignore 已更新"
+
+# 去重 .claude/ 条目（若已在标记块外存在，避免重复）
+if [ -f "$GITIGNORE_PATH" ]; then
+    awk 'index($0, ".claude/") == 1 {if(!seen++)print; next} {print}' "$GITIGNORE_PATH" > "${GITIGNORE_PATH}.tmp" && mv "${GITIGNORE_PATH}.tmp" "$GITIGNORE_PATH"
+fi

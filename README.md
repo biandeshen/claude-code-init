@@ -58,6 +58,24 @@ git clone https://github.com/biandeshen/claude-code-init.git ~/tools/claude-code
 ./init.sh ./your-project
 ```
 
+### 高级选项
+
+```bash
+# 跳过插件安装（ECC / Superpowers）
+./init.sh ./your-project --skip-ecc --skip-superpowers
+
+# 跳过 cc-discipline / OpenSpec
+./init.sh ./your-project --skip-ccdiscipline --skip-openspec
+
+# 强制覆盖已有配置（非交互模式，不询问直接覆盖）
+./init.sh ./your-project --force
+
+# 组合使用：完全非交互式初始化
+./init.sh ./your-project --force --skip-ecc --skip-superpowers --skip-ccdiscipline --skip-openspec
+```
+
+> 所有 `--skip-*` 和 `--force` 选项同样适用于 `init.ps1`（PowerShell 版）。
+
 ## 常用命令
 
 | 命令 | 作用 |

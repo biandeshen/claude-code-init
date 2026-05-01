@@ -169,7 +169,11 @@ else
     echo_step "安装 cc-discipline (物理防火墙 Hooks)"
     CC_DISCIPLINE_PATH="$HOME/.cc-discipline"
     CC_DISCIPLINE_COMMIT="916da00691128fde44599928d76c129f3d08b8f1"  # 锁定版本 2026-04-26
-    if [ ! -d "$CC_DISCIPLINE_PATH" ]; then
+    # 检查 $HOME 是否可写（CI/受限环境可能失败）
+    if [ ! -d "$HOME" ] || { [ -d "$HOME" ] && [ ! -w "$HOME" ]; }; then
+        echo_warn "\$HOME ($HOME) 不可写，无法安装 cc-discipline"
+        echo_info "请使用 --skip-ccdiscipline 跳过，或设置可写的 \$HOME 后重试"
+    elif [ ! -d "$CC_DISCIPLINE_PATH" ]; then
         echo_info "克隆 cc-discipline 仓库..."
         git clone -b main https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
         cd "$CC_DISCIPLINE_PATH"
@@ -422,8 +426,16 @@ fi
 echo_step "复制自定义命令"
 COMMANDS_DIR="$SCRIPT_DIR/commands"
 TARGET_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
-if [ -d "$COMMANDS_DIR" ]; then
+if [ "$COMMANDS_DIR" = "$TARGET_COMMANDS_DIR" ]; then
+    echo_info "源目录与目标目录相同，已跳过命令复制"
+elif [ -d "$COMMANDS_DIR" ]; then
     mkdir -p "$TARGET_COMMANDS_DIR"
+    # 非 --force 模式下备份已有命令（与 copy_template 行为一致）
+    if [ "$FORCE_OVERWRITE" != true ] && [ -d "$TARGET_COMMANDS_DIR" ] && [ -n "$(ls -A "$TARGET_COMMANDS_DIR" 2>/dev/null)" ]; then
+        _backup_path="${TARGET_COMMANDS_DIR}.bak-$(date +%Y%m%d-%H%M%S)"
+        cp -r "$TARGET_COMMANDS_DIR" "$_backup_path"
+        echo_info "已备份原命令到 ${_backup_path#$PROJECT_PATH/}"
+    fi
     cp -r "$COMMANDS_DIR/"* "$TARGET_COMMANDS_DIR/"
     echo_success "已复制自定义命令到 .claude/commands/"
 else
@@ -434,8 +446,16 @@ fi
 echo_step "复制 Skills"
 SKILLS_DIR="$SCRIPT_DIR/.claude/skills"
 TARGET_SKILLS_DIR="$PROJECT_PATH/.claude/skills"
-if [ -d "$SKILLS_DIR" ]; then
+if [ "$SKILLS_DIR" = "$TARGET_SKILLS_DIR" ]; then
+    echo_info "源目录与目标目录相同，已跳过 Skills 复制"
+elif [ -d "$SKILLS_DIR" ]; then
     mkdir -p "$TARGET_SKILLS_DIR"
+    # 非 --force 模式下备份已有 Skills
+    if [ "$FORCE_OVERWRITE" != true ] && [ -d "$TARGET_SKILLS_DIR" ] && [ -n "$(ls -A "$TARGET_SKILLS_DIR" 2>/dev/null)" ]; then
+        _backup_path="${TARGET_SKILLS_DIR}.bak-$(date +%Y%m%d-%H%M%S)"
+        cp -r "$TARGET_SKILLS_DIR" "$_backup_path"
+        echo_info "已备份原 Skills 到 ${_backup_path#$PROJECT_PATH/}"
+    fi
     cp -r "$SKILLS_DIR/"* "$TARGET_SKILLS_DIR/"
     echo_success "已复制 Skills 到 .claude/skills/"
 else
@@ -448,8 +468,16 @@ HOOKS_SOURCE_DIR="$SCRIPT_DIR/.claude/hooks"
 HOOKS_TARGET_DIR="$PROJECT_PATH/.claude/hooks"
 SETTINGS_SOURCE="$SCRIPT_DIR/.claude/settings.json"
 SETTINGS_TARGET="$PROJECT_PATH/.claude/settings.json"
-if [ -d "$HOOKS_SOURCE_DIR" ]; then
+if [ "$HOOKS_SOURCE_DIR" = "$HOOKS_TARGET_DIR" ]; then
+    echo_info "源目录与目标目录相同，已跳过 Hooks 复制"
+elif [ -d "$HOOKS_SOURCE_DIR" ]; then
     mkdir -p "$HOOKS_TARGET_DIR"
+    # 非 --force 模式下备份已有 Hooks
+    if [ "$FORCE_OVERWRITE" != true ] && [ -d "$HOOKS_TARGET_DIR" ] && [ -n "$(ls -A "$HOOKS_TARGET_DIR" 2>/dev/null)" ]; then
+        _backup_path="${HOOKS_TARGET_DIR}.bak-$(date +%Y%m%d-%H%M%S)"
+        cp -r "$HOOKS_TARGET_DIR" "$_backup_path"
+        echo_info "已备份原 Hooks 到 ${_backup_path#$PROJECT_PATH/}"
+    fi
     cp -r "$HOOKS_SOURCE_DIR/"* "$HOOKS_TARGET_DIR/"
     echo_success "已复制 Hooks 到 .claude/hooks/"
 fi

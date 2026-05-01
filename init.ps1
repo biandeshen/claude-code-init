@@ -124,7 +124,7 @@ if (-not $SkipOpenSpec) {
     Write-Info "跳过 OpenSpec 安装"
 }
 
-# 6. 安装 cc-discipline (物理防火墙) - 自动执行
+# 5. 安装 cc-discipline (物理防火墙) - 自动执行
 if (-not $SkipCcDiscipline) {
     Write-Step "安装 cc-discipline (物理防火墙 Hooks)"
     $CcDisciplinePath = "$env:USERPROFILE\.cc-discipline"
@@ -180,7 +180,7 @@ if (-not $SkipCcDiscipline) {
     Write-Info "跳过 cc-discipline 安装"
 }
 
-# 7. 复制 Python 校验脚本（白名单部署）
+# 6. 复制 Python 校验脚本（白名单部署）
 Write-Step "复制校验脚本和 Shell 工具到 .claude/scripts/"
 
 # 部署目标项目需要的脚本（白名单）
@@ -215,7 +215,7 @@ if (Test-SamePath $ScriptsDir $TargetScriptsDir) {
     Write-Info "scripts 目录不存在，跳过"
 }
 
-# 8. 复制 Pre-commit 配置
+# 7. 复制 Pre-commit 配置
 Write-Step "复制 Pre-commit 配置"
 $PrecommitConfig = Join-Path $ScriptDir "configs\.pre-commit-config.yaml"
 $TargetPrecommitConfig = "$ProjectPath\.pre-commit-config.yaml"
@@ -255,7 +255,7 @@ if ($pythonCmd) {
     Write-Host "  手动安装 hooks: pre-commit install" -ForegroundColor Yellow
 }
 
-# 10. 复制覆盖层模板
+# 9. 复制覆盖层模板
 Write-Step "复制覆盖层模板"
 $TemplateDir = Join-Path $ScriptDir "templates"
 
@@ -358,7 +358,7 @@ Check-TemplateVersion (Join-Path $TemplateDir "SPEC_Template.md") "$ProjectPath\
 Check-TemplateVersion (Join-Path $TemplateDir "ROUTINE_Template.md") "$ProjectPath\.claude\ROUTINE_Template.md"
 Write-Success "模板版本检查完成"
 
-# 10.2 复制记忆系统模板
+# 9.2 复制记忆系统模板
 Write-Step "复制记忆系统模板"
 $MemoryTemplate = Join-Path $TemplateDir "memory\MEMORY.md"
 if (Test-Path $MemoryTemplate) {
@@ -398,7 +398,7 @@ if ($SkillsDir -eq $TargetSkillsDir) {
     Write-Info "Skills 目录不存在，跳过"
 }
 
-# 11.2 复制 Hooks 和 settings.json
+# 10.2 复制 Hooks 和 settings.json
 Write-Step "复制 Hooks 和设置"
 $HooksSourceDir = Join-Path $ScriptDir ".claude\hooks"
 $HooksTargetDir = "$ProjectPath\.claude\hooks"
@@ -594,7 +594,7 @@ Write-Host "  5. 输入 /status 查看项目状态仪表盘" -ForegroundColor Wh
 Write-Host "  6. 输入 /capabilities 按场景查看全部能力" -ForegroundColor White
 Write-Host ""
 
-# 15. 全局偏好设置引导（跨所有项目生效）
+# 14. 全局偏好设置引导（跨所有项目生效）
 Write-Host "[建议] 设置全局偏好（跨所有项目生效）：" -ForegroundColor Yellow
 $globalClaude = "$env:USERPROFILE\.claude\CLAUDE.md"
 Write-Host "  将你的通用编码偏好写入 $globalClaude" -ForegroundColor Gray

@@ -97,6 +97,15 @@ $newContent = if ($existing) {
 }
 try {
     $newContent | Out-File -FilePath $gitignorePath -Encoding ascii -ErrorAction Stop
+    # 去重 .claude/ 条目（若已在标记块外存在，避免重复）
+    $content = Get-Content $gitignorePath
+    $seen = $false
+    $deduped = $content | ForEach-Object {
+        if ($_ -eq '.claude/') {
+            if (-not $seen) { $seen = $true; $_ }
+        } else { $_ }
+    }
+    $deduped | Set-Content $gitignorePath -Encoding ascii
     Write-Host "[OK] .gitignore 已更新" -ForegroundColor Green
 } catch {
     Write-Host "[ERROR] 写入 .gitignore 失败: $_" -ForegroundColor Red
