@@ -139,7 +139,7 @@ if [ "$SKIP_ECC" != true ] || [ "$SKIP_SUPERPOWERS" != true ]; then
         echo_info "跳过插件确认 (--force 模式)"
     else
         echo -e "${YELLOW} 如果你已完成安装，请输入 y 继续；否则请输入 n 退出${NC}"
-        read -r -p "是否已完成插件安装？(y/n) " confirm
+        read -r -p "是否已完成插件安装？(y/n) " confirm </dev/tty
         if [ "$confirm" != "y" ]; then
             echo -e "${RED}请先完成插件安装，再重新运行此脚本。${NC}"
             exit 1
@@ -610,8 +610,10 @@ fi
 # 13. 运行环境检查
 echo ""
 echo_step "运行环境完整性检查"
+# 注意：check-env.sh 目前仅存在于源仓库中，未部署到目标项目
+# 因为 lib/common.sh 不在部署白名单中，check-env.sh source 会失败
 if [ -f "$SCRIPT_DIR/scripts/check-env.sh" ]; then
-    echo_info "环境检查脚本已复制到项目"
+    echo_info "环境检查脚本可用（位于源仓库）"
 fi
 
 # 标记初始化完成（防止 cleanup 误删）

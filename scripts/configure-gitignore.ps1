@@ -45,7 +45,9 @@ switch ($choice) {
             "CLAUDE.md",
             "SOUL.md",
             "PLAN_Template.md",
-            "openspec/"
+            "openspec/",
+            "# Backup files（由 copy_template 生成）",
+            "*.bak"
         )
         Write-Host "[OK] 已将所有 AI 配置文件加入 .gitignore" -ForegroundColor Green
     }
@@ -55,7 +57,8 @@ switch ($choice) {
             "# Claude Code 个人本地文件（务必忽略）",
             ".claude/CLAUDE.local.md",
             ".claude/MEMORY.local.md",
-            "# === claude-code-init ==="
+            "# Backup files（由 copy_template 生成）",
+            "*.bak"
         )
         Write-Host "[OK] 已忽略个人偏好文件，其他配置可提交" -ForegroundColor Green
     }
@@ -65,7 +68,8 @@ switch ($choice) {
             "# Claude Code 个人本地文件",
             ".claude/CLAUDE.local.md",
             ".claude/MEMORY.local.md",
-            "# === claude-code-init ==="
+            "# Backup files（由 copy_template 生成）",
+            "*.bak"
         )
         Write-Host "[OK] 所有 AI 配置文件提交就绪" -ForegroundColor Green
     }
@@ -78,7 +82,9 @@ switch ($choice) {
             "CLAUDE.md",
             "SOUL.md",
             "PLAN_Template.md",
-            "openspec/"
+            "openspec/",
+            "# Backup files（由 copy_template 生成）",
+            "*.bak"
         )
         Write-Host "[OK] 已按默认处理（全部忽略）" -ForegroundColor Yellow
     }
