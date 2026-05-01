@@ -287,9 +287,9 @@ echo_step "安装 Pre-commit Hooks"
 if command -v python3 >/dev/null 2>&1 || command -v python >/dev/null 2>&1; then
     PYTHON_CMD=$(command -v python3 || command -v python)
     # 检查 pre-commit 是否已安装
-    $PYTHON_CMD -c "import pre_commit" 2>/dev/null || {
+    "$PYTHON_CMD" -c "import pre_commit" 2>/dev/null || {
         echo_info "正在安装 pre-commit..."
-        $PYTHON_CMD -m pip install --quiet "pre-commit>=4.0" 2>/dev/null && echo_success "pre-commit 安装完成"
+        "$PYTHON_CMD" -m pip install --quiet "pre-commit>=4.0" 2>/dev/null && echo_success "pre-commit 安装完成"
     }
     if command -v pre-commit >/dev/null 2>&1; then
         pre-commit install
@@ -315,7 +315,8 @@ template_version() {
 # 模板复制函数: 目标已存在时提供交互选择
 # 用法: copy_template <源> <目标> <显示名>
 copy_template() {
-    _src="$1"; _target="$2"; _display="$3"
+    local _src="$1" _target="$2" _display="$3"
+    local _src_ver _tgt_ver _choice _choice2
 
     if [ ! -f "$_target" ]; then
         cp "$_src" "$_target"
@@ -387,8 +388,8 @@ fi
 # 9.1 模板版本检查
 echo_step "检查模板版本"
 check_template_version() {
-    _src="$1"
-    _target="$2"
+    local _src="$1" _target="$2"
+    local _src_ver _target_ver _name
     if [ -f "$_src" ] && [ -f "$_target" ]; then
         _src_ver=$(grep -m1 "模板版本：" "$_src" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
         _target_ver=$(grep -m1 "模板版本：" "$_target" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)

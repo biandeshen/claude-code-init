@@ -27,6 +27,9 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Backup files
+*.bak
+
 # Claude Code
 CLAUDE.local.md
 MEMORY.local.md

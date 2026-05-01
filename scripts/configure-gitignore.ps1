@@ -6,6 +6,8 @@ param(
     [string]$ProjectPath = "."
 )
 
+$ErrorActionPreference = "Stop"
+
 Set-Location $ProjectPath
 
 Write-Host ""
@@ -87,4 +89,10 @@ $newContent = if ($existing) {
 } else {
     $rules -join "`n"
 }
-$newContent | Out-File -FilePath $gitignorePath -Encoding utf8
+try {
+    $newContent | Out-File -FilePath $gitignorePath -Encoding ascii -ErrorAction Stop
+    Write-Host "[OK] .gitignore 已更新" -ForegroundColor Green
+} catch {
+    Write-Host "[ERROR] 写入 .gitignore 失败: $_" -ForegroundColor Red
+    exit 1
+}

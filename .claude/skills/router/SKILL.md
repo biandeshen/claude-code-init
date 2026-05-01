@@ -1,5 +1,5 @@
 ---
-name: workflow-router
+name: router
 version: 1.0.0
 lastUpdated: 2026-05-01
 description: >
