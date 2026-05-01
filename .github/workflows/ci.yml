@@ -18,7 +18,7 @@ jobs:
         node-version: ['18', '20', '22']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
         with:
           node-version: ${{ matrix.node-version }}
@@ -31,7 +31,7 @@ jobs:
   shellcheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - run: sudo apt-get update -qq && sudo apt-get install -qq shellcheck
       - run: |
           echo "::group::init.sh"
@@ -44,7 +44,7 @@ jobs:
   bash-syntax:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - run: |
           for f in init.sh scripts/*.sh; do
             [ -f "$f" ] || continue
@@ -56,7 +56,7 @@ jobs:
   markdown-lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - uses: DavidAnson/markdownlint-cli2-action@db43aefc7bc5c56b8068f99235cb088f36cfa269
         with:
           globs: 'templates/*.md,docs/*.md,*.md'
@@ -64,7 +64,7 @@ jobs:
   python-syntax:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - uses: actions/setup-python@3c2dbd4fe58be2262966472148d6609918a8e3ae
         with:
           python-version: '3.9'
@@ -79,7 +79,7 @@ jobs:
   docs-consistency:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - uses: actions/setup-python@3c2dbd4fe58be2262966472148d6609918a8e3ae
         with:
           python-version: '3.9'
@@ -88,7 +88,7 @@ jobs:
   gitleaks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
       - uses: gitleaks/gitleaks-action@44bdecdef787b7ab0441bf2d8a9e4cd3ea8052f3
@@ -98,7 +98,7 @@ jobs:
   version-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: Check version consistency
         run: |
           PKG_VER=$(node -e "console.log(require('./package.json').version)")
