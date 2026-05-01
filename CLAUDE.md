@@ -50,10 +50,9 @@ claude-code-init/
 ├── commands/              # 21 个斜杠命令 (→ .claude/commands/)
 ├── .claude/               # Claude Code 配置
 │   ├── skills/            # 10 个自定义 Skill (→ .claude/skills/)
-│   ├── scripts/           # Python 校验 + PROMPT.md (→ .claude/scripts/)
-│   ├── hooks/             # Pre-commit hooks
-│   └── settings.json      # Claude Code 设置
-├── scripts/               # Shell 工具脚本
+│   ├── hooks/             # Pre-commit hooks (→ .claude/hooks/)
+│   └── settings.json      # Claude Code 设置文件
+├── scripts/               # Shell + Python 工具脚本 (→ .claude/scripts/)
 │   ├── tmux-session.sh    # 无人值守会话管理
 │   ├── ralph-setup.sh     # Ralph 插件安装
 │   ├── weekly-report.sh   # 周报生成

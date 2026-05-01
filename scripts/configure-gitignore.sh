@@ -4,6 +4,8 @@
 # 用法：bash scripts/configure-gitignore.sh [项目路径]
 # 与 configure-gitignore.ps1 保持一致的逻辑
 
+set -e
+
 PROJECT_PATH="${1:-.}"
 
 # 加载公共库（颜色输出 + 工具函数）

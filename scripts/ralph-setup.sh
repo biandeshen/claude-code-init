@@ -18,7 +18,7 @@ fi
 
 RALPH_REPO="https://github.com/snarktank/ralph.git"
 RALPH_DIR="$HOME/.claude/skills/ralph"
-RALPH_COMMIT=""  # 留空则自动锁定 main 分支最新 commit（供应链安全：固定提交哈希）
+RALPH_COMMIT="6c53cb0b831ebe8739c6a003e22af14902d8b0b5"  # 供应链安全：硬编码锁定 main 分支 commit
 INSTALL_MODE="${1:-ralph}"
 
 # 检查 Claude Code 是否安装
@@ -105,7 +105,7 @@ install_tmux_orche() {
     echo_step "安装 tmux-orche（备选方案）..."
 
     if command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1; then
-        pip install "tmux-orche>=0.1.0" 2>/dev/null || pip3 install "tmux-orche>=0.1.0" 2>/dev/null
+        pip install "tmux-orche==0.1.0" 2>/dev/null || pip3 install "tmux-orche==0.1.0" 2>/dev/null
         echo_success "tmux-orche 安装完成"
     else
         echo_warn "pip 未安装，跳过 tmux-orche"
