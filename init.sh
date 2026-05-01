@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.6.4 | 2026-05-02
+# 版本: v1.6.5 | 2026-05-02
 
 set -euo pipefail
 
@@ -81,7 +81,7 @@ echo_info() { echo -e "[信息] $1"; }
 
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.6.4)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.6.5)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 
@@ -575,7 +575,7 @@ echo -e "  ${GREEN}✅${NC} 6 个项目完整性校验脚本"
 echo -e "  ${GREEN}✅${NC} Pre-commit 自动检查（9 个检查项）"
 echo -e "  ${GREEN}✅${NC} 无人值守长任务环境（tmux + Ralph Wiggum 循环）"
 echo -e "  ${GREEN}✅${NC} Agent Teams 并行开发/审查（/team）"
-echo -e "  ${GREEN}✅${NC} gstack 角色体系（CEO审查/架构审查/QA测试/一键发布）"
+echo -e "  ${GREEN}✅${NC} gstack 角色体系（CEO审查/架构审查/QA测试/6-Agent 发布审查）"
 echo -e "  ${GREEN}✅${NC} Skills 触发优化工具（trigger-optimizer.sh）"
 echo -e "  ${GREEN}✅${NC} 周报生成工具（weekly-report.sh）"
 echo ""

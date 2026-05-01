@@ -1,6 +1,6 @@
 # claude-code-init 项目交接文档
 
-> 版本：v1.6.4 | 最后更新：2026-05-02
+> 版本：v1.6.5 | 最后更新：2026-05-02
 > **历史交接文档**：见 [HANDOVER-v1.6.0.md](HANDOVER-v1.6.0.md)（v1.6.0 快照，已归档）。本文档为当前最新版本。
 
 ---
@@ -158,6 +158,13 @@ claude-code-init/
 - **G8.1**: init.sh gitignore 配置优先 bash，PowerShell 回退
 - **Router**: 新增 ship/release 触发词 → `/ship-review`
 - **文档**: 命令数 21→22
+
+#### v1.6.5（/ship-review 6 角色升级）
+
+- **ship-review.md 重写**：4 角色 → 6 角色（Security / Architecture / Correctness / Code Quality / Test Coverage / Documentation），对齐 Google 审查规范 + c-CRAB 学术基准 10 维度
+- **新增审查维度**：Correctness（功能正确性/错误处理/并发安全）+ Test Coverage（测试充分性）
+- **交叉验证增强**：矛盾检测规则（安全 vs 架构、质量 vs 正确性、文档滞后）
+- **gstack 描述**：init.sh/init.ps1 "一键发布" → "6-Agent 发布审查"
 
 #### v1.6.1（第五轮 42 项审查修复）
 - **安全加固**：pip 版本锁定（`pre-commit>=4.0`、`tmux-orche>=0.1.0`），`.npmignore` 防御深度，`init.sh` 信号捕获增强（`trap ... INT TERM`）
@@ -748,6 +755,7 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| **v1.6.5** | 2026-05-02 | /ship-review 6 角色升级（Security/Architecture/Correctness/Quality/Test/Docs，对齐 Google + c-CRAB） |
 | **v1.6.4** | 2026-05-02 | 审查能力升级 — `/ship-review` 命令 + 剩余 5 个能力缺口修复 |
 | **v1.6.3** | 2026-05-01 | MEMORY.local.md 路径修复 + 14 个能力缺口修补 |
 | **v1.6.2** | 2026-05-01 | Hook JSON 损坏 + 供应链硬编码 + 版本同步 + 路径修正 + 文档修复（58 测试，4 提交） |
@@ -843,4 +851,4 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 ---
 
-*本文档为 claude-code-init 项目交接专用。v1.6.4，47 测试全部通过，9 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*
+*本文档为 claude-code-init 项目交接专用。v1.6.5，47 测试全部通过，9 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*

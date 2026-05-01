@@ -1,6 +1,6 @@
 ﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.6.4 | 2026-05-02
+# 版本: v1.6.5 | 2026-05-02
 
 param(
     [Parameter(Mandatory=$true)]
@@ -37,7 +37,7 @@ function Write-Info { param($msg) Write-Host "[信息] $msg" -ForegroundColor Gr
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  Claude Code 开发环境一键初始化 (v1.6.4)" -ForegroundColor Cyan
+Write-Host "  Claude Code 开发环境一键初始化 (v1.6.5)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -523,7 +523,7 @@ Write-Host "  ✅ 6 个项目完整性校验脚本" -ForegroundColor White
 Write-Host "  ✅ Pre-commit 自动检查（9 个检查项）" -ForegroundColor White
 Write-Host "  ✅ 无人值守长任务环境（tmux + Ralph Wiggum 循环）" -ForegroundColor White
 Write-Host "  ✅ Agent Teams 并行开发/审查（/team）" -ForegroundColor White
-Write-Host "  ✅ gstack 角色体系（CEO审查/架构审查/QA测试/一键发布）" -ForegroundColor White
+Write-Host "  ✅ gstack 角色体系（CEO审查/架构审查/QA测试/6-Agent 发布审查）" -ForegroundColor White
 Write-Host "  ✅ Skills 触发优化工具（trigger-optimizer.sh）" -ForegroundColor White
 Write-Host "  ✅ 周报生成工具（weekly-report.sh）" -ForegroundColor White
 Write-Host ""
