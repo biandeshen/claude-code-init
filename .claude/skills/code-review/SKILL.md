@@ -82,3 +82,9 @@ description: >
 - 发现严重问题时，必须阻止提交
 - 审查过程不修改代码，只报告问题
 - 使用多角色分析复杂变更（启动 code-reviewer agent）
+
+## 失败处理（回滚机制）
+
+- **修改前**：`git stash push -m "pre-review-{timestamp}"` 保存当前状态
+- **步骤级回滚**：本技能为只读审查，不修改文件。如审查中误修改了代码，`git checkout -- <file>` 恢复
+- **无人值守**：重试 ≤3 次，失败后跳过并记录到 `.claude/reports/blocked.md`

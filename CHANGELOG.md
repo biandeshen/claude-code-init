@@ -4,6 +4,20 @@ All notable changes to the claude-code-init project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5.7] - 2026-05-01
+
+### Fixed
+- **Memory access_count 递增机制 (P0)**: `/remember` 命令新增 access_count 递增规则，每次 search/show 检索到记忆时自动递增计数，为 GC 提供准确数据基础。
+- **Memory GC `/gc` 命令缺失 (P0)**: 新增 `commands/gc.md`，定义完整的 GC 流程（扫描 → 预览 → 执行），支持 `--dry-run` 和 `--auto` 无人值守模式。
+- **10 个 SKILL.md 缺少回滚规范 (P0)**: 全部 Skill 新增"失败处理"章节——高风险（code-review/safe-refactoring/git-commit）包含 git stash 完整回滚；中风险（tdd-workflow/error-fix/project-init）包含步骤级回滚；低风险标注只读无需回滚。
+- **smart-context.sh stdin 无超时保护 (P1)**: `cat` 读取 stdin 改为跨平台超时方案（优先 `timeout`，回退 `perl`，最后 `cat`），防止 hook 挂起。
+- **smart-context.sh JSON 转义不完整 (P1)**: `json_escape` 函数增强——优先使用 `jq -Rs`，回退补充换行符和控制字符转义。
+- **init.sh/init.ps1 全量复制 scripts/ 引发过度部署 (P1)**: `cp -r scripts/*` 改为白名单选择性复制，排除 `__pycache__/`、`check-env.sh`、`configure-gitignore.*`、`lib/common.sh` 等仅 init 使用的文件。
+
+### Changed
+- `package.json` 移除 `.claude/scripts/` 条目（已清空，所有脚本由 `scripts/` 部署）。
+- 版本号同步：package.json、init.sh、init.ps1、CLAUDE.md → v1.5.7。
+
 ## [1.5.6] - 2026-05-01
 
 ### Fixed

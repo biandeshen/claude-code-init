@@ -1,7 +1,7 @@
 # claude-code-init 开发规范
 
 > Claude Code 会话启动时自动读取。本项目自身用自己产出的工具开发（dogfooding）。
-> 版本：v1.5.6 | 最后更新：2026-05-01
+> 版本：v1.5.7 | 最后更新：2026-05-01
 
 ---
 
@@ -87,6 +87,7 @@ claude-code-init/
 
 ## 版本历史
 
+- `v1.5.7` (2026-05-01)：第四轮审查修复 Batch 3 — Memory GC + access_count + Skill 回滚规范 + timeout + JSON 转义 + 选择性部署
 - `v1.5.6` (2026-05-01)：第四轮审查修复 Batch 2 — Router/Brainstorming 路由冲突 + OWASP 补全 + 否定语义 + rm -rf 正则增强 + 触发词扩展
 - `v1.5.5` (2026-05-01)：第四轮审查修复 Batch 1 — hook exit 0 致命修复 + PROMPT.md 部署链 + 过时代码清理 + 版本标志
 - `v1.5.4` (2026-05-01)：第三轮多角色审查修复 — 安全加固 P0/P1 密钥检测增强 + 版本一致性修复

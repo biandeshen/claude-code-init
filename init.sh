@@ -1,7 +1,7 @@
 #!/bin/bash
 # claude-code-init - Claude Code 开发环境一键初始化 (Unix/macOS)
 # 用法: ./init.sh /path/to/your-project
-# 版本: v1.5.6 | 2026-05-01
+# 版本: v1.5.7 | 2026-05-01
 
 set -euo pipefail
 
@@ -54,7 +54,7 @@ echo_info() { echo -e "[信息] $1"; }
 
 echo ""
 echo -e "${CYAN}==============================================${NC}"
-echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.6)${NC}"
+echo -e "${CYAN}  Claude Code 开发环境一键初始化 (v1.5.7)${NC}"
 echo -e "${CYAN}==============================================${NC}"
 echo ""
 
@@ -180,18 +180,30 @@ else
     fi
 fi
 
-# 6. 复制校验脚本和 Shell 工具
+# 6. 复制校验脚本和 Shell 工具（白名单部署）
 echo_step "复制校验脚本和 Shell 工具到 .claude/scripts/"
+
+# 部署目标项目需要的脚本（白名单）
+# - Python 校验脚本（pre-commit hooks 使用）
+# - Shell 工具脚本（Skills/Router 引用）
+# 不包括：check-env.sh、configure-gitignore.*、lib/common.sh（仅 init 时用）
+# 不包括：__pycache__/（编译缓存）
+SCRIPT_WHITELIST="check_dependencies.py check_function_length.py check_import_order.py check_project_structure.py check_secrets.py check_docs_consistency.py tmux-session.sh weekly-report.sh ralph-setup.sh trigger-optimizer.sh validate_skills.sh PROMPT.md"
+
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 TARGET_SCRIPTS_DIR="$PROJECT_PATH/.claude/scripts"
 # 检查源目录与目标目录是否相同
 if [ "$SCRIPTS_DIR" = "$TARGET_SCRIPTS_DIR" ]; then
     echo_info "源目录与目标目录相同，已跳过脚本复制"
-elif [ -d "$SCRIPTS_DIR" ] && [ "$(ls -A "$SCRIPTS_DIR" 2>/dev/null)" ]; then
+elif [ -d "$SCRIPTS_DIR" ]; then
     mkdir -p "$TARGET_SCRIPTS_DIR"
-    cp -r "$SCRIPTS_DIR/"* "$TARGET_SCRIPTS_DIR/"
+    for file in $SCRIPT_WHITELIST; do
+        if [ -f "$SCRIPTS_DIR/$file" ]; then
+            cp "$SCRIPTS_DIR/$file" "$TARGET_SCRIPTS_DIR/"
+        fi
+    done
     find "$TARGET_SCRIPTS_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
-    echo_success "已复制校验脚本到 .claude/scripts/"
+    echo_success "已复制校验脚本和 Shell 工具到 .claude/scripts/"
 else
     echo_info "scripts 目录为空或不存在，跳过"
 fi

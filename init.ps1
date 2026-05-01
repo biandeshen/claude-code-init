@@ -1,6 +1,6 @@
 ﻿# claude-code-init - Claude Code 开发环境一键初始化
 # 用法: .\init.ps1 -ProjectPath "E:\产品\我的新项目"
-# 版本: v1.5.6 | 2026-05-01
+# 版本: v1.5.7 | 2026-05-01
 
 param(
     [Parameter(Mandatory=$true)]
@@ -37,7 +37,7 @@ function Write-Info { param($msg) Write-Host "[信息] $msg" -ForegroundColor Gr
 
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor Cyan
-Write-Host "  Claude Code 开发环境一键初始化 (v1.5.6)" -ForegroundColor Cyan
+Write-Host "  Claude Code 开发环境一键初始化 (v1.5.7)" -ForegroundColor Cyan
 Write-Host "==============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -165,16 +165,35 @@ if (-not $SkipCcDiscipline) {
     Write-Info "跳过 cc-discipline 安装"
 }
 
-# 7. 复制 Python 校验脚本
-Write-Step "复制校验脚本到 .claude/scripts/"
+# 7. 复制 Python 校验脚本（白名单部署）
+Write-Step "复制校验脚本和 Shell 工具到 .claude/scripts/"
+
+# 部署目标项目需要的脚本（白名单）
+# - Python 校验脚本（pre-commit hooks 使用）
+# - Shell 工具脚本（Skills/Router 引用）
+# 不包括：check-env.sh、configure-gitignore.*、lib/（仅 init 时用）
+# 不包括：__pycache__/（编译缓存）
+$ScriptWhitelist = @(
+    "check_dependencies.py", "check_function_length.py",
+    "check_import_order.py", "check_project_structure.py",
+    "check_secrets.py", "check_docs_consistency.py",
+    "tmux-session.sh", "weekly-report.sh", "ralph-setup.sh",
+    "trigger-optimizer.sh", "validate_skills.sh", "PROMPT.md"
+)
+
 $ScriptsDir = Join-Path $ScriptDir "scripts"
 $TargetScriptsDir = "$ProjectPath\.claude\scripts"
 if (Test-SamePath $ScriptsDir $TargetScriptsDir) {
     Write-Info "源目录与目标目录相同，已跳过脚本复制"
 } elseif (Test-Path $ScriptsDir) {
     New-Item -ItemType Directory -Force -Path $TargetScriptsDir | Out-Null
-    Copy-Item -Path "$ScriptsDir\*" -Destination $TargetScriptsDir -Force -Recurse
-    Write-Success "已复制校验脚本到 .claude/scripts/"
+    foreach ($file in $ScriptWhitelist) {
+        $src = Join-Path $ScriptsDir $file
+        if (Test-Path $src) {
+            Copy-Item -Path $src -Destination $TargetScriptsDir -Force
+        }
+    }
+    Write-Success "已复制校验脚本和 Shell 工具到 .claude/scripts/"
 } else {
     Write-Info "scripts 目录不存在，跳过"
 }

@@ -18,7 +18,9 @@
 | 编码模式 | PAT | PAT-001 |
 | 领域知识 | CTX | CTX-001 |
 
-`access_count` 表示该记忆被检索次数（GC 依据：>90 天且 access_count = 0 → 归档）。
+`access_count` 表示该记忆被检索次数。
+每次通过 /remember search 或 /remember show 检索到记忆时自动递增。
+GC 依据：>90 天且 access_count < 2（即几乎未被检索过）→ 归档。
 
 ---
 

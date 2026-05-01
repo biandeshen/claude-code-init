@@ -54,3 +54,13 @@
    - 标记 > 90 天且 access_count = 0 的记忆
    - 展示预览："将归档 X 条，建议删除 Y 条"
    - 用户确认后执行（归档 → archive/，删除 → 永久移除）
+
+## access_count 递增规则
+
+> **重要**：每次 `/remember search` 或 `/remember show <ID>` 检索到记忆时，
+> 必须递增对应记忆条目的 access_count。这是 GC 的基础数据。
+>
+> 实现方式：
+> 1. 在 MEMORY.md 索引表中找到对应 memory-id 的行
+> 2. 将 access_count 值 +1
+> 3. 确保索引表 `access_count` 列与实际值保持同步

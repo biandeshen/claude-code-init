@@ -99,3 +99,10 @@ git commit -m "<message>"
 - 不提交 .env 文件
 - 不使用 `--no-verify` 跳过检查
 - 提交前确认目标分支
+
+## 失败处理（回滚机制）
+
+- **Pre-commit 失败**：修复问题后重新运行 `pre-commit run --all-files`，不跳过检查
+- **错误提交**：`git reset --soft HEAD~1` 取消最近一次提交，保留修改后重新提交
+- **Commit message 错误**：`git commit --amend -m "<correct message>"`（仅当未 push 时）
+- **无人值守**：重试 ≤3 次，失败后跳过并记录到 `.claude/reports/blocked.md`

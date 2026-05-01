@@ -5,10 +5,24 @@
 
 # JSON 字符串转义函数（处理双引号和反斜杠）
 json_escape() {
-    printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+    if command -v jq >/dev/null 2>&1; then
+        printf '%s' "$1" | jq -Rs '.'
+    else
+        # 回退：基础转义（反斜杠、双引号、换行符、控制字符）
+        printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\//\\\//g' \
+            | while IFS= read -r line; do printf '%s\\n' "$line"; done \
+            | sed 's/\\n$//'
+    fi
 }
 
-event_data=$(cat 2>/dev/null)
+# 跨平台 timeout 兼容读取 stdin（防止挂起）
+if command -v timeout >/dev/null 2>&1; then
+    event_data=$(timeout 5 cat 2>/dev/null)
+elif command -v perl >/dev/null 2>&1; then
+    event_data=$(perl -e 'alarm 5; eval { local $SIG{ALRM} = sub { die "timeout\n" }; print <STDIN> }' 2>/dev/null)
+else
+    event_data=$(cat 2>/dev/null)
+fi
 if [ -z "$event_data" ]; then
     exit 0
 fi

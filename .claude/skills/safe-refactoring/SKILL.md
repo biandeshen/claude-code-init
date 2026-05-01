@@ -110,3 +110,10 @@ description: >
 - 测试结果：<all pass>
 - 覆盖率：<before% → after%>
 ```
+
+## 失败处理（回滚机制）
+
+- **修改前**：`git stash push -m "pre-refactor-{timestamp}"` 保存当前状态
+- **步骤级回滚**：每个文件的修改在独立 commit 中，失败时 `git reset --hard HEAD~1`
+- **整体回滚**：`git stash pop` 恢复到修改前完整状态
+- **无人值守**：重试 ≤3 次，失败后跳过并记录到 `.claude/reports/blocked.md`
