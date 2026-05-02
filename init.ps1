@@ -476,21 +476,48 @@ if (Test-Path $SettingsSource) {
                     Write-Success "已合并 settings.json（smart-context hooks + Agent Teams 环境变量）"
                     # Windows 平台兼容：移除 settings.json 中不兼容的 bash hooks
                     # Claude Code 在 Windows 上使用 Bun 运行时，其 uv_spawn 无法启动 bash
+                    # 注意：hooks 结构为 { "matcher": "...", "hooks": [{ "type": "command", "command": "bash ..." }] }
+                    # command 嵌套在 hooks 子数组中，不能用简单正则处理
                     if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
                         try {
-                            $s = Get-Content $SettingsTarget -Raw -ErrorAction Stop
-                            $before = $s.Length
-                            # 1) 移除单个 bash hook: "command": "bash ..."（连带前面的逗号）
-                            $s = $s -replace ',\s*"command":\s*"bash\s[^"]*"', ''
-                            # 2) 移除空 hooks 数组: "hooks": [   ]
-                            while ($s -match '"hooks":\s*\[\s*\]') {
-                                $s = $s -replace '"hooks":\s*\[\s*\]\s*,?\s*', ''
-                            }
-                            # 3) 移除空的 matcher 对象 { "matcher": "..." }
-                            $s = $s -replace '\{[^}]*"matcher":\s*"[^"]*"\s*\}\s*,?\s*', ''
-                            if ($s.Length -ne $before) {
-                                $s | Out-File -FilePath $SettingsTarget -Encoding utf8 -Force
-                                Write-Info "已移除不兼容的 bash hooks，适配 Windows+Bun 运行环境"
+                            $json = Get-Content $SettingsTarget -Raw -ErrorAction Stop
+                            $before = $json.Length
+                            $obj = $json | ConvertFrom-Json
+                            $changed = $false
+
+                            if ($obj.hooks) {
+                                $emptyTypes = @()  # 记录需要移除的空 hook 类型
+                                foreach ($prop in $obj.hooks.PSObject.Properties) {
+                                    $hooksList = @($prop.Value)
+                                    $filtered = $hooksList | Where-Object {
+                                        $hasBash = $false
+                                        foreach ($h in @($_.hooks)) {
+                                            if ($h.command -and ($h.command -match '^bash\s')) {
+                                                $hasBash = $true
+                                                break
+                                            }
+                                        }
+                                        -not $hasBash
+                                    }
+                                    if ($filtered.Count -eq 0) {
+                                        $emptyTypes += $prop.Name
+                                    } else {
+                                        $prop.Value = $filtered
+                                    }
+                                }
+                                # 移除空的 hook 类型（PreToolUse/PostToolUse 等）
+                                foreach ($name in $emptyTypes) {
+                                    $obj.hooks.PSObject.Properties.Remove($name)
+                                }
+                                # 如果 hooks 对象下面没有任何属性了，移除整个 hooks
+                                if ($obj.hooks.PSObject.Properties.Count -eq 0) {
+                                    $obj.PSObject.Properties.Remove('hooks')
+                                }
+                                $newJson = $obj | ConvertTo-Json -Depth 10
+                                if ($newJson -ne $json) {
+                                    $newJson | Out-File -FilePath $SettingsTarget -Encoding utf8 -Force
+                                    Write-Info "已移除不兼容的 bash hooks，适配 Windows+Bun 运行环境"
+                                }
                             }
                         } catch {
                             Write-Warn "Windows hooks 兼容处理失败: $_"
