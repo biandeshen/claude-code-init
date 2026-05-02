@@ -29,7 +29,7 @@ def merge_settings(source_path, target_path):
 
     # 读取源文件
     try:
-        with open(source_path, encoding='utf-8') as f:
+        with open(source_path, encoding='utf-8-sig') as f:
             src = json.load(f)
     except FileNotFoundError:
         print(f"merge_json: 源文件不存在: {source_path}", file=sys.stderr)
