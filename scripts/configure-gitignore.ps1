@@ -29,7 +29,7 @@ $gitignorePath = Join-Path $ProjectPath ".gitignore"
 if (Test-Path $gitignorePath) {
     $existing = Get-Content $gitignorePath -Raw
     # 移除 claude-code-init 标记的块
-    $existing = $existing -replace "(?ms)# === claude-code-init ===.*?# === claude-code-init ===", ""
+    $existing = $existing -replace '# === claude-code-init ===[\s\S]*?# === claude-code-init ===', ""
     $existing = $existing.TrimEnd()
 } else {
     $existing = ""
@@ -47,7 +47,8 @@ switch ($choice) {
             "PLAN_Template.md",
             "openspec/",
             "# Backup files（由 copy_template 生成）",
-            "*.bak"
+            "*.bak",
+            "# === claude-code-init ==="
         )
         Write-Host "[OK] 已将所有 AI 配置文件加入 .gitignore" -ForegroundColor Green
     }
@@ -58,7 +59,8 @@ switch ($choice) {
             ".claude/CLAUDE.local.md",
             ".claude/MEMORY.local.md",
             "# Backup files（由 copy_template 生成）",
-            "*.bak"
+            "*.bak",
+            "# === claude-code-init ==="
         )
         Write-Host "[OK] 已忽略个人偏好文件，其他配置可提交" -ForegroundColor Green
     }
@@ -69,7 +71,8 @@ switch ($choice) {
             ".claude/CLAUDE.local.md",
             ".claude/MEMORY.local.md",
             "# Backup files（由 copy_template 生成）",
-            "*.bak"
+            "*.bak",
+            "# === claude-code-init ==="
         )
         Write-Host "[OK] 所有 AI 配置文件提交就绪" -ForegroundColor Green
     }
@@ -84,7 +87,8 @@ switch ($choice) {
             "PLAN_Template.md",
             "openspec/",
             "# Backup files（由 copy_template 生成）",
-            "*.bak"
+            "*.bak",
+            "# === claude-code-init ==="
         )
         Write-Host "[OK] 已按默认处理（全部忽略）" -ForegroundColor Yellow
     }
@@ -96,7 +100,7 @@ $newContent = if ($existing) {
     $rules -join "`n"
 }
 try {
-    $newContent | Out-File -FilePath $gitignorePath -Encoding ascii -ErrorAction Stop
+    $newContent | Out-File -FilePath $gitignorePath -Encoding utf8 -ErrorAction Stop
     # 去重 .claude/ 条目（若已在标记块外存在，避免重复）
     $content = Get-Content $gitignorePath
     $seen = $false
@@ -105,7 +109,7 @@ try {
             if (-not $seen) { $seen = $true; $_ }
         } else { $_ }
     }
-    $deduped | Set-Content $gitignorePath -Encoding ascii
+    $deduped | Set-Content $gitignorePath -Encoding utf8
     Write-Host "[OK] .gitignore 已更新" -ForegroundColor Green
 } catch {
     Write-Host "[ERROR] 写入 .gitignore 失败: $_" -ForegroundColor Red

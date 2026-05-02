@@ -27,6 +27,7 @@ echo -e "  ${YELLOW}3)${NC} 全部提交 —— 所有 AI 配置提交到仓库"
 echo ""
 
 read -p "请选择 (1/2/3，默认 1): " choice || true
+choice="${choice//$'\r'/}"  # 去除 Windows 管道可能携带的 CR 字符
 choice=${choice:-1}
 
 GITIGNORE_PATH="$PROJECT_PATH/.gitignore"

@@ -18,6 +18,10 @@ $ScriptDir = $PSScriptRoot
 $CleanupNeeded = $false
 $InitCompleted = $false
 
+# 设置 UTF-8 输出编码（防止通过 bash 管道时中文字符乱码）
+$OutputEncoding = [System.Text.UTF8Encoding]::new()
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+
 # 路径规范化比较（处理符号链接、junction、不同路径表示形式）
 function Test-SamePath {
     param([string]$PathA, [string]$PathB)
@@ -148,14 +152,12 @@ if (-not $SkipOpenSpec) {
 }
 
 # 5. 安装 cc-discipline (物理防火墙) - 自动执行
-# 前置检查: jq (cc-discipline JSON 合并依赖)
-if (-not (Get-Command jq -ErrorAction SilentlyContinue)) {
-    Write-Warn "未找到 jq，cc-discipline 需要 jq 进行 settings.json 合并"
-    Write-Info "请手动安装: https://jqlang.github.io/jq/download/"
-    Write-Info "或使用 -SkipCcDiscipline 跳过此步骤"
-}
-
 if (-not $SkipCcDiscipline) {
+    # 前置检查: jq (cc-discipline JSON 合并依赖)
+    if (-not (Get-Command jq -ErrorAction SilentlyContinue)) {
+        Write-Warn "未找到 jq，cc-discipline 需要 jq 进行 settings.json 合并"
+        Write-Info "请手动安装: https://jqlang.github.io/jq/download/"
+    }
     Write-Step "安装 cc-discipline (物理防火墙 Hooks)"
     # $HOME 跨平台兼容（Windows 用 USERPROFILE，Unix 用 HOME）
     $CcDisciplineHome = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE }
@@ -533,16 +535,39 @@ if (Test-Path $memoryLocalPath) {
     Write-Warn "MEMORY.local.template.md 不存在，跳过 MEMORY.local.md 创建"
 }
 
-# 12. 配置 .gitignore（bash-first，与 init.sh 对齐）
+# 12. 配置 .gitignore
 Write-Step "配置 .gitignore"
 $gitignoreSh = Join-Path $ScriptDir "scripts\configure-gitignore.sh"
 $gitignorePs1 = Join-Path $ScriptDir "scripts\configure-gitignore.ps1"
-# --force 模式下自动输入 "1"（全部忽略），避免交互
-$configureInput = if ($Force) { "1" } else { "" }
-if (Test-Path $gitignoreSh) {
-    $configureInput | bash "$gitignoreSh" "$ProjectPath"
+
+if ($Force) {
+    # --force 模式：直接写入默认规则（全部忽略），避免通过管道传递输入
+    $gitignorePath = Join-Path $ProjectPath ".gitignore"
+    $existing = if (Test-Path $gitignorePath) {
+        (Get-Content $gitignorePath -Raw) -replace '# === claude-code-init ===[\s\S]*?# === claude-code-init ===', ""
+    } else { "" }
+    $rules = @(
+        "# === claude-code-init ===",
+        "# Claude Code 开发环境配置（已全部忽略）",
+        ".claude/",
+        ".pre-commit-config.yaml",
+        "CLAUDE.md",
+        "SOUL.md",
+        "PLAN_Template.md",
+        "openspec/",
+        "# Backup files（由 copy_template 生成）",
+        "*.bak",
+        "# === claude-code-init ==="
+    )
+    $newContent = if ($existing.Trim()) { "$($existing.Trim())`n`n$($rules -join "`n")" } else { $rules -join "`n" }
+    $newContent | Out-File -FilePath $gitignorePath -Encoding utf8 -Force
+    Write-Success "已将所有 AI 配置文件加入 .gitignore"
 } elseif (Test-Path $gitignorePs1) {
-    $configureInput | & $gitignorePs1 -ProjectPath $ProjectPath
+    # Windows 上优先使用 PowerShell 变体（原生体验）
+    & $gitignorePs1 -ProjectPath $ProjectPath
+} elseif (Test-Path $gitignoreSh) {
+    Write-Info "使用 bash 配置 .gitignore"
+    bash "$gitignoreSh" "$ProjectPath"
 } else {
     Write-Warn "未找到配置脚本，跳过 .gitignore 配置"
 }

@@ -83,10 +83,10 @@ const scriptDir = __dirname;
 const isWindows = process.platform === 'win32';
 const isMac = process.platform === 'darwin';
 
-// 检查系统依赖
-function checkDependency(cmd, name) {
+// 检查系统依赖（支持自定义版本检测命令）
+function checkDependency(cmd, name, versionCmd) {
     try {
-        execSync(`${cmd} --version`, { stdio: 'pipe' });
+        execSync(versionCmd || `${cmd} --version`, { stdio: 'pipe' });
         return true;
     } catch {
         console.error(`[错误] 未找到 ${name}，请先安装。`);
@@ -126,12 +126,19 @@ const deps = [
     ['git', 'Git'],
     ['python', 'Python'],
 ];
-if (isWindows) deps.push([psCmd || 'pwsh', 'PowerShell']);
-else deps.push(['bash', 'Bash']);
+if (isWindows) {
+    // PowerShell 5.1 不支持 --version，需用 -Command 查询版本
+    const psName = psCmd || 'pwsh';
+    const psVerCmd = `${psName} -Command "$PSVersionTable.PSVersion.ToString()"`;
+    deps.push([psName, 'PowerShell', psVerCmd]);
+} else {
+    deps.push(['bash', 'Bash']);
+}
 
 const missingDeps = [];
-for (const [cmd, name] of deps) {
-    if (!checkDependency(cmd, name)) {
+for (const dep of deps) {
+    const [cmd, name, versionCmd] = dep;
+    if (!checkDependency(cmd, name, versionCmd)) {
         missingDeps.push(name);
     }
 }
