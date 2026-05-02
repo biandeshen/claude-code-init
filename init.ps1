@@ -75,6 +75,29 @@ if (-not (Test-Path ".git")) {
 # Git 初始化成功后，标记需要清理（脚本中途退出时清理）
 $CleanupNeeded = $true
 
+# ─── 模式检测 ───
+$InstallMode = "fresh"
+$versionFile = "$ProjectPath\.claude\.claude-code-init-version"
+if (Test-Path $versionFile) {
+    $InstallMode = "reconfigure"
+    Write-Info "检测到 claude-code-init 重运行（reconfigure 模式）"
+} elseif (Test-Path "$ProjectPath\.claude") {
+    $InstallMode = "append"
+    Write-Info "检测到已有 .claude 配置（append 模式）"
+}
+
+# ─── 预操作备份 ───
+if (Test-Path "$ProjectPath\.claude") {
+    Write-Step "备份已有配置（预操作）"
+    $backupDir = "$ProjectPath\.claude\.init-backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+    New-Item -ItemType Directory -Force -Path $backupDir | Out-Null
+    if (Test-Path "$ProjectPath\.claude\settings.json") { Copy-Item "$ProjectPath\.claude\settings.json" "$backupDir\" }
+    if (Test-Path "$ProjectPath\.claude\hooks") { Copy-Item -Recurse "$ProjectPath\.claude\hooks" "$backupDir\" }
+    if (Test-Path "$ProjectPath\.claude\skills") { Copy-Item -Recurse "$ProjectPath\.claude\skills" "$backupDir\" }
+    if (Test-Path "$ProjectPath\.claude\commands") { Copy-Item -Recurse "$ProjectPath\.claude\commands" "$backupDir\" }
+    Write-Success "备份到 $(Split-Path $backupDir -Leaf)/"
+}
+
 # 3. 安装核心 Claude Code 插件 (ECC + Superpowers)
 if ($SkipECC -and $SkipSuperpowers) {
     Write-Info "跳过插件安装 (SkipECC, SkipSuperpowers)"
@@ -125,14 +148,23 @@ if (-not $SkipOpenSpec) {
 }
 
 # 5. 安装 cc-discipline (物理防火墙) - 自动执行
+# 前置检查: jq (cc-discipline JSON 合并依赖)
+if (-not (Get-Command jq -ErrorAction SilentlyContinue)) {
+    Write-Warn "未找到 jq，cc-discipline 需要 jq 进行 settings.json 合并"
+    Write-Info "请手动安装: https://jqlang.github.io/jq/download/"
+    Write-Info "或使用 -SkipCcDiscipline 跳过此步骤"
+}
+
 if (-not $SkipCcDiscipline) {
     Write-Step "安装 cc-discipline (物理防火墙 Hooks)"
-    $CcDisciplinePath = "$env:USERPROFILE\.cc-discipline"
+    # $HOME 跨平台兼容（Windows 用 USERPROFILE，Unix 用 HOME）
+    $CcDisciplineHome = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE }
+    $CcDisciplinePath = "$CcDisciplineHome\.cc-discipline"
     $CcDisciplineCommit = "916da00691128fde44599928d76c129f3d08b8f1"  # 锁定版本 2026-04-26
     if (-not (Test-Path $CcDisciplinePath)) {
         Write-Warn "即将从第三方仓库下载代码: https://github.com/TechHU-GS/cc-discipline"
         Write-Info "克隆 cc-discipline 仓库..."
-        git clone -b main https://github.com/TechHU-GS/cc-discipline.git $CcDisciplinePath
+        git clone --depth 1 -b main https://github.com/TechHU-GS/cc-discipline.git $CcDisciplinePath
         Set-Location $CcDisciplinePath
         git checkout $CcDisciplineCommit
         # 验证 commit 是否匹配锁定版本
@@ -163,8 +195,15 @@ if (-not $SkipCcDiscipline) {
     try {
         $ccArgs = @()
         if ($Force) { $ccArgs += "--auto" }
-        bash "$CcDisciplinePath/init.sh" @ccArgs
-        Write-Success "cc-discipline 已安装"
+        $bashCmd = Get-Command bash -ErrorAction SilentlyContinue
+        if ($bashCmd) {
+            bash "$CcDisciplinePath/init.sh" @ccArgs
+            Write-Success "cc-discipline 已安装"
+        } else {
+            Write-Warn "未找到 bash 命令，无法自动执行 cc-discipline 初始化"
+            Write-Info "请手动执行以下命令："
+            Write-Host "  bash $CcDisciplinePath/init.sh" -ForegroundColor Yellow
+        }
         # 验证 cc-discipline 部署完整性
         $ccDiscVerFile = "$ProjectPath\.claude\.cc-discipline-version"
         if (Test-Path $ccDiscVerFile) {
@@ -222,13 +261,23 @@ $TargetPrecommitConfig = "$ProjectPath\.pre-commit-config.yaml"
 if ($PrecommitConfig -eq $TargetPrecommitConfig) {
     Write-Info "源文件与目标文件相同，已跳过 Pre-commit 配置复制"
 } elseif (Test-Path $PrecommitConfig) {
-    Copy-Item -Path $PrecommitConfig -Destination $TargetPrecommitConfig -Force
-    Write-Success "已复制 .pre-commit-config.yaml"
+    if (Test-Path $TargetPrecommitConfig) {
+        if ($Force) {
+            Copy-Item -Path $TargetPrecommitConfig -Destination "$TargetPrecommitConfig.bak" -Force
+            Copy-Item -Path $PrecommitConfig -Destination $TargetPrecommitConfig -Force
+            Write-Success "已覆盖 .pre-commit-config.yaml（原文件备份为 .bak）"
+        } else {
+            Write-Warn ".pre-commit-config.yaml 已存在，跳过（使用 -Force 可覆盖）"
+        }
+    } else {
+        Copy-Item -Path $PrecommitConfig -Destination $TargetPrecommitConfig -Force
+        Write-Success "已复制 .pre-commit-config.yaml"
+    }
 } else {
     Write-Info "Pre-commit 配置不存在，跳过"
 }
 
-# 9. 安装 Pre-commit hooks - 自动执行
+# 8. 安装 Pre-commit hooks - 自动执行
 Write-Step "安装 Pre-commit Hooks"
 
 # 检查 Python 是否可用
@@ -336,7 +385,7 @@ if (Test-Path $TemplateDir) {
     Write-Warn "模板目录不存在，跳过模板复制"
 }
 
-# 10.1 模板版本检查
+# 9.1 模板版本检查
 Write-Step "检查模板版本"
 function Check-TemplateVersion {
     param($SrcPath, $TargetPath)
@@ -370,7 +419,7 @@ if (Test-Path $MemoryTemplate) {
     Write-Info "记忆模板不存在，跳过"
 }
 
-# 11. 复制自定义命令
+# 10. 复制自定义命令
 Write-Step "复制自定义命令"
 $CommandsDir = Join-Path $ScriptDir "commands"
 $TargetCommandsDir = "$ProjectPath\.claude\commands"
@@ -384,7 +433,7 @@ if (Test-SamePath $CommandsDir $TargetCommandsDir) {
     Write-Info "命令目录不存在，跳过"
 }
 
-# 11.1 复制 Skills
+# 10.1 复制 Skills
 Write-Step "复制 Skills"
 $SkillsDir = Join-Path $ScriptDir ".claude\skills"
 $TargetSkillsDir = "$ProjectPath\.claude\skills"
@@ -413,38 +462,24 @@ if (-not (Test-SamePath $HooksSourceDir $HooksTargetDir) -and (Test-Path $HooksS
 }
 if (Test-Path $SettingsSource) {
     if (Test-Path $SettingsTarget) {
-        Copy-Item -Path $SettingsTarget -Destination "$SettingsTarget.bak" -Force
-        try {
-            $src = Get-Content $SettingsSource -Raw -Encoding UTF8 | ConvertFrom-Json
-            $tgt = Get-Content $SettingsTarget -Raw -Encoding UTF8 | ConvertFrom-Json
-            # Merge env
-            if ($src.env) {
-                foreach ($key in $src.env.PSObject.Properties.Name) {
-                    if (-not $tgt.env -or (-not ($tgt.env.$key))) {
-                        if (-not $tgt.env) { $tgt | Add-Member -NotePropertyName 'env' -NotePropertyValue @{} }
-                        $tgt.env | Add-Member -NotePropertyName $key -NotePropertyValue $src.env.$key -Force
-                    }
+        # 调用独立脚本合并 settings.json（env + hooks 按规则去重，预操作备份已包含此文件）
+        $pythonBin = $null
+        if (Get-Command python3 -ErrorAction SilentlyContinue) { $pythonBin = "python3" }
+        elseif (Get-Command python -ErrorAction SilentlyContinue) { $pythonBin = "python" }
+        if ($pythonBin) {
+            try {
+                $mergeScript = Join-Path $ScriptDir "scripts\merge_json.py"
+                & $pythonBin $mergeScript $SettingsSource $SettingsTarget 2>$null
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Success "已合并 settings.json（smart-context hooks + Agent Teams 环境变量）"
+                } else {
+                    Write-Warn "settings.json 合并失败，请从 .init-backup-* 备份中手动恢复"
                 }
+            } catch {
+                Write-Warn "settings.json 合并失败，请从 .init-backup-* 备份中手动恢复"
             }
-            # Merge hooks
-            foreach ($htype in @('SessionStart', 'PreToolUse', 'PostToolUse')) {
-                $srcHooks = $src.hooks.$htype
-                if ($srcHooks) {
-                    if (-not $tgt.hooks) { $tgt | Add-Member -NotePropertyName 'hooks' -NotePropertyValue @{} }
-                    if (-not $tgt.hooks.$htype) { $tgt.hooks | Add-Member -NotePropertyName $htype -NotePropertyValue @() }
-                    foreach ($hook in $srcHooks) {
-                        $exists = ($tgt.hooks.$htype | Where-Object { $_.matcher -eq $hook.matcher -and $_.command -eq $hook.command }) -ne $null
-                        if (-not $exists) {
-                            $tgt.hooks.$htype += $hook
-                        }
-                    }
-                }
-            }
-            $tgt | ConvertTo-Json -Depth 10 | Set-Content -Path $SettingsTarget -Encoding UTF8
-            Remove-Item -Path "$SettingsTarget.bak" -Force
-            Write-Success "已合并 settings.json（smart-context hooks + Agent Teams 环境变量）"
-        } catch {
-            Write-Warn "settings.json 合并失败，备份保留在 .bak，请手动处理"
+        } else {
+            Write-Warn "settings.json 已存在，无法自动合并（Python 不可用），请从 .init-backup-* 备份中手动合并"
         }
     } else {
         Copy-Item -Path $SettingsSource -Destination $SettingsTarget -Force
@@ -452,95 +487,53 @@ if (Test-Path $SettingsSource) {
     }
 }
 
-# 12. 创建本地偏好文件 (gitignored)
+# 11. 创建本地偏好文件 (gitignored)
 Write-Step "创建 CLAUDE.local.md (本地偏好)"
 New-Item -ItemType Directory -Force -Path "$ProjectPath\.claude" | Out-Null
 $claudeLocalPath = "$ProjectPath\.claude\CLAUDE.local.md"
+$claudeLocalTemplate = Join-Path $ScriptDir "templates\CLAUDE.local.template.md"
 if (Test-Path $claudeLocalPath) {
     if ($Force) {
         Write-Warn "CLAUDE.local.md 已存在，-Force 模式：覆盖"
-        $localMd = @"
-# 本地个人偏好
-# 此文件会被 .gitignore 忽略，不会提交到仓库
-
-> 由 claude-code-init 自动生成
-> 版本: v1.0.0 | $(Get-Date -Format 'yyyy-MM-dd')
-
----
-
-## 个人偏好设置
-
-- 开始编码前先解释 Plan
-- 所有异步函数必须有 timeout
-- 复杂任务先创建 Plan.md
-
----
-"@
-        $localMd | Out-File -FilePath $claudeLocalPath -Encoding utf8
-        Write-Success "已覆盖 CLAUDE.local.md"
+        if (Test-Path $claudeLocalTemplate) {
+            (Get-Content $claudeLocalTemplate) -replace '__DATE__', (Get-Date -Format 'yyyy-MM-dd') | Out-File -FilePath $claudeLocalPath -Encoding utf8
+            Write-Success "已覆盖 CLAUDE.local.md"
+        } else {
+            Write-Warn "CLAUDE.local.template.md 不存在，跳过 CLAUDE.local.md 创建"
+        }
     } else {
         Write-Warn "CLAUDE.local.md 已存在，跳过创建（使用 -Force 可覆盖）"
     }
-} else {
-    $localMd = @"
-# 本地个人偏好
-# 此文件会被 .gitignore 忽略，不会提交到仓库
-
-> 由 claude-code-init 自动生成
-> 版本: v1.0.0 | $(Get-Date -Format 'yyyy-MM-dd')
-
----
-
-## 个人偏好设置
-
-- 开始编码前先解释 Plan
-- 所有异步函数必须有 timeout
-- 复杂任务先创建 Plan.md
-
----
-"@
-    $localMd | Out-File -FilePath $claudeLocalPath -Encoding utf8
+} elseif (Test-Path $claudeLocalTemplate) {
+    (Get-Content $claudeLocalTemplate) -replace '__DATE__', (Get-Date -Format 'yyyy-MM-dd') | Out-File -FilePath $claudeLocalPath -Encoding utf8
     Write-Success "已创建 CLAUDE.local.md (.claude/)"
+} else {
+    Write-Warn "CLAUDE.local.template.md 不存在，跳过 CLAUDE.local.md 创建"
 }
 
 # 创建 MEMORY.local.md (个人私密记忆，不提交)
 $memoryLocalPath = "$ProjectPath\.claude\MEMORY.local.md"
+$memoryLocalTemplate = Join-Path $ScriptDir "templates\MEMORY.local.template.md"
 if (Test-Path $memoryLocalPath) {
     if ($Force) {
         Write-Warn "MEMORY.local.md 已存在，-Force 模式：覆盖"
-        $memoryLocalMd = @"
-# 个人私密记忆
-# 此文件会被 .gitignore 忽略，不会提交到仓库
-# 记录个人偏好、工作习惯等不适合团队共享的内容
-
-> 由 claude-code-init 自动生成
-> 模板版本: v1.0.0
-
----
-<!-- 在此记录个人偏好设置、临时笔记等内容 -->
-"@
-        $memoryLocalMd | Out-File -FilePath $memoryLocalPath -Encoding utf8
-        Write-Success "已覆盖 MEMORY.local.md"
+        if (Test-Path $memoryLocalTemplate) {
+            Copy-Item -Path $memoryLocalTemplate -Destination $memoryLocalPath -Force
+            Write-Success "已覆盖 MEMORY.local.md"
+        } else {
+            Write-Warn "MEMORY.local.template.md 不存在，跳过 MEMORY.local.md 创建"
+        }
     } else {
         Write-Warn "MEMORY.local.md 已存在，跳过创建（使用 -Force 可覆盖）"
     }
-} else {
-    $memoryLocalMd = @"
-# 个人私密记忆
-# 此文件会被 .gitignore 忽略，不会提交到仓库
-# 记录个人偏好、工作习惯等不适合团队共享的内容
-
-> 由 claude-code-init 自动生成
-> 模板版本: v1.0.0
-
----
-<!-- 在此记录个人偏好设置、临时笔记等内容 -->
-"@
-    $memoryLocalMd | Out-File -FilePath $memoryLocalPath -Encoding utf8
+} elseif (Test-Path $memoryLocalTemplate) {
+    Copy-Item -Path $memoryLocalTemplate -Destination $memoryLocalPath -Force
     Write-Success "已创建 MEMORY.local.md (gitignored)"
+} else {
+    Write-Warn "MEMORY.local.template.md 不存在，跳过 MEMORY.local.md 创建"
 }
 
-# 13. 配置 .gitignore（bash-first，与 init.sh 对齐）
+# 12. 配置 .gitignore（bash-first，与 init.sh 对齐）
 Write-Step "配置 .gitignore"
 $gitignoreSh = Join-Path $ScriptDir "scripts\configure-gitignore.sh"
 $gitignorePs1 = Join-Path $ScriptDir "scripts\configure-gitignore.ps1"
@@ -554,7 +547,7 @@ if (Test-Path $gitignoreSh) {
     Write-Warn "未找到配置脚本，跳过 .gitignore 配置"
 }
 
-# 14. 运行环境检查
+# 13. 运行环境检查
 Write-Step "运行环境完整性检查"
 $checkEnvScript = Join-Path $ScriptDir "scripts\check-env.sh"
 if (Test-Path $checkEnvScript) {
@@ -563,6 +556,9 @@ if (Test-Path $checkEnvScript) {
 
 # 标记初始化完成（防止 cleanup 误删）
 $InitCompleted = $true
+
+# 写入版本标记（用于后续运行的模式检测）
+"v1.6.5" | Out-File -FilePath "$ProjectPath\.claude\.claude-code-init-version" -Encoding utf8 -Force
 
 # 完成
 Write-Host ""
@@ -596,7 +592,8 @@ Write-Host ""
 
 # 14. 全局偏好设置引导（跨所有项目生效）
 Write-Host "[建议] 设置全局偏好（跨所有项目生效）：" -ForegroundColor Yellow
-$globalClaude = "$env:USERPROFILE\.claude\CLAUDE.md"
+$globalHome = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE }
+$globalClaude = "$globalHome\.claude\CLAUDE.md"
 Write-Host "  将你的通用编码偏好写入 $globalClaude" -ForegroundColor Gray
 Write-Host "  例如：" -ForegroundColor Gray
 Write-Host "  - 所有函数必须有类型标注" -ForegroundColor Gray

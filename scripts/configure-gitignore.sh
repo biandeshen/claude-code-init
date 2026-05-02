@@ -42,9 +42,8 @@ else
     existing=""
 fi
 
-case $choice in
-    1)
-        rules="# === claude-code-init ===
+# 规则定义（按选择分支，1 和默认共享相同规则）
+RULES_IGNORE_ALL="# === claude-code-init ===
 # Claude Code 开发环境配置（已全部忽略）
 .claude/
 .pre-commit-config.yaml
@@ -55,40 +54,30 @@ openspec/
 # Backup files（由 copy_template 生成）
 *.bak
 # === claude-code-init ==="
-        echo_success "已将所有 AI 配置文件加入 .gitignore"
-        ;;
-    2)
-        rules="# === claude-code-init ===
+
+RULES_PARTIAL="# === claude-code-init ===
 # Claude Code 个人本地文件（务必忽略）
 .claude/CLAUDE.local.md
 .claude/MEMORY.local.md
 # Backup files（由 copy_template 生成）
 *.bak
 # === claude-code-init ==="
+
+case $choice in
+    1)
+        rules="$RULES_IGNORE_ALL"
+        echo_success "已将所有 AI 配置文件加入 .gitignore"
+        ;;
+    2)
+        rules="$RULES_PARTIAL"
         echo_success "已忽略个人偏好文件，其他配置可提交"
         ;;
     3)
-        rules="# === claude-code-init ===
-# Claude Code 个人本地文件
-.claude/CLAUDE.local.md
-.claude/MEMORY.local.md
-# Backup files（由 copy_template 生成）
-*.bak
-# === claude-code-init ==="
+        rules="$RULES_PARTIAL"
         echo_success "所有 AI 配置文件提交就绪"
         ;;
     *)
-        rules="# === claude-code-init ===
-# Claude Code 开发环境配置（已全部忽略）
-.claude/
-.pre-commit-config.yaml
-CLAUDE.md
-SOUL.md
-PLAN_Template.md
-openspec/
-# Backup files（由 copy_template 生成）
-*.bak
-# === claude-code-init ==="
+        rules="$RULES_IGNORE_ALL"
         echo_warn "无效选择，已按默认处理（全部忽略）"
         ;;
 esac
@@ -104,5 +93,6 @@ echo_success ".gitignore 已更新"
 
 # 去重 .claude/ 条目（若已在标记块外存在，避免重复）
 if [ -f "$GITIGNORE_PATH" ]; then
-    awk 'index($0, ".claude/") == 1 {if(!seen++)print; next} {print}' "$GITIGNORE_PATH" > "${GITIGNORE_PATH}.tmp" && mv "${GITIGNORE_PATH}.tmp" "$GITIGNORE_PATH"
+    TMPFILE=$(mktemp "${GITIGNORE_PATH}.XXXXXX") || TMPFILE="${GITIGNORE_PATH}.tmp"
+    awk 'index($0, ".claude/") == 1 {if(!seen++)print; next} {print}' "$GITIGNORE_PATH" > "$TMPFILE" && mv "$TMPFILE" "$GITIGNORE_PATH"
 fi

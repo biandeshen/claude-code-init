@@ -15,6 +15,11 @@ const path = require('path');
 // 解析命令行参数
 const args = process.argv.slice(2);
 let projectPath = '.';
+const forwardFlags = [];  // 转发到 init.sh/init.ps1 的标志
+const knownFlags = new Set([
+    '--force', '--skip-ecc', '--skip-superpowers',
+    '--skip-openspec', '--skip-ccdiscipline'
+]);
 
 for (let i = 0; i < args.length; i++) {
     if (args[i] === '--version' || args[i] === '-v') {
@@ -28,18 +33,29 @@ for (let i = 0; i < args.length; i++) {
 
 选项:
   --project-path <路径>  目标项目目录（默认: 当前目录）
+  --force                强制覆盖已有文件（跳过交互确认）
+  --skip-ecc             跳过 ECC 插件安装
+  --skip-superpowers     跳过 Superpowers 插件安装
+  --skip-openspec        跳过 OpenSpec 安装
+  --skip-ccdiscipline    跳过 cc-discipline 安装
   --version, -v          显示版本号
   --help, -h             显示此帮助信息
 
 示例:
   npx @biandeshen/claude-code-init --project-path ./my-project
+  npx @biandeshen/claude-code-init --project-path ./my-project --force --skip-ecc
 `);
         process.exit(0);
     }
     if (args[i] === '--project-path' && args[i + 1]) {
         projectPath = args[i + 1];
+        i++;  // 跳过下一个参数（值）
     } else if (args[i].startsWith('--project-path=')) {
         projectPath = args[i].split('=')[1];
+    } else if (knownFlags.has(args[i])) {
+        forwardFlags.push(args[i]);
+    } else if (args[i].startsWith('--')) {
+        console.error(`[警告] 未知选项: ${args[i]}，已忽略`);
     }
 }
 
@@ -53,8 +69,9 @@ if (resolved === rootPath) {
     console.error('请使用 --project-path ./my-project 指定子目录。');
     process.exit(1);
 }
-// 禁止 shell 元字符
-if (/[\$`;|&<>(){}]/.test(projectPath)) {
+// 禁止 shell 注入元字符（使用 spawnSync 但仍提供早期检测）
+// 只阻止真正的 shell 注入字符: $ ` ; | & < > ( ) { }
+if (/[\$\x60;|&<>(){}]/.test(projectPath)) {
     console.error('[错误] 项目路径包含不安全字符。');
     process.exit(1);
 }
@@ -129,6 +146,24 @@ if (missingDeps.length > 0) {
 console.log('[成功] 系统依赖检查通过');
 console.log('');
 
+// 转换 CLI 标志到子进程参数
+function toShFlag(flag) {
+    return flag;  // 与 init.sh 格式一致，直接传递
+}
+
+function toPsFlag(flag) {
+    // --force → -Force, --skip-ecc → -SkipECC, --skip-superpowers → -SkipSuperpowers
+    // --skip-openspec → -SkipOpenSpec, --skip-ccdiscipline → -SkipCcDiscipline
+    const map = {
+        '--force': '-Force',
+        '--skip-ecc': '-SkipECC',
+        '--skip-superpowers': '-SkipSuperpowers',
+        '--skip-openspec': '-SkipOpenSpec',
+        '--skip-ccdiscipline': '-SkipCcDiscipline',
+    };
+    return map[flag] || flag;
+}
+
 try {
     if (isWindows) {
         // Windows: 使用 PowerShell（优先 pwsh，降级到 powershell）
@@ -138,10 +173,14 @@ try {
         }
         console.log(`[执行] init.ps1 (${psCmd})`);
         const initScript = path.join(scriptDir, 'init.ps1');
-        const result = spawnSync(psCmd, [
+        const psArgs = [
             '-File', initScript,
             '-ProjectPath', path.resolve(projectPath)
-        ], {
+        ];
+        for (const flag of forwardFlags) {
+            psArgs.push(toPsFlag(flag));
+        }
+        const result = spawnSync(psCmd, psArgs, {
             stdio: 'inherit',
             cwd: scriptDir
         });
@@ -158,10 +197,14 @@ try {
         }
         console.log('[执行] init.sh');
         const initScript = path.join(scriptDir, 'init.sh');
-        const result = spawnSync('bash', [
+        const shArgs = [
             initScript,
             path.resolve(projectPath)
-        ], {
+        ];
+        for (const flag of forwardFlags) {
+            shArgs.push(toShFlag(flag));
+        }
+        const result = spawnSync('bash', shArgs, {
             stdio: 'inherit',
             cwd: scriptDir
         });

@@ -21,6 +21,11 @@ fi
 if [ "$PROJECT_PATH" != "." ] && [ ! -e "$PROJECT_PATH" ]; then
     echo "[警告] 目录不存在: $PROJECT_PATH，将自动创建"
 fi
+# 根路径防护
+if [ "$PROJECT_PATH" = "/" ]; then
+    echo "错误: 禁止使用根目录作为项目路径。"
+    exit 1
+fi
 ORIGINAL_PATH="$PROJECT_PATH"  # 保存原始输入用于显示
 FORCE_OVERWRITE=false
 SKIP_ECC=false
@@ -37,6 +42,7 @@ for arg in "$@"; do
         --skip-superpowers) SKIP_SUPERPOWERS=true ;;
         --skip-openspec) SKIP_OPENSPEC=true ;;
         --skip-ccdiscipline) SKIP_CCDISCIPLINE=true ;;
+        *) echo "[警告] 未知选项: $arg，已忽略" ;;
     esac
 done
 
@@ -111,6 +117,30 @@ fi
 # Git 初始化成功后，标记需要清理（脚本中途退出时清理）
 CLEANUP_NEEDED=true
 
+# ─── 模式检测 ───
+# fresh: 全新项目, append: 已有 .claude, reconfigure: 之前运行过
+INSTALL_MODE="fresh"
+if [ -f "$PROJECT_PATH/.claude/.claude-code-init-version" ]; then
+    INSTALL_MODE="reconfigure"
+    echo_info "检测到 claude-code-init 重运行（reconfigure 模式）"
+elif [ -d "$PROJECT_PATH/.claude" ]; then
+    INSTALL_MODE="append"
+    echo_info "检测到已有 .claude 配置（append 模式）"
+fi
+
+# ─── 预操作备份 ───
+# 如果 .claude/ 已存在，创建时间戳全量备份
+if [ -d "$PROJECT_PATH/.claude" ]; then
+    echo_step "备份已有配置（预操作）"
+    BACKUP_DIR="$PROJECT_PATH/.claude/.init-backup-$(date +%Y%m%d-%H%M%S)"
+    mkdir -p "$BACKUP_DIR"
+    [ -f "$PROJECT_PATH/.claude/settings.json" ] && cp "$PROJECT_PATH/.claude/settings.json" "$BACKUP_DIR/"
+    [ -d "$PROJECT_PATH/.claude/hooks" ] && cp -r "$PROJECT_PATH/.claude/hooks" "$BACKUP_DIR/"
+    [ -d "$PROJECT_PATH/.claude/skills" ] && cp -r "$PROJECT_PATH/.claude/skills" "$BACKUP_DIR/"
+    [ -d "$PROJECT_PATH/.claude/commands" ] && cp -r "$PROJECT_PATH/.claude/commands" "$BACKUP_DIR/"
+    echo_success "备份到 $(basename "$BACKUP_DIR")/"
+fi
+
 # 3. 安装核心 Claude Code 插件 (ECC + Superpowers)
 if [ "$SKIP_ECC" = true ] && [ "$SKIP_SUPERPOWERS" = true ]; then
     echo_info "跳过插件安装 (--skip-ecc --skip-superpowers)"
@@ -163,6 +193,13 @@ else
 fi
 
 # 5. 安装 cc-discipline (物理防火墙) - 自动执行
+# 前置检查: jq (cc-discipline JSON 合并依赖)
+if ! command -v jq >/dev/null 2>&1; then
+    echo_warn "未找到 jq，cc-discipline 需要 jq 进行 settings.json 合并"
+    echo_info "请手动安装: https://jqlang.github.io/jq/download/"
+    echo_info "或使用 --skip-ccdiscipline 跳过此步骤"
+fi
+
 if [ "$SKIP_CCDISCIPLINE" = true ]; then
     echo_info "跳过 cc-discipline 安装 (--skip-ccdiscipline)"
 else
@@ -175,7 +212,7 @@ else
         echo_info "请使用 --skip-ccdiscipline 跳过，或设置可写的 \$HOME 后重试"
     elif [ ! -d "$CC_DISCIPLINE_PATH" ]; then
         echo_info "克隆 cc-discipline 仓库..."
-        git clone -b main https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
+        git clone --depth 1 -b main https://github.com/TechHU-GS/cc-discipline.git "$CC_DISCIPLINE_PATH"
         cd "$CC_DISCIPLINE_PATH"
         git checkout "$CC_DISCIPLINE_COMMIT"
         # 验证 commit 是否匹配锁定版本
@@ -203,11 +240,11 @@ else
     fi
     echo_info "正在执行 cc-discipline 初始化..."
     # --force 模式下传递 --auto 给 cc-discipline，使其非交互运行
-    CC_DISCIPLINE_FLAGS=""
+    CC_DISCIPLINE_ARGS=()
     if [ "$FORCE_OVERWRITE" = true ]; then
-        CC_DISCIPLINE_FLAGS="--auto"
+        CC_DISCIPLINE_ARGS+=("--auto")
     fi
-    if bash "$CC_DISCIPLINE_PATH/init.sh" $CC_DISCIPLINE_FLAGS; then
+    if bash "$CC_DISCIPLINE_PATH/init.sh" "${CC_DISCIPLINE_ARGS[@]}"; then
         echo_success "cc-discipline 已安装"
         # 验证 cc-discipline 部署完整性
         CC_DISC_VER_FILE="$PROJECT_PATH/.claude/.cc-discipline-version"
@@ -278,8 +315,18 @@ echo_step "复制 Pre-commit 配置"
 PRECOMMIT_CONFIG="$SCRIPT_DIR/configs/.pre-commit-config.yaml"
 TARGET_PRECOMMIT_CONFIG="$PROJECT_PATH/.pre-commit-config.yaml"
 if [ -f "$PRECOMMIT_CONFIG" ]; then
-    cp "$PRECOMMIT_CONFIG" "$TARGET_PRECOMMIT_CONFIG"
-    echo_success "已复制 .pre-commit-config.yaml"
+    if [ -f "$TARGET_PRECOMMIT_CONFIG" ]; then
+        if [ "$FORCE_OVERWRITE" = true ]; then
+            cp "$TARGET_PRECOMMIT_CONFIG" "$TARGET_PRECOMMIT_CONFIG.bak"
+            cp "$PRECOMMIT_CONFIG" "$TARGET_PRECOMMIT_CONFIG"
+            echo_success "已覆盖 .pre-commit-config.yaml（原文件备份为 .bak）"
+        else
+            echo_warn ".pre-commit-config.yaml 已存在，跳过（使用 --force 可覆盖）"
+        fi
+    else
+        cp "$PRECOMMIT_CONFIG" "$TARGET_PRECOMMIT_CONFIG"
+        echo_success "已复制 .pre-commit-config.yaml"
+    fi
 else
     echo_info "Pre-commit 配置不存在，跳过"
 fi
@@ -430,12 +477,6 @@ if [ "$COMMANDS_DIR" = "$TARGET_COMMANDS_DIR" ]; then
     echo_info "源目录与目标目录相同，已跳过命令复制"
 elif [ -d "$COMMANDS_DIR" ]; then
     mkdir -p "$TARGET_COMMANDS_DIR"
-    # 非 --force 模式下备份已有命令（与 copy_template 行为一致）
-    if [ "$FORCE_OVERWRITE" != true ] && [ -d "$TARGET_COMMANDS_DIR" ] && [ -n "$(ls -A "$TARGET_COMMANDS_DIR" 2>/dev/null)" ]; then
-        _backup_path="${TARGET_COMMANDS_DIR}.bak-$(date +%Y%m%d-%H%M%S)"
-        cp -r "$TARGET_COMMANDS_DIR" "$_backup_path"
-        echo_info "已备份原命令到 ${_backup_path#$PROJECT_PATH/}"
-    fi
     cp -r "$COMMANDS_DIR/"* "$TARGET_COMMANDS_DIR/"
     echo_success "已复制自定义命令到 .claude/commands/"
 else
@@ -450,12 +491,6 @@ if [ "$SKILLS_DIR" = "$TARGET_SKILLS_DIR" ]; then
     echo_info "源目录与目标目录相同，已跳过 Skills 复制"
 elif [ -d "$SKILLS_DIR" ]; then
     mkdir -p "$TARGET_SKILLS_DIR"
-    # 非 --force 模式下备份已有 Skills
-    if [ "$FORCE_OVERWRITE" != true ] && [ -d "$TARGET_SKILLS_DIR" ] && [ -n "$(ls -A "$TARGET_SKILLS_DIR" 2>/dev/null)" ]; then
-        _backup_path="${TARGET_SKILLS_DIR}.bak-$(date +%Y%m%d-%H%M%S)"
-        cp -r "$TARGET_SKILLS_DIR" "$_backup_path"
-        echo_info "已备份原 Skills 到 ${_backup_path#$PROJECT_PATH/}"
-    fi
     cp -r "$SKILLS_DIR/"* "$TARGET_SKILLS_DIR/"
     echo_success "已复制 Skills 到 .claude/skills/"
 else
@@ -472,20 +507,12 @@ if [ "$HOOKS_SOURCE_DIR" = "$HOOKS_TARGET_DIR" ]; then
     echo_info "源目录与目标目录相同，已跳过 Hooks 复制"
 elif [ -d "$HOOKS_SOURCE_DIR" ]; then
     mkdir -p "$HOOKS_TARGET_DIR"
-    # 非 --force 模式下备份已有 Hooks
-    if [ "$FORCE_OVERWRITE" != true ] && [ -d "$HOOKS_TARGET_DIR" ] && [ -n "$(ls -A "$HOOKS_TARGET_DIR" 2>/dev/null)" ]; then
-        _backup_path="${HOOKS_TARGET_DIR}.bak-$(date +%Y%m%d-%H%M%S)"
-        cp -r "$HOOKS_TARGET_DIR" "$_backup_path"
-        echo_info "已备份原 Hooks 到 ${_backup_path#$PROJECT_PATH/}"
-    fi
     cp -r "$HOOKS_SOURCE_DIR/"* "$HOOKS_TARGET_DIR/"
     echo_success "已复制 Hooks 到 .claude/hooks/"
 fi
 if [ -f "$SETTINGS_SOURCE" ]; then
     if [ -f "$SETTINGS_TARGET" ]; then
-        # 备份已有配置
-        cp "$SETTINGS_TARGET" "$SETTINGS_TARGET.bak"
-        # 尝试合并 claude-code-init 的 hooks/env 到已有配置中
+        # 调用独立脚本合并 settings.json（env + hooks 按规则去重，预操作备份已包含此文件）
         MERGE_PYTHON=""
         if command -v python3 >/dev/null 2>&1; then
             MERGE_PYTHON="python3"
@@ -493,38 +520,13 @@ if [ -f "$SETTINGS_SOURCE" ]; then
             MERGE_PYTHON="python"
         fi
         if [ -n "$MERGE_PYTHON" ]; then
-            if "$MERGE_PYTHON" -c "
-import json, sys
-try:
-    with open(sys.argv[1], encoding='utf-8') as f:
-        src = json.load(f)
-    with open(sys.argv[2], encoding='utf-8') as f:
-        tgt = json.load(f)
-except Exception:
-    sys.exit(1)
-for k, v in src.get('env', {}).items():
-    if k not in tgt.get('env', {}):
-        tgt.setdefault('env', {})[k] = v
-for htype in ('SessionStart', 'PreToolUse', 'PostToolUse'):
-    for hook in src.get('hooks', {}).get(htype, []):
-        exists = any(
-            h.get('matcher') == hook.get('matcher')
-            and h.get('command') == hook.get('command')
-            for h in tgt.get('hooks', {}).get(htype, [])
-        )
-        if not exists:
-            tgt.setdefault('hooks', {}).setdefault(htype, []).append(hook)
-with open(sys.argv[2], 'w', encoding='utf-8') as f:
-    json.dump(tgt, f, indent=2, ensure_ascii=False)
-    f.write('\n')
-" "$SETTINGS_SOURCE" "$SETTINGS_TARGET" 2>/dev/null; then
-                rm -f "$SETTINGS_TARGET.bak"
+            if "$MERGE_PYTHON" "$SCRIPT_DIR/scripts/merge_json.py" "$SETTINGS_SOURCE" "$SETTINGS_TARGET" 2>/dev/null; then
                 echo_success "已合并 settings.json（smart-context hooks + Agent Teams 环境变量）"
             else
-                echo_warn "settings.json 合并失败，备份保留在 .bak，请手动处理"
+                echo_warn "settings.json 合并失败，请从 .init-backup-* 备份中手动恢复"
             fi
         else
-            echo_warn "settings.json 已存在，无法自动合并（Python 不可用），备份保留在 .bak，请手动合并"
+            echo_warn "settings.json 已存在，无法自动合并（Python 不可用），请从 .init-backup-* 备份中手动合并"
         fi
     else
         cp "$SETTINGS_SOURCE" "$SETTINGS_TARGET"
@@ -535,83 +537,37 @@ fi
 # 11. 创建本地偏好文件 (gitignored)
 echo_step "创建 CLAUDE.local.md (本地偏好)"
 mkdir -p "$PROJECT_PATH/.claude"
+CLAUDE_LOCAL_TEMPLATE="$SCRIPT_DIR/templates/CLAUDE.local.template.md"
 if [ -f "$PROJECT_PATH/.claude/CLAUDE.local.md" ]; then
     if [ "$FORCE_OVERWRITE" = true ]; then
         echo_warn "CLAUDE.local.md 已存在，--force 模式：覆盖"
-        cat > "$PROJECT_PATH/.claude/CLAUDE.local.md" << EOF
-# 本地个人偏好
-# 此文件会被 .gitignore 忽略，不会提交到仓库
-
-> 由 claude-code-init 自动生成
-> 版本: v1.0.0 | $(date +%Y-%m-%d)
-
----
-
-## 个人偏好设置
-
-- 开始编码前先解释 Plan
-- 所有异步函数必须有 timeout
-- 复杂任务先创建 Plan.md
-
----
-EOF
+        sed "s/__DATE__/$(date +%Y-%m-%d)/g" "$CLAUDE_LOCAL_TEMPLATE" > "$PROJECT_PATH/.claude/CLAUDE.local.md"
         echo_success "已覆盖 CLAUDE.local.md"
     else
         echo_warn "CLAUDE.local.md 已存在，跳过创建（使用 --force 可覆盖）"
     fi
-else
-    cat > "$PROJECT_PATH/.claude/CLAUDE.local.md" << EOF
-# 本地个人偏好
-# 此文件会被 .gitignore 忽略，不会提交到仓库
-
-> 由 claude-code-init 自动生成
-> 版本: v1.0.0 | $(date +%Y-%m-%d)
-
----
-
-## 个人偏好设置
-
-- 开始编码前先解释 Plan
-- 所有异步函数必须有 timeout
-- 复杂任务先创建 Plan.md
-
----
-EOF
+elif [ -f "$CLAUDE_LOCAL_TEMPLATE" ]; then
+    sed "s/__DATE__/$(date +%Y-%m-%d)/g" "$CLAUDE_LOCAL_TEMPLATE" > "$PROJECT_PATH/.claude/CLAUDE.local.md"
     echo_success "已创建 CLAUDE.local.md (.claude/)"
+else
+    echo_warn "CLAUDE.local.template.md 不存在，跳过 CLAUDE.local.md 创建"
 fi
 
 # 创建 MEMORY.local.md (个人私密记忆，不提交)
+MEMORY_LOCAL_TEMPLATE="$SCRIPT_DIR/templates/MEMORY.local.template.md"
 if [ -f "$PROJECT_PATH/.claude/MEMORY.local.md" ]; then
     if [ "$FORCE_OVERWRITE" = true ]; then
         echo_warn "MEMORY.local.md 已存在，--force 模式：覆盖"
-        cat > "$PROJECT_PATH/.claude/MEMORY.local.md" << 'LOCALEOF'
-# 个人私密记忆
-# 此文件会被 .gitignore 忽略，不会提交到仓库
-# 记录个人偏好、工作习惯等不适合团队共享的内容
-
-> 由 claude-code-init 自动生成
-> 模板版本: v1.0.0
-
----
-<!-- 在此记录个人偏好设置、临时笔记等内容 -->
-LOCALEOF
+        cp "$MEMORY_LOCAL_TEMPLATE" "$PROJECT_PATH/.claude/MEMORY.local.md"
         echo_success "已覆盖 MEMORY.local.md"
     else
         echo_warn "MEMORY.local.md 已存在，跳过创建（使用 --force 可覆盖）"
     fi
-else
-    cat > "$PROJECT_PATH/.claude/MEMORY.local.md" << 'LOCALEOF'
-# 个人私密记忆
-# 此文件会被 .gitignore 忽略，不会提交到仓库
-# 记录个人偏好、工作习惯等不适合团队共享的内容
-
-> 由 claude-code-init 自动生成
-> 模板版本: v1.0.0
-
----
-<!-- 在此记录个人偏好设置、临时笔记等内容 -->
-LOCALEOF
+elif [ -f "$MEMORY_LOCAL_TEMPLATE" ]; then
+    cp "$MEMORY_LOCAL_TEMPLATE" "$PROJECT_PATH/.claude/MEMORY.local.md"
     echo_success "已创建 MEMORY.local.md (.claude/)"
+else
+    echo_warn "MEMORY.local.template.md 不存在，跳过 MEMORY.local.md 创建"
 fi
 
 # 12. 处理 .gitignore（调用独立脚本）
@@ -646,6 +602,9 @@ fi
 
 # 标记初始化完成（防止 cleanup 误删）
 INIT_COMPLETED=true
+
+# 写入版本标记（用于后续运行的模式检测）
+echo "v1.6.5" > "$PROJECT_PATH/.claude/.claude-code-init-version"
 
 # 完成
 echo ""

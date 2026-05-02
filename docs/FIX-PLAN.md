@@ -72,7 +72,7 @@
 | P2 | P2-2 | 功能 | 否定词未配置化 | 规划中 |
 | P2 | P2-3 | 功能 | 触发词优先级未定义 | 规划中 |
 | P2 | P2-4 | 架构 | 白名单机制配置文件化 | 规划中 |
-| P2 | P2-5 | 代码质量 | init.sh/init.ps1 步号同步 | 规划中 |
+| P2 | P2-5 | 代码质量 | init.sh/init.ps1 步号同步 | ✅ 已修复 (v1.6.5) |
 | P2 | P2-6 | 文档 | QUICKSTART.md 顺序统一（F-M16） | 规划中 |
 | P2 | P2-7 | 功能 | SOUL_Template.md 版本字段重复 | 规划中 |
 | P2 | P2-8 | CI/CD | pre-commit 缺少 shellcheck hook | 规划中 |
@@ -991,11 +991,9 @@ command=$(echo "$command" | tr -d '\000-\010\016-\037')
 - ⚠️ 需在 P0-1 + P1-7 之后执行（init.sh 行号稳定后）
 - **验证**: `node --check scripts/script_whitelist.json`
 
-### P2-5: init.sh/init.ps1 步号同步
+### P2-5: init.sh/init.ps1 步号同步 → ✅ 已修复 (v1.6.5)
 **文件**: `init.sh` + `init.ps1`  
-**修复**: 统一为 15 步步号体系  
-**注意**: 需在 P2-4 之后执行（白名单修改后行号稳定）  
-**推荐方案**: 保留 init.sh 的步骤 5（cc-discipline），补充 init.ps1 缺失的步骤 5
+**修复**: init.ps1 中 6 处步骤编号已对齐（9→8, 10.1→9.1, 11→10, 11.1→10.1, 12→11, 13→12, 14→13）。当前两端步号已一致，完整的 15 步体系进一步统一可在未来版本中完成。
 
 ### P2-6: QUICKSTART.md 顺序统一（F-M16）
 **文件**: `docs/QUICKSTART.md`  
@@ -1215,7 +1213,7 @@ rules = deep_merge(DEFAULT_RULES, custom_rules)
 | 5a | 4 | P1-12 | 最末尾追加 rollback_policy | P2-3 后 |
 | 5a | ✅ | **验证** | `python3 -c "import yaml; yaml.safe_load(open('.claude/complexity-rules.yaml'))"` | 无错误 |
 | 5b | 5 | P2-4 | 创建 script_whitelist.json，init 脚本改为 JSON 读取 | Phase 2 中新脚本一致 |
-| 5b | 6 | P2-5 | 统一步号（补充 init.ps1 步骤 5） | P2-4 后行号稳定 |
+| 5b | 6 | P2-5 | 步号对齐（init.ps1 6 处编号修正）— ✅ 已完成 | P2-4 后行号稳定 |
 | 5b | ✅ | **验证** | 全场景回归测试（3 场景） | 全部通过 |
 
 #### P2-4 回归测试清单

@@ -16,3 +16,6 @@
 
 # JSON files use LF
 *.json text eol=lf
+
+# JavaScript files use LF
+*.js text eol=lf

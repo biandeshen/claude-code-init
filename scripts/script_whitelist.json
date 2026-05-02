@@ -4,9 +4,10 @@
   "lastUpdated": "2026-05-01",
   "excluded": [
     "configure-gitignore.sh",
+    "merge_json.py",
     "__pycache__/"
   ],
-  "excludedReason": "configure-gitignore.sh is init-only, not deployed; __pycache__/ is build cache",
+  "excludedReason": "configure-gitignore.sh and merge_json.py are init-only; __pycache__/ is build cache",
   "scripts": [
     "check-env.sh",
     "check_dependencies.py",

@@ -11,6 +11,8 @@ CYAN='\033[0;36m'
 GRAY='\033[0;90m'
 NC='\033[0m'
 
+# 注意：此脚本被部署到 .claude/scripts/ 后无 common.sh 依赖
+# 因此这些输出函数是必要的重复（自包含设计）
 echo_step() { echo -e "${CYAN}[步骤]${NC} $1"; }
 echo_success() { echo -e "${GREEN}[成功]${NC} $1"; }
 echo_warn() { echo -e "${YELLOW}[警告]${NC} $1"; }
@@ -68,19 +70,27 @@ echo "--- Python ---"
 if command -v python3 >/dev/null 2>&1; then
     python_version=$(python3 --version 2>&1)
     echo -e "$CHECK_OK $python_version"
-
-    # 检查版本
-    version_num=$(echo "$python_version" | sed -n 's/[^0-9]*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | head -1)
-    major=$(echo "$version_num" | cut -d. -f1)
-    minor=$(echo "$version_num" | cut -d. -f2)
-    if [ "$major" -gt 3 ] || ([ "$major" -eq 3 ] && [ "$minor" -ge 8 ]); then
-        echo -e "  版本要求: ${GREEN}满足${NC} (>= 3.8)"
-    else
-        echo -e "  版本要求: ${YELLOW}建议升级${NC} (推荐 >= 3.10)"
-    fi
+elif command -v python >/dev/null 2>&1; then
+    python_version=$(python --version 2>&1)
+    echo -e "$CHECK_OK $python_version (python3 不可用，回退到 python)"
 else
     echo -e "$CHECK_FAIL Python 未安装"
     echo "  安装: https://www.python.org/downloads/"
+fi
+
+# 版本检查（兼容 python3 和 python 两种名称）
+PYTHON_BIN=""
+command -v python3 >/dev/null 2>&1 && PYTHON_BIN="python3" || PYTHON_BIN="python"
+if [ -n "$PYTHON_BIN" ] && command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+    py_ver=$("$PYTHON_BIN" --version 2>&1)
+    version_num=$(echo "$py_ver" | sed -n 's/[^0-9]*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | head -1)
+    major=$(echo "$version_num" | cut -d. -f1)
+    minor=$(echo "$version_num" | cut -d. -f2)
+    if [ "$major" -gt 3 ] || ([ "$major" -eq 3 ] && [ "$minor" -ge 8 ]); then
+        echo "  版本要求: ${GREEN}满足${NC} (>= 3.8)"
+    else
+        echo "  版本要求: ${YELLOW}建议升级${NC} (推荐 >= 3.10)"
+    fi
 fi
 
 # 4. Node.js

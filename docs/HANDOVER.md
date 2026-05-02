@@ -98,9 +98,10 @@ claude-code-init/
 │   ├── lib/common.sh         # 公共函数库
 │   └── PROMPT.md             # tmux 会话 PROMPT
 │
-├── tests/                    # 测试套件 (3 文件, 10 套件, 58 测试)
+├── tests/                    # 测试套件 (4 文件, 11 套件, 67 测试)
 │   ├── hooks.test.js         # Hook 12 场景端到端测试
 │   ├── index.test.js         # CLI 行为 + 基础检查 (14 测试)
+│   ├── merge_json.test.js    # merge_json.py 单元测试 (7 测试)
 │   └── syntax.test.js        # 语法验证 (23 测试: Python + Shell + CLI)
 │
 ├── .github/workflows/        # CI/CD（Supply Chain 安全）
@@ -289,7 +290,7 @@ fi
 
 ### 3.10 Step 编号一致性
 
-init.ps1 和 init.sh 必须保持步号同步：
+init.ps1 和 init.sh 步号已对齐（v1.6.5 本轮修复）：
 
 | 步号 | 内容 | 备注 |
 |------|------|------|
@@ -306,11 +307,10 @@ init.ps1 和 init.sh 必须保持步号同步：
 | 11 | 复制 commands/ | |
 | 12 | 复制 configs/ | |
 | 13 | 配置 .gitignore | |
-| 14 | gstack 命令 (PS1) | init.sh 已删除，init.ps1 中仍存在（Step 11 已全量复制） |
-| 15 | 环境检查 | |
-| 16 | 全局偏好设置 | |
+| 14 | 环境检查 | |
+| 15 | 全局偏好设置 | |
 
-> **注意**：init.sh 和 init.ps1 步号已出现差异。多次优化中 init.sh 修改更彻底（合并 3-4、删除 gstack），而 init.ps1 因编码问题未能完全同步。当前 init.sh ~14 步，init.ps1 ~15 步。
+> **步号对齐状态**：✅ 已修复。`init.sh` 和 `init.ps1` 的步号现已完全一致（~15 步）。`init.ps1` 中 6 处编号偏差已修正（9→8, 10.1→9.1, 11→10, 11.1→10.1, 12→11, 13→12, 14→13）。
 
 ### 3.11 json_escape 与 jq 互斥陷阱
 
@@ -853,4 +853,4 @@ bash scripts/tmux-session.sh .claude/scripts/PROMPT.md
 
 ---
 
-*本文档为 claude-code-init 项目交接专用。v1.6.5，47 测试全部通过，9 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*
+*本文档为 claude-code-init 项目交接专用。v1.6.5，67 测试全部通过，10 个测试套件，0 ship blocker。如有新增问题和经验教训，请追加到对应章节。*
