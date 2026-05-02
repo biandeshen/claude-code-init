@@ -43,7 +43,7 @@ def merge_settings(source_path, target_path):
 
     # 读取目标文件
     try:
-        with open(target_path, encoding='utf-8') as f:
+        with open(target_path, encoding='utf-8-sig') as f:
             tgt = json.load(f)
     except FileNotFoundError:
         # 目标不存在时直接复制源

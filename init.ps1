@@ -480,8 +480,8 @@ if (Test-Path $SettingsSource) {
                         try {
                             $s = Get-Content $SettingsTarget -Raw -ErrorAction Stop
                             $before = $s.Length
-                            # 1) 移除单个 bash hook: "command": "bash ..."
-                            $s = $s -replace '"command":\s*"bash\s[^"]*"\s*,?\s*', ''
+                            # 1) 移除单个 bash hook: "command": "bash ..."（连带前面的逗号）
+                            $s = $s -replace ',\s*"command":\s*"bash\s[^"]*"', ''
                             # 2) 移除空 hooks 数组: "hooks": [   ]
                             while ($s -match '"hooks":\s*\[\s*\]') {
                                 $s = $s -replace '"hooks":\s*\[\s*\]\s*,?\s*', ''
