@@ -478,40 +478,18 @@ if (Test-Path $SettingsSource) {
                     # Claude Code 在 Windows 上使用 Bun 运行时，其 uv_spawn 无法启动 bash
                     if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
                         try {
-                            $settingsContent = Get-Content $SettingsTarget -Raw -ErrorAction Stop
-                            $settingsJson = $settingsContent | ConvertFrom-Json -ErrorAction Stop
-                            $hooksRemoved = $false
-                            if ($settingsJson.hooks) {
-                                # 递归移除所有使用 bash 命令的 hook
-                                $hookTypes = $settingsJson.hooks.PSObject.Properties.Name
-                                foreach ($ht in $hookTypes) {
-                                    $matchers = $settingsJson.hooks.$ht
-                                    for ($i = $matchers.Count - 1; $i -ge 0; $i--) {
-                                        $matcher = $matchers[$i]
-                                        if ($matcher.hooks) {
-                                            $matcher.hooks = @($matcher.hooks | Where-Object {
-                                                $cmd = $_.command
-                                                $isBashCmd = $cmd -and $cmd -match '^bash\s'
-                                                if ($isBashCmd) { $hooksRemoved = $true; $false } else { $true }
-                                            })
-                                        }
-                                        # 如果 matcher 下已无 hooks，移除整个 matcher
-                                        if ($matcher.hooks.Count -eq 0) {
-                                            $settingsJson.hooks.$ht = @($matchers[0..($i-1)] + $matchers[($i+1)..($matchers.Count-1)])
-                                        }
-                                    }
-                                    # 如果整个 hook 类型已空，移除该类型
-                                    if ($settingsJson.hooks.$ht.Count -eq 0) {
-                                        $settingsJson.hooks.PSObject.Properties.Remove($ht)
-                                    }
-                                }
-                                # 如果所有 hooks 都空了，移除 hooks 顶级键
-                                if ($settingsJson.hooks.PSObject.Properties.Name.Count -eq 0) {
-                                    $settingsJson.PSObject.Properties.Remove('hooks')
-                                }
+                            $s = Get-Content $SettingsTarget -Raw -ErrorAction Stop
+                            $before = $s.Length
+                            # 1) 移除单个 bash hook: "command": "bash ..."
+                            $s = $s -replace '"command":\s*"bash\s[^"]*"\s*,?\s*', ''
+                            # 2) 移除空 hooks 数组: "hooks": [   ]
+                            while ($s -match '"hooks":\s*\[\s*\]') {
+                                $s = $s -replace '"hooks":\s*\[\s*\]\s*,?\s*', ''
                             }
-                            if ($hooksRemoved) {
-                                $settingsJson | ConvertTo-Json -Depth 10 | Out-File -FilePath $SettingsTarget -Encoding utf8 -Force
+                            # 3) 移除空的 matcher 对象 { "matcher": "..." }
+                            $s = $s -replace '\{[^}]*"matcher":\s*"[^"]*"\s*\}\s*,?\s*', ''
+                            if ($s.Length -ne $before) {
+                                $s | Out-File -FilePath $SettingsTarget -Encoding utf8 -Force
                                 Write-Info "已移除不兼容的 bash hooks，适配 Windows+Bun 运行环境"
                             }
                         } catch {
